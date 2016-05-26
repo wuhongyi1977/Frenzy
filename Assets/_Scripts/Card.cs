@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.UI;
 /// <summary>
 /// A script to handle the functions that should be available to every
 /// card in the game. This is an abstract object. It will be used as a
@@ -21,15 +21,56 @@ public abstract class Card : MonoBehaviour {
 	private bool dropped;
 	//The time it takes for the card to be casted
 	public float castTime;
-
+	private float currentTime;
+	public Text summonZoneTextBox;
 	//Something for the dragging of cards
 	private Vector3 screenPoint;
 	//Something fo the dragging of cards
 	private Vector3 offset;
 
 	// Use this for initialization
-	public abstract void Start ();				//Abstract method for start
-	public abstract void Update ();				//Abstract method for Update
+	public void Start ()				//Abstract method for start
+	{
+		doneAddingToGraveyard = false;
+		currentTime = castTime;
+	}
+	public void Update ()				//Abstract method for Update
+	{
+		//If the card is Not in the graveyard and is in the summon zone
+		if (!inGraveyard && inSummonZone) 
+		{
+			//Increment the current Time
+			currentTime -= Time.deltaTime;
+			summonZoneTextBox.text = currentTime.ToString ("F1");
+			//cardTimerBox.text = currentTime.ToString ("F1");
+			//IF the current time is larger than or equal to the cast time
+			if (currentTime <= 0) {
+				//reset the timer
+				currentTime = 0;
+				//Set state of card to being in the graveyard
+				inGraveyard = true;
+				//Set state of card to not being in the summon zone
+				inSummonZone = false;
+			}
+		}
+		//If the card is in the graveyard and manager code hasn't been executed yet
+		if (inGraveyard && doneAddingToGraveyard == false) 
+		{
+			//If the card beings to player 1
+			if (playerID == 1) 
+			{
+				summonZoneTextBox.text = "";
+				//Set this to false to prevent multiple executions of this block
+				doneAddingToGraveyard = true;
+				//Execute the game manager code
+				GameObject.Find ("Player1Manager").GetComponent<Player1Manager> ().cardDoneCasting (gameObject);
+			} 
+			else 
+			{
+				//Logic for player2
+			}
+		}
+	}
 
 	//Registers that the player has clicked on the card
 	public void OnMouseDown()			
@@ -44,6 +85,13 @@ public abstract class Card : MonoBehaviour {
 		dropped = true;
 		if (playerID == 1)
 			GameObject.Find ("Player1Manager").GetComponent<Player1Manager> ().cardIsDropped (gameObject);
+		//finds the text box that corresponds to the summon zone
+		if (summonZoneTextBox == null) {
+			if (playerID == 1)
+				summonZoneTextBox = GameObject.Find ("Player1Manager").GetComponent<Player1Manager> ().getSummonZone (gameObject);
+			//else
+			//summonZoneTextBox = gameObject.Find ("Player2Manager").GetComponent<Player2Manager> ().getSummonZone (gameObject);
+		}
 		//if(playerID == 2)
 			//GameObject.Find ("Player2Manager").GetComponent<Player2Manager> ().cardIsDropped (gameObject);
 		//gameObject.transform.position = new Vector3 (0, -3.79f, 0);
@@ -66,5 +114,9 @@ public abstract class Card : MonoBehaviour {
 	public void setDroppedState(bool b)
 	{
 		dropped = b;
+	}
+	public float currentCastingTime()
+	{
+		return currentTime;
 	}
 }

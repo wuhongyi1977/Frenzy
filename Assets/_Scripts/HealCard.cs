@@ -2,14 +2,14 @@
 using System.Collections;
 using UnityEngine.UI;
 /// <summary>
-/// This is the base for any damage card. Any future
-/// Damage cards such as a creature or spell card
-/// would inherit this and add their own functionalities 
+/// This is the base for any healing card. Any
+/// future healing cards would inherit this
+/// and add their own functionalities
 /// </summary>
-public class DamageCard : Card
-{
+public class HealCard : Card {
+
 	//The damage that this card will deal
-	public int damageToDeal = 0;
+	public int healAmount = 0;
 	//The current time from 0 that it is since the card has been summoned
 	//private float currentTime;
 	//private Text cardTimerBox;
@@ -18,11 +18,12 @@ public class DamageCard : Card
 	{
 		doneAddingToGraveyard = false;
 		currentTime = castTime;
-		//cardTimerBox = GameObject.Find ("cardTimerBox").GetComponent<Text> ();;
+		//cardTimerBox = GameObject.Find ("cardTimerBox").GetComponent<Text> ();
 	}
-
+	/*
 	public override void Update()
 	{
+		/*
 		//If the card is Not in the graveyard and is in the summon zone
 		if (!inGraveyard && inSummonZone) 
 		{
@@ -55,10 +56,5 @@ public class DamageCard : Card
 				//Logic for player2
 			}
 		}
-	}
-
-	public float currentCastingTime()
-	{
-		return currentTime;
-	}*/
+}*/
 }

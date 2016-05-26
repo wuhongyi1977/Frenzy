@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour {
 	int player2Health = 20;
 	// Use this for initialization
 	void Start () {
+		player1HealthTextBox = GameObject.Find ("Player1HealthBox").GetComponent<Text> ();
+		player1HealthTextBox.text = "Life: " + 20;
 		player2HealthTextBox = GameObject.Find ("Player2HealthBox").GetComponent<Text> ();
 		player2HealthTextBox.text = "Enemy Life: " + 20;
 	}
@@ -38,5 +40,19 @@ public class GameManager : MonoBehaviour {
 			player1Health -= damage;
 			Debug.Log ("Player 1 Health: " + player1Health);
 		}
+	}
+	public void healPlayer(int healAmount, int playerID)
+	{
+		if (playerID == 1) 
+		{
+			player1Health += healAmount;
+			player1HealthTextBox.text = "Life: " + player1Health;
+		} 
+		else 
+		{
+			player2Health += healAmount;
+			player2HealthTextBox.text = "Enemy Life: " + player2Health;
+		}
+
 	}
 }
