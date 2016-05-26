@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.UI;
 /// <summary>
 /// This is the base for any damage card. Any future
 /// Damage cards such as a creature or spell card
@@ -12,12 +12,13 @@ public class DamageCard : Card
 	public int damageToDeal = 0;
 	//The current time from 0 that it is since the card has been summoned
 	private float currentTime;
-
+	private Text cardTimerBox;
 
 	public override void Start()
 	{
 		doneAddingToGraveyard = false;
 		currentTime = 0;
+		cardTimerBox = GameObject.Find ("cardTimerBox").GetComponent<Text> ();;
 	}
 
 	public override void Update()
@@ -27,6 +28,7 @@ public class DamageCard : Card
 		{
 			//Increment the current Time
 			currentTime += Time.deltaTime;
+			cardTimerBox.text = ""+(int)currentTime;
 			//IF the current time is larger than or equal to the cast time
 			if (currentTime >= castTime) {
 				//reset the timer
@@ -53,5 +55,9 @@ public class DamageCard : Card
 				//Logic for player2
 			}
 		}
+	}
+	public float currentCastingTime()
+	{
+		return currentTime;
 	}
 }

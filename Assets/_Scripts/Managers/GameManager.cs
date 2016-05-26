@@ -4,14 +4,15 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 	//The text box that the enemie's health is placed
-	private Text textBox;
+	private Text player2HealthTextBox;
+	private Text player1HealthTextBox;
 	//The health of the players
 	int player1Health = 20;
 	int player2Health = 20;
 	// Use this for initialization
 	void Start () {
-		textBox = GameObject.Find ("Text").GetComponent<Text> ();
-		textBox.text = "Enemy Life: " + 20;
+		player2HealthTextBox = GameObject.Find ("Player2HealthBox").GetComponent<Text> ();
+		player2HealthTextBox.text = "Enemy Life: " + 20;
 	}
 	
 	// Update is called once per frame
@@ -29,7 +30,7 @@ public class GameManager : MonoBehaviour {
 			player2Health -= damage;
 			Debug.Log ("Player 2 Health: " + player2Health);
 			//Update the text box
-			textBox.text = "Enemy Life: " + player2Health;
+			player2HealthTextBox.text = "Enemy Life: " + player2Health;
 		} 
 		//If the card belongs to player 2
 		else 
