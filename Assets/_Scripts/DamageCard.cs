@@ -17,7 +17,7 @@ public class DamageCard : Card
 	public override void Start()
 	{
 		doneAddingToGraveyard = false;
-		currentTime = 0;
+		currentTime = castTime;
 		cardTimerBox = GameObject.Find ("cardTimerBox").GetComponent<Text> ();;
 	}
 
@@ -27,10 +27,10 @@ public class DamageCard : Card
 		if (!inGraveyard && inSummonZone) 
 		{
 			//Increment the current Time
-			currentTime += Time.deltaTime;
-			cardTimerBox.text = ""+(int)currentTime;
+			currentTime -= Time.deltaTime;
+			cardTimerBox.text = currentTime.ToString ("F1");
 			//IF the current time is larger than or equal to the cast time
-			if (currentTime >= castTime) {
+			if (currentTime <= 0) {
 				//reset the timer
 				currentTime = 0;
 				//Set state of card to being in the graveyard
