@@ -9,7 +9,9 @@ public class SummonZone : MonoBehaviour {
 	public bool isOccupied;
 	// Use this for initialization
 	void Start () {
-		textBox = GameObject.Find (gameObject.name+"TextBox").GetComponent<Text> ();
+		//sets this zones text box to the first text component it
+        //finds in its children (which is the summonZoneTextBox)
+        textBox = gameObject.GetComponentInChildren<Text>();
 		//player1HealthTextBox.text = "Life: " + 20;
 	}
 	
