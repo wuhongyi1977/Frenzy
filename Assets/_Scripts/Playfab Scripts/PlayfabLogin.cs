@@ -7,76 +7,61 @@ using PlayFab.ClientModels;
 public class PlayfabLogin : MonoBehaviour
 {
     //input field where the user inputs their email address
-    public InputField loginUsernameField;
+    public InputField loginEmailField;
     //input field where the user inputs their password
     public InputField loginPasswordField;
+    //input field where the user inputs their email address for registration
+    public InputField registerEmailField;
+    //input field where the user inputs their username for registration
+    public InputField registerUsernameField;
+    //input field where the user inputs their password for registration
+    public InputField registerPasswordField;
+
+    //panel for login UI
+    public GameObject loginPanel;
+    //panel for registration UI
+    public GameObject registerPanel;
+
 
     void Awake()
     {
         PlayFabSettings.TitleId = "57F4";
-       
-    }
-    // Use this for initialization
-    void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-    //Login to playfab/game
-    public static void PlayFabLogin(string username, string password)
-    {
-        var request = new LoginWithPlayFabRequest()
-        {
-            TitleId = PlayFabSettings.TitleId,
-            Username = username,
-            Password = password
-        };
+        //make sure login panel is the only active panel
+        registerPanel.SetActive(false);
 
-        PlayFabClientAPI.LoginWithPlayFab(request, (result) =>
+        //check playerpref storage for rapid login
+        if(PlayerPrefs.HasKey("SavedLogin"))
         {
-            Debug.Log("Login Successful!");
-          
-            PlayFabDataStore.playFabId = result.PlayFabId;
-            PlayFabDataStore.userName = username;
-            PlayFabDataStore.sessionTicket = result.SessionTicket;
-           
-            GetPhotonToken();
-        }, (error) =>
-        {
-            Debug.Log("Login Failed!");
-            Debug.Log(error.ErrorMessage.ToString());
-        });
-    }
-
-    //Get Photon Token from playfab
-    public static void GetPhotonToken()
-    {
-        /*
-        var request = new GetPhotonAuthenticationTokenRequest();
-        {
-            request.PhotonApplicationId = "ee6881e0-06d0-4b7c-b552-a4087cd14926".Trim();
+            //login automatically, skip login page
+            //offer option to log out later
         }
+        
 
-        PlayFabClientAPI.GetPhotonAuthenticationToken(request, (result) =>
-        {
-            string photonToken = result.PhotonCustomAuthenticationToken;
-            Debug.Log(string.Format("Yay, logged in in session token: {0}", photonToken));
-            PhotonNetwork.AuthValues = new AuthenticationValues();
-            PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Custom;
-            PhotonNetwork.AuthValues.AddAuthParameter("username", PlayFabDataStore.playFabId);
-            PhotonNetwork.AuthValues.AddAuthParameter("Token", result.PhotonCustomAuthenticationToken);
-            PhotonNetwork.AuthValues.UserId = PlayFabDataStore.playFabId;
-            PhotonNetwork.ConnectUsingSettings("1.0");
-            //make sure all players are synced to same scene in same room
-            PhotonNetwork.automaticallySyncScene = true;
-            GetUserStatistic();
-        }, (error) =>
-        {
-            Debug.Log("Photon Connection Failed! " + error.ErrorMessage.ToString());
-        });
-        */
+    }
+   
+    //called when player clicks the new account button
+    //sets login panel inactive and activates registration panel
+    public void NewAccount()
+    {
+        loginPanel.SetActive(false);
+        registerPanel.SetActive(true);
+    }
+    public void BackToLogin()
+    {
+        registerPanel.SetActive(false);
+        loginPanel.SetActive(true);
+    }
+    //calls the PlayfabLogin function in PlayFabApiCalls
+    //Sends data from username and password input fields
+    public void Login()
+    {
+        PlayFabApiCalls.PlayFabLogin(loginEmailField.text, loginPasswordField.text);
+    }
+
+    //calls the PlayfabRegister function in PlayFabApiCalls
+    //Sends data from username,password, and email input fields
+    public void Register()
+    {
+        PlayFabApiCalls.PlayFabRegister(registerUsernameField.text, registerPasswordField.text, registerEmailField.text);
     }
 }
