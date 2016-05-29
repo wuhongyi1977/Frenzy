@@ -10,13 +10,7 @@ public class PlayFabDataStore : MonoBehaviour
     public static string sessionTicket;
     public static string playFabId;
     public static string userName;
-    // Use this for initialization
-    void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    public static string email;
+ 
+   
 }
