@@ -19,10 +19,18 @@ public class PlayfabLogin : MonoBehaviour
 
     //panel for login UI
     public GameObject loginPanel;
+    //Error Text for Login
+    public Text loginError;
+
     //panel for registration UI
     public GameObject registerPanel;
+    //Error Text for Registration
+    public Text registerError;
+
     //panel for main menu UI
     public GameObject mainMenuPanel;
+    //Text for the name of the user currently logged in
+    public Text accountName;
 
 
     void Awake()
@@ -51,11 +59,19 @@ public class PlayfabLogin : MonoBehaviour
     //sets login panel inactive and activates registration panel
     public void NewAccount()
     {
+        //set error text to blank
+        registerError.text = "";
+        loginError.text = "";
+        //switch panels
         loginPanel.SetActive(false);
         registerPanel.SetActive(true);
     }
     public void BackToLogin()
     {
+        //set error text to blank
+        registerError.text = "";
+        loginError.text = "";
+        //switch panels
         registerPanel.SetActive(false);
         loginPanel.SetActive(true);
     }
@@ -78,21 +94,36 @@ public class PlayfabLogin : MonoBehaviour
     /// </summary>
     public void Logout()
     {
-        //PlayFabLogin(loginEmailField.text, loginPasswordField.text);
+        //Disconnect from Photon Server
+        PhotonNetwork.Disconnect();
+
+        //Delete all saved login data
+        PlayerPrefs.DeleteKey("SavedEmail");
+        PlayerPrefs.DeleteKey("SavedPassword");
+        //set error text to blank
+        registerError.text = "";
+        loginError.text = "";
+        //set other panels inactive
         mainMenuPanel.SetActive(false);
         registerPanel.SetActive(false);
+        //reactivate login panel 
+        //to allow login as other user/register a new user
         loginPanel.SetActive(true);
-       
-
     }
     /// <summary>
     /// Call to load main menu panel on successful login
     /// </summary>
     public void MainMenu()
     {
+        //set other panels inactive
         registerPanel.SetActive(false);
         loginPanel.SetActive(false);
+
+        //set main menu panel active
         mainMenuPanel.SetActive(true);
+        //set main menu account name to the player's username
+        accountName.text = "User: "+ PlayFabDataStore.userName;
+        Debug.Log(PlayFabDataStore.userName);
     }
 
     /// <summary>
@@ -108,7 +139,8 @@ public class PlayfabLogin : MonoBehaviour
             TitleId = PlayFabSettings.TitleId,
             Username = username,
             Password = password,
-            Email = email
+            Email = email,
+            RequireBothUsernameAndEmail = true
         };
 
         PlayFabClientAPI.RegisterPlayFabUser(request, (result) =>
@@ -128,6 +160,9 @@ public class PlayfabLogin : MonoBehaviour
         }, (error) =>
         {
             Debug.Log("New Account Creation Failed!");
+            Debug.Log(error.ErrorMessage.ToString());
+            //output error to error text
+            registerError.text = error.ErrorMessage.ToString();
 
         });
     }
@@ -153,22 +188,50 @@ public class PlayfabLogin : MonoBehaviour
 
             PlayFabDataStore.playFabId = result.PlayFabId;
             PlayFabDataStore.email = email;
+            
+           
             PlayFabDataStore.sessionTicket = result.SessionTicket;
             //save user data for rapid login
             ChangeSavedLogin(email, password);
             //get photon token
             GetPhotonToken();
-            //set main menu active on successful login
-            MainMenu();
-            
 
+            //get account info (username) to save in PlayFabDataStore
+            //jumps to main menu in GetAccountInfo to avoid jumping before retrieving data
+            GetAccountInfo(email);
         }, (error) =>
         {
             Debug.Log("Login Failed!");
             Debug.Log(error.ErrorMessage.ToString());
+            //output error to error text
+            loginError.text = error.ErrorMessage.ToString();
         });
     }
 
+    public void GetAccountInfo(string email)
+    {
+        var request = new GetAccountInfoRequest()
+        {
+            PlayFabId = PlayFabDataStore.playFabId,
+            Email = email,
+
+        };
+
+        PlayFabClientAPI.GetAccountInfo(request, (result) =>
+        {
+            Debug.Log("Info Retrieval Successful!");
+            PlayFabDataStore.userName = result.AccountInfo.Username.ToString();
+            //set main menu active on successful login
+            MainMenu();
+
+
+        }, (error) =>
+        {
+            Debug.Log("Retrieval Failed!");
+            Debug.Log(error.ErrorMessage.ToString());
+
+        });
+    }
     //modify saved login info
     public static void ChangeSavedLogin(string email, string password)
     {
