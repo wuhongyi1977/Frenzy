@@ -31,6 +31,12 @@ public class PlayfabLogin : MonoBehaviour
     public GameObject mainMenuPanel;
     //Text for the name of the user currently logged in
     public Text accountName;
+    //Panel for searching for game
+    public GameObject searchPanel;
+    //Text for searching progress
+    public Text searchText;
+    //The number of seconds to wait for an opponent before returning to main menu
+    int searchingTime = 10;
 
 
     void Awake()
@@ -39,6 +45,7 @@ public class PlayfabLogin : MonoBehaviour
         //make sure login panel is the only active panel
         registerPanel.SetActive(false);
         mainMenuPanel.SetActive(false);
+        searchPanel.SetActive(false);
         //check playerpref storage for rapid login
         if(PlayerPrefs.HasKey("SavedEmail") && PlayerPrefs.HasKey("SavedPassword"))
         {
@@ -124,6 +131,92 @@ public class PlayfabLogin : MonoBehaviour
         //set main menu account name to the player's username
         accountName.text = "User: "+ PlayFabDataStore.userName;
         Debug.Log(PlayFabDataStore.userName);
+    }
+    //begin searching for an opponent
+    public void SearchForOpponent()
+    {
+        //set search panel active
+        mainMenuPanel.SetActive(false);
+        searchPanel.SetActive(true);
+        //Indicate that search is happening
+        searchText.text = "Searching For Opponent...";
+        //search for a random room to join, fails if room is not found
+        //jumps to OnPhotonRandomJoinFailed()
+        Debug.Log("Attempting to Join Room");
+        PhotonNetwork.JoinRandomRoom();    
+    }
+    //if the player fails to join a random room
+    public void OnPhotonRandomJoinFailed()
+    {
+        Debug.Log("No Room Found");
+        Debug.Log("Creating a new room");
+        //set up room options
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.maxPlayers = 2;//set max players to 2
+        //create a room with random name, the previous options, and no specification for typed lobby
+        PhotonNetwork.CreateRoom(null, roomOptions, null);// this can make room name same as username(PlayFabDataStore.userName);
+        //Start Waiting for user to join
+        StartCoroutine(WaitForOpponent());
+
+    }
+    //upon joining a new room, output the room name
+    public void OnJoinedRoom()
+    {
+        Debug.Log("Join Room Successfully!");
+        Debug.Log("Room name is: " + PhotonNetwork.room);
+        //if this player is the room owner
+        if (PhotonNetwork.isMasterClient)
+        {
+            //jump to gameplay scene
+            PhotonNetwork.LoadLevel("Test");
+        }
+        else
+        {
+            searchText.text = "Opponent Found!";
+        }
+        //ACTIVATE PLAYER
+        //spawnPoint = GameObject.Find("SpawnPoint");
+        // GameObject player = PhotonNetwork.Instantiate("Player", spawnPoint.transform.position, Quaternion.identity, 0);
+        //player.GetComponent<>().enabled = true;
+    }
+    //Wait for a set number of seconds in a room for an opponent before leaving
+    IEnumerator WaitForOpponent()
+    {
+        //wait here until player has joined their own room
+        while(PhotonNetwork.room == null)
+        {
+            if(PhotonNetwork.room != null)
+            { break; }
+            yield return null;
+        }
+        //begin timer for searching
+        Debug.Log("Waiting for an opponent");
+        for(int i = 0; i <= searchingTime; i++)
+        {
+            Debug.Log("Time Elapsed: "+i);
+            Debug.Log(PhotonNetwork.room);
+            //if a player has joined
+            if(PhotonNetwork.room != null && (PhotonNetwork.room.playerCount > 1))
+            {
+                Debug.Log("Player Found");
+                searchText.text = "Opponent Found!";
+                //exit this function, level will load
+                yield break;
+            }
+            //wait 1 second each iteration
+            yield return new WaitForSeconds(1);
+        }
+        Debug.Log("Failed to find opponent");
+        //leave current room (room is empty because no one joined)
+        PhotonNetwork.LeaveRoom();
+        //indicate that a player was not found 
+        searchText.text = "Opponent Not Found";
+        //wait so user can read failure indication
+        yield return new WaitForSeconds(3);
+        //set main menu panel active
+        searchPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
+        yield return null;
     }
 
     /// <summary>
