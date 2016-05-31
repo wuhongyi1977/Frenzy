@@ -145,6 +145,20 @@ public class PlayfabLogin : MonoBehaviour
         Debug.Log("Attempting to Join Room");
         PhotonNetwork.JoinRandomRoom();    
     }
+    public void ComputerOpponent()
+    {
+        //set search panel active
+        mainMenuPanel.SetActive(false);
+        searchPanel.SetActive(true);
+        //Indicate that search is happening
+        searchText.text = "Preparing AI Opponent...";
+
+        //set up room options
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.maxPlayers = 1;//set max players to 1
+        //create a room with random name, the previous options, and no specification for typed lobby
+        PhotonNetwork.CreateRoom(null, roomOptions, null);// this can make room name same as username(PlayFabDataStore.userName);
+    }
     //if the player fails to join a random room
     public void OnPhotonRandomJoinFailed()
     {
