@@ -13,7 +13,7 @@ GameObject:
   - 50: {fileID: 5083796}
   - 114: {fileID: 11478996}
   m_Layer: 0
-  m_Name: 2s.-2EnemyHealth DamageCard
+  m_Name: 8s, -3EnemyHealth DamageCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77,10 +77,10 @@ MonoBehaviour:
   inGraveyard: 0
   inSummonZone: 0
   playerID: 1
-  cardNumber: 29
-  castTime: 2
+  cardNumber: 11
+  castTime: 8
   summonZoneTextBox: {fileID: 0}
-  damageToDeal: 2
+  damageToDeal: 6
 --- !u!212 &21277416
 SpriteRenderer:
   m_ObjectHideFlags: 1

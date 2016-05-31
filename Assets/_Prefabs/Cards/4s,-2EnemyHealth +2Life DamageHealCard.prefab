@@ -78,7 +78,7 @@ MonoBehaviour:
   inSummonZone: 0
   playerID: 1
   cardNumber: 29
-  castTime: 4
+  castTime: 5
   summonZoneTextBox: {fileID: 0}
   healAmount: 2
   damageToDeal: 2

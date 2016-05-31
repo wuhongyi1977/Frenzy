@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Player1SummonZone
+  - Player2SummonZone
   layers:
   - Default
   - TransparentFX

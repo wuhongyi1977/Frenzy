@@ -27,10 +27,18 @@ public abstract class Card : MonoBehaviour {
 	private Vector3 screenPoint;
 	//Something fo the dragging of cards
 	private Vector3 offset;
-
+	//The game object for player 1 manager
+	private GameObject p1Manager;
+	//The game object for player 2 manager
+	private GameObject p2Manager;
+	//The position that the card was at when the player picks up the card. 
+	//This is used for when a player makes an invalid placement the card is placed back in it's original hand position
+	private Vector3 cardHandPos;
 	// Use this for initialization
 	public void Start ()				//Abstract method for start
 	{
+		p1Manager = GameObject.Find ("Player1Manager");
+		p2Manager = GameObject.Find ("Player2Manager");
 		doneAddingToGraveyard = false;
 		currentTime = castTime;
 	}
@@ -63,11 +71,16 @@ public abstract class Card : MonoBehaviour {
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
 				//Execute the game manager code
-				GameObject.Find ("Player1Manager").GetComponent<Player1Manager> ().cardDoneCasting (gameObject);
+				p1Manager.GetComponent<Player1Manager> ().cardDoneCasting (gameObject);
 			} 
 			else 
 			{
 				//Logic for player2
+				summonZoneTextBox.text = "";
+				//Set this to false to prevent multiple executions of this block
+				doneAddingToGraveyard = true;
+				//Execute the game manager code
+				p2Manager.GetComponent<Player2Manager> ().cardDoneCasting (gameObject);
 			}
 		}
 	}
@@ -75,6 +88,7 @@ public abstract class Card : MonoBehaviour {
 	//Registers that the player has clicked on the card
 	public void OnMouseDown()			
 	{
+		cardHandPos = gameObject.transform.position;
 		screenPoint = Camera.main.WorldToScreenPoint (gameObject.transform.position);
 		offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
 	}
@@ -84,13 +98,16 @@ public abstract class Card : MonoBehaviour {
 	{
 		dropped = true;
 		if (playerID == 1)
-			GameObject.Find ("Player1Manager").GetComponent<Player1Manager> ().cardIsDropped (gameObject);
+			p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject,cardHandPos);
+		else
+			p2Manager.GetComponent<Player2Manager> ().cardIsDropped (gameObject,cardHandPos);
 		//finds the text box that corresponds to the summon zone
-		if (summonZoneTextBox == null) {
+		if (summonZoneTextBox == null) 
+		{
 			if (playerID == 1)
-				summonZoneTextBox = GameObject.Find ("Player1Manager").GetComponent<Player1Manager> ().getSummonZone (gameObject);
-			//else
-			//summonZoneTextBox = gameObject.Find ("Player2Manager").GetComponent<Player2Manager> ().getSummonZone (gameObject);
+				summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+			else
+				summonZoneTextBox = p2Manager.GetComponent<Player2Manager> ().getSummonZone (gameObject);
 		}
 		//if(playerID == 2)
 			//GameObject.Find ("Player2Manager").GetComponent<Player2Manager> ().cardIsDropped (gameObject);

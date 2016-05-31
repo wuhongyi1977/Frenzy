@@ -39,8 +39,10 @@ public class GameManager : MonoBehaviour {
 		{
 			player1Health -= damage;
 			Debug.Log ("Player 1 Health: " + player1Health);
+			player1HealthTextBox.text = "Life: " + player1Health;
 		}
 	}
+
 	public void healPlayer(int healAmount, int playerID)
 	{
 		if (playerID == 1) 

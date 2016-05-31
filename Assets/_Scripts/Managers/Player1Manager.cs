@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 public class Player1Manager : MonoBehaviour {
+	//The total number of shuffles when the game starts
+	private int maxInitialShuffles = 10;
+	//The number of times the deck is shuffled before game starts
+	private int numbShuffles;
 	//The player ID
 	private static int playerID = 1;
 	//Player's health
@@ -60,7 +64,9 @@ public class Player1Manager : MonoBehaviour {
 			//Give the card an ID(currently all the same for all card since there is only one card going into the deck multiple times)
 			//cardDeck [i].GetComponent<Card> ().cardNumber = i;
 		}
-		library = shuffleDeck(library);
+		int numbShuffles = Random.Range(1, maxInitialShuffles);
+		for(int i = 0; i < numbShuffles; i++)
+			library = shuffleDeck(library);
 		//draw a hand of (startingHandSize) cards
 		for(int i = 0; i < startingHandSize; i++)
 		{
@@ -94,7 +100,7 @@ public class Player1Manager : MonoBehaviour {
 	void Update () 
 	{
 		libraryDrawCounterTimer += Time.deltaTime;
-		Debug.Log (libraryDrawCounterTimer);
+		//Debug.Log ("P1:" + libraryDrawCounterTimer);
 		if (libraryDrawCounterTimer > libraryDrawSpeed) 
 		{
 			libraryDrawCounterTimer = 0;
@@ -112,7 +118,7 @@ public class Player1Manager : MonoBehaviour {
 	}
 
 	//Method called for when a card is dropped
-	public void cardIsDropped(GameObject card)
+	public void cardIsDropped(GameObject card,Vector3 cardHandPos)
 	{
 		//Set the state of being dropped to false
 		card.GetComponent<Card> ().setDroppedState(false);
@@ -150,7 +156,7 @@ public class Player1Manager : MonoBehaviour {
 
 		//If the player picks up the card and drops it anywhere else the card will be placed back in the hand zone
 		if(card.GetComponent<Card>().inSummonZone == false)
-			card.transform.position = handZone.transform.position;
+			card.transform.position = cardHandPos;
 	}
 
 	//This method is called when the card is done casting
@@ -237,6 +243,7 @@ public class Player1Manager : MonoBehaviour {
 		{
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
+			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
 			playerHand.Add(library[currentCardIndex]);
 
 			//increment the index of the deck (since a card has now been taken)

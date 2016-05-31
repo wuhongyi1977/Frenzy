@@ -77,8 +77,8 @@ MonoBehaviour:
   inGraveyard: 0
   inSummonZone: 0
   playerID: 1
-  cardNumber: 29
-  castTime: 3
+  cardNumber: 23
+  castTime: 5
   summonZoneTextBox: {fileID: 0}
   damageToDeal: 3
 --- !u!212 &21247504
