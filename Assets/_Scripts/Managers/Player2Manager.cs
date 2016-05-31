@@ -41,10 +41,15 @@ public class Player2Manager : MonoBehaviour {
 	//be able to interact directly with the cards in the graveyard
 	Vector3 graveyardPos;
 
-	// Use this for initialization
-	void Start () {
-		//Find the game manager
-		gameManager = GameObject.Find ("GameManager").GetComponent<GameManager>();
+    //NETWORK COMPONENTS
+    PhotonView photonView;
+
+    // Use this for initialization
+    void Start () {
+        //get this manager's photon view
+        photonView = GetComponent<PhotonView>();
+        //Find the game manager
+        gameManager = GameObject.Find ("GameManager").GetComponent<GameManager>();
 		//get the position of the graveyard
 		graveyardPos = GameObject.Find ("Player2Graveyard").transform.position;
 		//Finds the summon zones
@@ -132,14 +137,10 @@ public class Player2Manager : MonoBehaviour {
 				Vector3 zonePosition = SummonZones [i].transform.position;
 				//Checks if the card is within a square surrounding the zone
 				if (card.transform.position.x > (zonePosition.x - 1) && card.transform.position.x < (zonePosition.x + 1)) {
-					if (card.transform.position.y > (zonePosition.y - 1) && card.transform.position.y < (zonePosition.y + 1)) {						
-						//Puts the card in the summoning zone
-						card.transform.position = zonePosition;
-						//Sets the state of the zone to be occupied
-						SummonZones [i].GetComponent<SummonZone> ().isOccupied = true;
-						//Sets the state of the card to being in a summon zone
-						card.GetComponent<Card> ().inSummonZone = true;
-						currentHandSize--;
+					if (card.transform.position.y > (zonePosition.y - 1) && card.transform.position.y < (zonePosition.y + 1)) {
+                        //Play card, pass the card, the position of the zone, and the index of the zone
+                        PlayCard(card, zonePosition, i);						
+						
 					}
 				}				
 			} 
@@ -158,6 +159,16 @@ public class Player2Manager : MonoBehaviour {
 		if(card.GetComponent<Card>().inSummonZone == false)
 			card.transform.position = cardHandPos;
 	}
+    public void PlayCard(GameObject card, Vector3 zonePosition, int i)
+    {
+        //Puts the card in the summoning zone
+        card.transform.position = zonePosition;
+        //Sets the state of the zone to be occupied
+        SummonZones[i].GetComponent<SummonZone>().isOccupied = true;
+        //Sets the state of the card to being in a summon zone
+        card.GetComponent<Card>().inSummonZone = true;
+        currentHandSize--;
+    }
 
 	//This method is called when the card is done casting
 	public void cardDoneCasting(GameObject card)
@@ -252,4 +263,16 @@ public class Player2Manager : MonoBehaviour {
 			currentCardIndex++;
 		}
 	}
+
+    //////////////////////////////////////////////////////
+    //NETWORK RECEIVERS
+    [PunRPC]
+    void PlayCard(int viewID, GameObject oppCard, Vector3 oppZonePos, int i)
+    {
+        if (photonView.isMine)
+        {
+            //Play the card for player 2 that the opponent played
+            PlayCard(oppCard, oppZonePos, i);
+        }
+    }
 }

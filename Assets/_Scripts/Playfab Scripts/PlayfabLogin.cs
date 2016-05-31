@@ -354,6 +354,8 @@ public class PlayfabLogin : MonoBehaviour
             PhotonNetwork.ConnectUsingSettings("1.0");
             //make sure all players are synced to same scene in same room
             PhotonNetwork.automaticallySyncScene = true;
+            //Set photon nickname to player username
+            PhotonNetwork.player.name = PlayFabDataStore.userName;
 
         }, (error) =>
         {

@@ -3,6 +3,11 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
+    bool networkGame = false;
+    string computerAiName = "Jarvis";
+    //The text box to display the player's name
+    public Text player1Username;
+    public Text player2Username;
 	//The text box that the enemie's health is placed
 	private Text player2HealthTextBox;
 	private Text player1HealthTextBox;
@@ -15,7 +20,18 @@ public class GameManager : MonoBehaviour {
 		player1HealthTextBox.text = "Life: " + 20;
 		player2HealthTextBox = GameObject.Find ("Player2HealthBox").GetComponent<Text> ();
 		player2HealthTextBox.text = "Enemy Life: " + 20;
-	}
+     
+        player1Username.text = PlayFabDataStore.userName;
+        //if there is another player in the room
+        if (PhotonNetwork.room != null && PhotonNetwork.room.playerCount > 1)
+        {
+            player2Username.text = PhotonNetwork.otherPlayers[0].name;
+        }
+        else // if the opponent is a computer controlled player
+        {
+            player2Username.text = computerAiName;
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {

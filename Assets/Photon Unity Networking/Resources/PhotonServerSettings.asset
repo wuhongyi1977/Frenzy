@@ -36,4 +36,5 @@ MonoBehaviour:
   - PunRespawn
   - RequestForPickupTimes
   - TaggedPlayer
+  - PlayCard
   DisableAutoOpenWizard: 1
