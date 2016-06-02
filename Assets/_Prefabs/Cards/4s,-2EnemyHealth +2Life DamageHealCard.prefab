@@ -26,7 +26,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 114608}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.505509, y: -8.803023, z: 0}
+  m_LocalPosition: {x: 2.5, y: 0.91, z: 0}
   m_LocalScale: {x: 6.8374996, y: 10.425044, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -76,10 +76,13 @@ MonoBehaviour:
   doneAddingToGraveyard: 0
   inGraveyard: 0
   inSummonZone: 0
-  playerID: 1
+  playerID: 2
   cardNumber: 29
   castTime: 5
   summonZoneTextBox: {fileID: 0}
+  p1Manager: {fileID: 0}
+  p2Manager: {fileID: 0}
+  cardHandPos: {x: 0, y: 0.91, z: 0}
   healAmount: 2
   damageToDeal: 2
 --- !u!212 &21211104

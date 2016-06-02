@@ -178,9 +178,9 @@ public class Player1Manager : MonoBehaviour {
 		
 		//Find the zone that the card is in and set it to unoccupied
 		for (int i = 0; i < SummonZones.Count; i++) {
-			Debug.Log ("HERE");
+			//Debug.Log ("HERE");
 			if (card.transform.position.x == SummonZones [i].transform.position.x) {
-				Debug.Log ("HERE2");
+				//Debug.Log ("HERE2");
 				SummonZones [i].GetComponent<SummonZone> ().isOccupied = false;
 			}
 		}

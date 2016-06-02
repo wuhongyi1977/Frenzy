@@ -1785,6 +1785,7 @@ MonoBehaviour:
   - {fileID: 114608, guid: e7620f4d7c29f6b449ae24a0c5d45113, type: 2}
   - {fileID: 114608, guid: e7620f4d7c29f6b449ae24a0c5d45113, type: 2}
   - {fileID: 114608, guid: e7620f4d7c29f6b449ae24a0c5d45113, type: 2}
+  activeAI: 1
 --- !u!114 &852595251
 MonoBehaviour:
   m_ObjectHideFlags: 0

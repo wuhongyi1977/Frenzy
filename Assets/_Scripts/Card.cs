@@ -41,6 +41,8 @@ public abstract class Card : MonoBehaviour {
 		p2Manager = GameObject.Find ("Player2Manager");
 		doneAddingToGraveyard = false;
 		currentTime = castTime;
+		inSummonZone = false;
+		summonZoneTextBox = null;
 	}
 	public void Update ()				//Abstract method for Update
 	{
@@ -94,7 +96,7 @@ public abstract class Card : MonoBehaviour {
 	}
 
 	//Registers that the player has let go of the card
-	public  void OnMouseUp()			
+	public void OnMouseUp()			
 	{
 		dropped = true;
 		if (playerID == 1)

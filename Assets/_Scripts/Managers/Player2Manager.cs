@@ -44,6 +44,21 @@ public class Player2Manager : MonoBehaviour {
     //NETWORK COMPONENTS
     PhotonView photonView;
 
+
+	//Turn on the AI
+	public bool activeAI = false;
+	//The time for AI waits before making another action
+	public int AIWaitTime = 1;
+	//The list of zones that aren't occupied
+	private List<GameObject> unoccupiedZones = new List<GameObject>(5);
+	//The timer for how many times the AI can do a move
+	private float waitTimerAI;
+	//The temp variable for the index of the randomly chosen card
+	private int cardAIHandIndex;
+	//The temp variable for the index of the randomly chosen summon zone
+	private int zoneAIIndex;
+
+
     // Use this for initialization
     void Start () {
         //get this manager's photon view
@@ -77,10 +92,11 @@ public class Player2Manager : MonoBehaviour {
 		{
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
-			playerHand.Add(library[currentCardIndex]);
-
+			//playerHand.Add(library[currentCardIndex]);
+			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
+			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 			//increment the index of the deck (since a card has now been taken)
-			Instantiate(library[currentCardIndex], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
+			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;
 			currentCardIndex++;
 		}
@@ -112,6 +128,18 @@ public class Player2Manager : MonoBehaviour {
 			drawFromLibrary ();
 			//draw from the deck
 		}
+
+		//The timer for long the AI waits before making an action
+		waitTimerAI += Time.deltaTime;
+		if (waitTimerAI > AIWaitTime) {
+			//If the AI is active
+			if (activeAI) {
+				performAIMove ();
+			}
+			//reset timer
+			waitTimerAI = 0;
+		}
+
 		/*
 		Debug.Log ("HERE");
 		//move cards down the hand
@@ -176,9 +204,7 @@ public class Player2Manager : MonoBehaviour {
 
 		//Find the zone that the card is in and set it to unoccupied
 		for (int i = 0; i < SummonZones.Count; i++) {
-			Debug.Log ("HERE");
 			if (card.transform.position.x == SummonZones [i].transform.position.x) {
-				Debug.Log ("HERE2");
 				SummonZones [i].GetComponent<SummonZone> ().isOccupied = false;
 			}
 		}
@@ -254,11 +280,11 @@ public class Player2Manager : MonoBehaviour {
 		{
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
+			//playerHand.Add(library[currentCardIndex]);
 			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
-			playerHand.Add(library[currentCardIndex]);
-
+			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 			//increment the index of the deck (since a card has now been taken)
-			Instantiate(library[currentCardIndex], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
+			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;
 			currentCardIndex++;
 		}
@@ -275,4 +301,32 @@ public class Player2Manager : MonoBehaviour {
             PlayCard(oppCard, oppZonePos, i);
         }
     }
+
+	//The function that controls the AI
+	void performAIMove ()
+	{
+		//If the AI doesn't have anything in hand there is no need to go further
+		if (playerHand.Count > 0) {
+			//get a random index for a card 
+			cardAIHandIndex = Random.Range (0, currentHandSize);
+
+			//Find summon zones that aren't occupied
+			for (int i = 0; i < SummonZones.Count; i++) {
+				if (!SummonZones [i].GetComponent<SummonZone> ().isOccupied) {
+					unoccupiedZones.Add (SummonZones [i]);
+				}
+			}
+
+			//get a random index for unoccupied zones
+			zoneAIIndex = Random.Range (0, unoccupiedZones.Count);
+			//perform the actual card movements
+			if (playerHand [cardAIHandIndex].GetComponent<Card> ().inSummonZone == false && playerHand [cardAIHandIndex].GetComponent<Card> ().inGraveyard == false) {
+				playerHand [cardAIHandIndex].GetComponent<Card> ().OnMouseDown ();
+				playerHand [cardAIHandIndex].transform.position = unoccupiedZones [zoneAIIndex].transform.position;
+				playerHand [cardAIHandIndex].GetComponent<Card> ().OnMouseUp ();
+			}
+		}
+		//clear the list for a new set of unoccupied zones
+		unoccupiedZones.Clear();
+	}
 }
