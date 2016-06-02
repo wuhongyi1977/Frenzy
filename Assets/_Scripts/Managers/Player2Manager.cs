@@ -46,7 +46,7 @@ public class Player2Manager : MonoBehaviour {
 
 
 	//Turn on the AI
-	public bool activeAI = false;
+	bool activeAI = false;
 	//The time for AI waits before making another action
 	public int AIWaitTime = 1;
 	//The list of zones that aren't occupied
@@ -63,6 +63,13 @@ public class Player2Manager : MonoBehaviour {
     void Start () {
         //get this manager's photon view
         photonView = GetComponent<PhotonView>();
+        //Check if this against computer or network player
+        //Checks the max players for the room (1 is computer opponent, 2 is network opponent)
+        Debug.Log(PhotonNetwork.room.maxPlayers);
+        if(PhotonNetwork.room.maxPlayers == 1)
+        {
+            activeAI = true;
+        }
         //Find the game manager
         gameManager = GameObject.Find ("GameManager").GetComponent<GameManager>();
 		//get the position of the graveyard
@@ -129,18 +136,21 @@ public class Player2Manager : MonoBehaviour {
 			//draw from the deck
 		}
 
-		//The timer for long the AI waits before making an action
-		waitTimerAI += Time.deltaTime;
-		if (waitTimerAI > AIWaitTime) {
-			//If the AI is active
-			if (activeAI) {
+        //AI CONTROLS
+        //If the AI is active
+        if (activeAI)
+        {
+            //The timer for long the AI waits before making an action
+            waitTimerAI += Time.deltaTime;
+		    if (waitTimerAI > AIWaitTime)
+            {
 				performAIMove ();
-			}
-			//reset timer
-			waitTimerAI = 0;
-		}
+			    //reset timer
+			    waitTimerAI = 0;
+		    }
+        }
 
-		/*
+        /*
 		Debug.Log ("HERE");
 		//move cards down the hand
 		for(int j = 0; j < playerHand.Count;j++)
@@ -148,7 +158,7 @@ public class Player2Manager : MonoBehaviour {
 			//if(!playerHand[j].GetComponent<Card>().inSummonZone)
 				playerHand[j].transform.position = new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y, handZone.transform.position.z);
 		}*/
-	}
+    }
 
 	//Method called for when a card is dropped
 	public void cardIsDropped(GameObject card,Vector3 cardHandPos)

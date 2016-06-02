@@ -73,4 +73,10 @@ public class GameManager : MonoBehaviour {
 		}
 
 	}
+    //Handle the player quitting or crashing mid game
+    void OnApplicationQuit()
+    {
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
+    }
 }

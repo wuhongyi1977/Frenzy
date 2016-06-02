@@ -6,6 +6,7 @@ using PlayFab.ClientModels;
 
 public class PlayfabLogin : MonoBehaviour
 {
+   
     //input field where the user inputs their email address
     public InputField loginEmailField;
     //input field where the user inputs their password
@@ -27,6 +28,8 @@ public class PlayfabLogin : MonoBehaviour
     //Error Text for Registration
     public Text registerError;
 
+    //panel to notify player that game is connecting
+    public GameObject connectPanel;
     //panel for main menu UI
     public GameObject mainMenuPanel;
     //Text for the name of the user currently logged in
@@ -52,6 +55,8 @@ public class PlayfabLogin : MonoBehaviour
             //login automatically, skip login page
             //offer option to log out later
             loginPanel.SetActive(false);
+            //display connecting panel
+            connectPanel.SetActive(true);
             PlayFabLogin(PlayerPrefs.GetString("SavedEmail"), PlayerPrefs.GetString("SavedPassword"));
         }
         else
@@ -61,7 +66,7 @@ public class PlayfabLogin : MonoBehaviour
         
 
     }
-   
+  
     //called when player clicks the new account button
     //sets login panel inactive and activates registration panel
     public void NewAccount()
@@ -125,12 +130,36 @@ public class PlayfabLogin : MonoBehaviour
         //set other panels inactive
         registerPanel.SetActive(false);
         loginPanel.SetActive(false);
-
+        //display connecting panel
+        connectPanel.SetActive(true);
+        //wait until network is connected
+        StartCoroutine(WaitForConnection());
+        
+        /*
+        //hide connecting panel
+        connectPanel.SetActive(false);
         //set main menu panel active
         mainMenuPanel.SetActive(true);
+        */
+       
+    }
+    //Wait for a set number of seconds in a room for an opponent before leaving
+    IEnumerator WaitForConnection()
+    {
+        //wait here until player has joined their own room
+        while (PhotonNetwork.connected == false)
+        {
+            if (PhotonNetwork.connected == true)
+            { break; }
+            yield return null;
+        }
+        //set main menu panel active
+        connectPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
         //set main menu account name to the player's username
-        accountName.text = "User: "+ PlayFabDataStore.userName;
+        accountName.text = "User: " + PlayFabDataStore.userName;
         Debug.Log(PlayFabDataStore.userName);
+        yield return null;
     }
     //begin searching for an opponent
     public void SearchForOpponent()
@@ -156,6 +185,7 @@ public class PlayfabLogin : MonoBehaviour
         //set up room options
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.maxPlayers = 1;//set max players to 1
+        roomOptions.isVisible = false;//make the room unjoinable by other players
         //create a room with random name, the previous options, and no specification for typed lobby
         PhotonNetwork.CreateRoom(null, roomOptions, null);// this can make room name same as username(PlayFabDataStore.userName);
     }
@@ -370,6 +400,7 @@ public class PlayfabLogin : MonoBehaviour
             PhotonNetwork.automaticallySyncScene = true;
             //Set photon nickname to player username
             PhotonNetwork.player.name = PlayFabDataStore.userName;
+          
 
         }, (error) =>
         {
