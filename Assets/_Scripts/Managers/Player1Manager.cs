@@ -109,9 +109,16 @@ public class Player1Manager : MonoBehaviour {
 		if (libraryDrawCounterTimer > libraryDrawSpeed) 
 		{
 			libraryDrawCounterTimer = 0;
+            //draw a card
 			drawFromLibrary ();
-			//draw from the deck
-		}
+            //if connected to photon, make your network player
+            //on your opponents screen draw a card
+            if (PhotonNetwork.connected && !gameManager.versusAi)
+            {
+                photonView.RPC("drawFromLibrary", PhotonTargets.Others);
+            }
+            //draw from the deck
+        }
 		/*
 		Debug.Log ("HERE");
 		//move cards down the hand
@@ -252,6 +259,7 @@ public class Player1Manager : MonoBehaviour {
 			library [i] = temp;
 		}
 		return library;
+
 	}
 	public void drawFromLibrary()
 	{
@@ -268,4 +276,8 @@ public class Player1Manager : MonoBehaviour {
 			currentCardIndex++;
 		}
 	}
+    void OnPhotonSerializeView()
+    {
+
+    }
 }

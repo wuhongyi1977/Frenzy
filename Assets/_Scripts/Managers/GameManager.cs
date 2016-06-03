@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour {
 	//The health of the players
 	int player1Health = 20;
 	int player2Health = 20;
+
+    
 	// Use this for initialization
 	void Start () {
 		player1HealthTextBox = GameObject.Find ("Player1HealthBox").GetComponent<Text> ();
@@ -26,7 +28,7 @@ public class GameManager : MonoBehaviour {
         //set your username to the stored username on playfabdatastore
         player1Username.text = PlayFabDataStore.userName;
         //if there is another player in the room
-        if (PhotonNetwork.room != null && PhotonNetwork.room.playerCount > 1)
+        if (PhotonNetwork.room != null && PhotonNetwork.room.maxPlayers == 2)
         {
             //set bool to indicate real player
             versusAi = false;
@@ -85,6 +87,9 @@ public class GameManager : MonoBehaviour {
     //Handle the player quitting or crashing mid game
     void OnApplicationQuit()
     {
+        //notify other player that they won
+
+
         //if the player is connected to the network
         if (PhotonNetwork.connected)
         {

@@ -126,19 +126,19 @@ public class Player2Manager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		libraryDrawCounterTimer += Time.deltaTime;
-		//Debug.Log ("P2:" + libraryDrawCounterTimer);
-		if (libraryDrawCounterTimer > libraryDrawSpeed) 
-		{
-			libraryDrawCounterTimer = 0;
-			drawFromLibrary ();
-			//draw from the deck
-		}
-
         //AI CONTROLS
         //If the AI is active
         if (activeAI)
         {
+            libraryDrawCounterTimer += Time.deltaTime;
+            //Debug.Log ("P2:" + libraryDrawCounterTimer);
+            if (libraryDrawCounterTimer > libraryDrawSpeed)
+            {
+                libraryDrawCounterTimer = 0;
+                drawFromLibrary();
+                //draw from the deck
+            }
+
             //The timer for long the AI waits before making an action
             waitTimerAI += Time.deltaTime;
 		    if (waitTimerAI > AIWaitTime)
@@ -283,7 +283,8 @@ public class Player2Manager : MonoBehaviour {
 		}
 		return library;
 	}
-	public void drawFromLibrary()
+    [PunRPC]
+    public void drawFromLibrary()
 	{
 		if(currentHandSize < startingHandSize)
 		{
@@ -338,4 +339,8 @@ public class Player2Manager : MonoBehaviour {
 		//clear the list for a new set of unoccupied zones
 		unoccupiedZones.Clear();
 	}
+    void OnPhotonSerializeView()
+    {
+
+    }
 }

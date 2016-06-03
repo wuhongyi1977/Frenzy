@@ -37,4 +37,5 @@ MonoBehaviour:
   - RequestForPickupTimes
   - TaggedPlayer
   - PlayCard
+  - drawFromLibrary
   DisableAutoOpenWizard: 1
