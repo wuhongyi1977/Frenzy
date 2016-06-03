@@ -13,7 +13,7 @@ GameObject:
   - 50: {fileID: 5083916}
   - 114: {fileID: 11409544}
   m_Layer: 0
-  m_Name: 4s,-2EnemyHealth +2Life DamageHealCard
+  m_Name: 5s,-2EnemyHealth +2Life DamageHealCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,9 +80,6 @@ MonoBehaviour:
   cardNumber: 29
   castTime: 5
   summonZoneTextBox: {fileID: 0}
-  p1Manager: {fileID: 0}
-  p2Manager: {fileID: 0}
-  cardHandPos: {x: 0, y: 0.91, z: 0}
   healAmount: 2
   damageToDeal: 2
 --- !u!212 &21211104
