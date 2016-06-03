@@ -993,6 +993,7 @@ GameObject:
   - 4: {fileID: 554367204}
   - 114: {fileID: 554367205}
   - 114: {fileID: 554367206}
+  - 114: {fileID: 554367207}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1023,6 +1024,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 332d03cb4eb3500489ae0a252834d4dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  versusAi: 0
   player1Username: {fileID: 917772405}
   player2Username: {fileID: 46509723}
 --- !u!114 &554367206
@@ -1036,6 +1038,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70bce3fdbf12d744b9160006a8460d5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &554367207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 554367203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  prefixBackup: -1
+  observed: {fileID: 0}
+  synchronization: 3
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 554367205}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 3
+  instantiationId: 3
+  isRuntimeInstantiated: 0
 --- !u!1001 &616539783
 Prefab:
   m_ObjectHideFlags: 0
@@ -1785,7 +1812,7 @@ MonoBehaviour:
   - {fileID: 114608, guid: e7620f4d7c29f6b449ae24a0c5d45113, type: 2}
   - {fileID: 114608, guid: e7620f4d7c29f6b449ae24a0c5d45113, type: 2}
   - {fileID: 114608, guid: e7620f4d7c29f6b449ae24a0c5d45113, type: 2}
-  activeAI: 1
+  AIWaitTime: 1
 --- !u!114 &852595251
 MonoBehaviour:
   m_ObjectHideFlags: 0

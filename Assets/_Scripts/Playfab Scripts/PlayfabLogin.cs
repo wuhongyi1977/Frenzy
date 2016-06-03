@@ -66,6 +66,10 @@ public class PlayfabLogin : MonoBehaviour
         
 
     }
+    void Update()
+    {
+        
+    }
   
     //called when player clicks the new account button
     //sets login panel inactive and activates registration panel
@@ -203,7 +207,7 @@ public class PlayfabLogin : MonoBehaviour
         StartCoroutine(WaitForOpponent());
 
     }
-    //upon joining a new room, output the room name
+    //upon  this player joining a new room, output the room name
     public void OnJoinedRoom()
     {
         Debug.Log("Join Room Successfully!");
@@ -217,9 +221,20 @@ public class PlayfabLogin : MonoBehaviour
         //else if this is the joining player
         else if(!PhotonNetwork.isMasterClient)
         {
-            searchText.text = "Opponent Found!";
+            searchText.text = "Opponent Found! \n "+ PhotonNetwork.otherPlayers[0].name;
+            Debug.Log("Opponent is: " + PhotonNetwork.otherPlayers[0].name);
+
+
         }
        
+    }
+    //on another player joining this room
+    void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
+    {
+        if (PhotonNetwork.countOfPlayers == 2)
+        {
+            Debug.Log("Opponent is: " + newPlayer.name);
+        }
     }
     //Wait for a set number of seconds in a room for an opponent before leaving
     IEnumerator WaitForOpponent()
@@ -241,7 +256,8 @@ public class PlayfabLogin : MonoBehaviour
             if(PhotonNetwork.room != null && (PhotonNetwork.room.playerCount > 1))
             {
                 Debug.Log("Player Found");
-                searchText.text = "Opponent Found!";
+                searchText.text = "Opponent Found!\n " + PhotonNetwork.otherPlayers[0].name;
+               
                 //if this player is the room owner
                 if (PhotonNetwork.isMasterClient)
                 {

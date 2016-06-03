@@ -17,14 +17,21 @@ public class GameManager : MonoBehaviour {
 	int player1Health = 20;
 	int player2Health = 20;
 
-    
-	// Use this for initialization
-	void Start () {
-		player1HealthTextBox = GameObject.Find ("Player1HealthBox").GetComponent<Text> ();
-		player1HealthTextBox.text = "Life: " + 20;
-		player2HealthTextBox = GameObject.Find ("Player2HealthBox").GetComponent<Text> ();
-		player2HealthTextBox.text = "Enemy Life: " + 20;
-     
+    //NETWORK COMPONENTS
+    PhotonView photonView;
+
+    // Use this for initialization
+    void Start ()
+    {
+        Debug.Log("Running start function!!!!");
+        //get this manager's photon view
+        photonView = GetComponent<PhotonView>();
+
+        player1HealthTextBox = GameObject.Find("Player1HealthBox").GetComponent<Text>();
+        player1HealthTextBox.text = "Life: " + 20;
+        player2HealthTextBox = GameObject.Find("Player2HealthBox").GetComponent<Text>();
+        player2HealthTextBox.text = "Enemy Life: " + 20;
+
         //set your username to the stored username on playfabdatastore
         player1Username.text = PlayFabDataStore.userName;
         //if there is another player in the room
@@ -45,10 +52,11 @@ public class GameManager : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 	
 	}
-
+   
 	//Method for when a damage card is done casting
 	public void dealDamage(int damage, int playerID)
 	{
@@ -84,11 +92,18 @@ public class GameManager : MonoBehaviour {
 		}
 
 	}
+    [PunRPC]
+    void Win()
+    {
+        Debug.Log("You Win!!");
+        //leave the current room
+        PhotonNetwork.LeaveRoom();
+    }
     //Handle the player quitting or crashing mid game
     void OnApplicationQuit()
     {
         //notify other player that they won
-
+        photonView.RPC("Win", PhotonTargets.Others);
 
         //if the player is connected to the network
         if (PhotonNetwork.connected)

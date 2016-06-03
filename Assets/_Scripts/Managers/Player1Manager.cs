@@ -113,10 +113,12 @@ public class Player1Manager : MonoBehaviour {
 			drawFromLibrary ();
             //if connected to photon, make your network player
             //on your opponents screen draw a card
+            /*
             if (PhotonNetwork.connected && !gameManager.versusAi)
             {
                 photonView.RPC("drawFromLibrary", PhotonTargets.Others);
             }
+            */
             //draw from the deck
         }
 		/*
