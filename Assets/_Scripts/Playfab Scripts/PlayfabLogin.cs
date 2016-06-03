@@ -208,20 +208,18 @@ public class PlayfabLogin : MonoBehaviour
     {
         Debug.Log("Join Room Successfully!");
         Debug.Log("Room name is: " + PhotonNetwork.room);
-        //if this player is the room owner
-        if (PhotonNetwork.isMasterClient)
+        //if this player is the room owner and this is a single player room
+        if (PhotonNetwork.isMasterClient && PhotonNetwork.room.maxPlayers == 1)
         {
-            //jump to gameplay scene
+            //jump to gameplay scene immediately
             PhotonNetwork.LoadLevel("Test");
         }
-        else
+        //else if this is the joining player
+        else if(!PhotonNetwork.isMasterClient)
         {
             searchText.text = "Opponent Found!";
         }
-        //ACTIVATE PLAYER
-        //spawnPoint = GameObject.Find("SpawnPoint");
-        // GameObject player = PhotonNetwork.Instantiate("Player", spawnPoint.transform.position, Quaternion.identity, 0);
-        //player.GetComponent<>().enabled = true;
+       
     }
     //Wait for a set number of seconds in a room for an opponent before leaving
     IEnumerator WaitForOpponent()
@@ -239,11 +237,17 @@ public class PlayfabLogin : MonoBehaviour
         {
             Debug.Log("Time Elapsed: "+i);
             Debug.Log(PhotonNetwork.room);
-            //if a player has joined
+            //if you are in a room and another player has joined
             if(PhotonNetwork.room != null && (PhotonNetwork.room.playerCount > 1))
             {
                 Debug.Log("Player Found");
                 searchText.text = "Opponent Found!";
+                //if this player is the room owner
+                if (PhotonNetwork.isMasterClient)
+                {
+                    //jump to gameplay scene
+                    PhotonNetwork.LoadLevel("Test");
+                }
                 //exit this function, level will load
                 yield break;
             }
