@@ -65,8 +65,7 @@ public class Player2Manager : MonoBehaviour {
         photonView = GetComponent<PhotonView>();
         //Check if this against computer or network player
         //Checks the max players for the room (1 is computer opponent, 2 is network opponent)
-        Debug.Log(PhotonNetwork.room.maxPlayers);
-        if(PhotonNetwork.room.maxPlayers == 1)
+        if(PhotonNetwork.connected && PhotonNetwork.room.maxPlayers == 1)
         {
             activeAI = true;
         }

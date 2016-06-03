@@ -3,7 +3,9 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
-    bool networkGame = false;
+    //bool tracks if player is a network opponent or AI opponent
+    public bool versusAi;
+    //stored name for AI player
     string computerAiName = "Jarvis";
     //The text box to display the player's name
     public Text player1Username;
@@ -21,14 +23,21 @@ public class GameManager : MonoBehaviour {
 		player2HealthTextBox = GameObject.Find ("Player2HealthBox").GetComponent<Text> ();
 		player2HealthTextBox.text = "Enemy Life: " + 20;
      
+        //set your username to the stored username on playfabdatastore
         player1Username.text = PlayFabDataStore.userName;
         //if there is another player in the room
         if (PhotonNetwork.room != null && PhotonNetwork.room.playerCount > 1)
         {
+            //set bool to indicate real player
+            versusAi = false;
+            //set username to opponents username
             player2Username.text = PhotonNetwork.otherPlayers[0].name;
         }
         else // if the opponent is a computer controlled player
         {
+            //set bool to indicate computer player
+            versusAi = true;
+            //set username to AI username
             player2Username.text = computerAiName;
         }
     }
@@ -76,7 +85,13 @@ public class GameManager : MonoBehaviour {
     //Handle the player quitting or crashing mid game
     void OnApplicationQuit()
     {
-        PhotonNetwork.LeaveRoom();
-        PhotonNetwork.Disconnect();
+        //if the player is connected to the network
+        if (PhotonNetwork.connected)
+        {
+            //leave the current room
+            PhotonNetwork.LeaveRoom();
+            //disconnect from the server
+            PhotonNetwork.Disconnect();
+        }
     }
 }

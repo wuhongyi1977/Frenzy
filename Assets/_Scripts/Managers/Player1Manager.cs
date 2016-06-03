@@ -141,7 +141,10 @@ public class Player1Manager : MonoBehaviour {
                         //Play card, pass the card, the position of the zone, and the index of the zone
                         PlayCard(card, zonePosition, i);
                         //NETWORK CODE
-                        photonView.RPC("PlayCard", PhotonTargets.Others, photonView.viewID, card, zonePosition, i);
+                        if (PhotonNetwork.connected && !gameManager.versusAi)
+                        {
+                            photonView.RPC("PlayCard", PhotonTargets.Others, photonView.viewID, card, zonePosition, i);
+                        }
                         //END NETWORK CODE
                     }
 				}				
