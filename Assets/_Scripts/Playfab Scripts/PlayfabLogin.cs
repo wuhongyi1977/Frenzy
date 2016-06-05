@@ -216,13 +216,15 @@ public class PlayfabLogin : MonoBehaviour
         if (PhotonNetwork.isMasterClient && PhotonNetwork.room.maxPlayers == 1)
         {
             //jump to gameplay scene immediately
-            PhotonNetwork.LoadLevel("Test");
+            StartCoroutine(BeginGame());
         }
         //else if this is the joining player
         else if(!PhotonNetwork.isMasterClient)
         {
             searchText.text = "Opponent Found! \n "+ PhotonNetwork.otherPlayers[0].name;
             Debug.Log("Opponent is: " + PhotonNetwork.otherPlayers[0].name);
+            //jump to gameplay scene
+            StartCoroutine(BeginGame());
 
 
         }
@@ -235,6 +237,12 @@ public class PlayfabLogin : MonoBehaviour
         {
             Debug.Log("Opponent is: " + newPlayer.name);
         }
+    }
+    IEnumerator BeginGame()
+    {
+        //wait so user can read success indication
+        yield return new WaitForSeconds(2);
+        PhotonNetwork.LoadLevel("Test");
     }
     //Wait for a set number of seconds in a room for an opponent before leaving
     IEnumerator WaitForOpponent()
@@ -262,7 +270,7 @@ public class PlayfabLogin : MonoBehaviour
                 if (PhotonNetwork.isMasterClient)
                 {
                     //jump to gameplay scene
-                    PhotonNetwork.LoadLevel("Test");
+                    StartCoroutine(BeginGame());
                 }
                 //exit this function, level will load
                 yield break;
@@ -416,8 +424,8 @@ public class PlayfabLogin : MonoBehaviour
             PhotonNetwork.AuthValues.AddAuthParameter("Token", result.PhotonCustomAuthenticationToken);
             PhotonNetwork.AuthValues.UserId = PlayFabDataStore.playFabId;
             PhotonNetwork.ConnectUsingSettings("1.0");
-            //make sure all players are synced to same scene in same room
-            PhotonNetwork.automaticallySyncScene = true;
+            //make sure all players are  NOT synced to same scene in same room
+            PhotonNetwork.automaticallySyncScene = false;
             //Set photon nickname to player username
             PhotonNetwork.player.name = PlayFabDataStore.userName;
           

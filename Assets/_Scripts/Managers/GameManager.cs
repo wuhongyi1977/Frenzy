@@ -99,6 +99,7 @@ public class GameManager : MonoBehaviour {
         //leave the current room
         PhotonNetwork.LeaveRoom();
     }
+    
     //Handle the player quitting or crashing mid game
     void OnApplicationQuit()
     {
