@@ -39,4 +39,5 @@ MonoBehaviour:
   - PlayCard
   - drawFromLibrary
   - Win
+  - SetOpponentName
   DisableAutoOpenWizard: 1

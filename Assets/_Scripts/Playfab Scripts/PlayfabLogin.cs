@@ -222,6 +222,7 @@ public class PlayfabLogin : MonoBehaviour
         else if(!PhotonNetwork.isMasterClient)
         {
             searchText.text = "Opponent Found! \n "+ PhotonNetwork.otherPlayers[0].name;
+            Debug.Log(PhotonNetwork.otherPlayers);
             Debug.Log("Opponent is: " + PhotonNetwork.otherPlayers[0].name);
             //jump to gameplay scene
             StartCoroutine(BeginGame());
@@ -254,12 +255,13 @@ public class PlayfabLogin : MonoBehaviour
             { break; }
             yield return null;
         }
+        Debug.Log(PhotonNetwork.room);
         //begin timer for searching
         Debug.Log("Waiting for an opponent");
         for(int i = 0; i <= searchingTime; i++)
         {
             Debug.Log("Time Elapsed: "+i);
-            Debug.Log(PhotonNetwork.room);
+            
             //if you are in a room and another player has joined
             if(PhotonNetwork.room != null && (PhotonNetwork.room.playerCount > 1))
             {
