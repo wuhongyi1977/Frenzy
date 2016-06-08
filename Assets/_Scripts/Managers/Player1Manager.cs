@@ -40,6 +40,8 @@ public class Player1Manager : MonoBehaviour {
 	//The position of the graveyard. It is off screen so that that player doesn't see it but the player won't 
 	//be able to interact directly with the cards in the graveyard
 	Vector3 graveyardPos;
+	//The card that the player is moused over
+	private GameObject mousedOverCard;
 
     //NETWORK COMPONENTS
     PhotonView photonView;
@@ -173,6 +175,19 @@ public class Player1Manager : MonoBehaviour {
 		if(card.GetComponent<Card>().inSummonZone == false)
 			card.transform.position = cardHandPos;
 	}
+	public void creatureCardIsDropped(GameObject card, Vector3 cardHandPos)
+	{
+		card.transform.position = cardHandPos;
+
+		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+		RaycastHit hit;
+		Debug.Log ("ray: " + ray.direction);
+		if(Physics.Raycast(ray, out hit))
+			Debug.DrawLine (ray.origin, hit.point, Color.red);
+
+		//Debug.Log ("HERE - " + objectHit.name);
+
+	}
     public void PlayCard(GameObject card, Vector3 zonePosition, int i)
     {
         //Puts the card in the summoning zone
@@ -277,6 +292,10 @@ public class Player1Manager : MonoBehaviour {
 			currentHandSize++;
 			currentCardIndex++;
 		}
+	}
+	public void setMousedOverCard(GameObject card)
+	{
+		mousedOverCard = card;
 	}
     void OnPhotonSerializeView()
     {

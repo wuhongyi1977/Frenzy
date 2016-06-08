@@ -14,7 +14,7 @@ GameObject:
   - 114: {fileID: 11427342}
   m_Layer: 0
   m_Name: 5s.+3health HealCard
-  m_TagString: Untagged
+  m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -80,9 +80,6 @@ MonoBehaviour:
   cardNumber: 17
   castTime: 5
   summonZoneTextBox: {fileID: 0}
-  p1Manager: {fileID: 0}
-  p2Manager: {fileID: 0}
-  cardHandPos: {x: 5, y: 0.91, z: 0}
   healAmount: 3
 --- !u!212 &21297872
 SpriteRenderer:

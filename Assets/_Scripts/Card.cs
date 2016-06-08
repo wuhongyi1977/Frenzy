@@ -18,22 +18,22 @@ public abstract class Card : MonoBehaviour {
 	//The card number. Used to correctly delete from the player's hand
 	public int cardNumber;
 	//Checks to see if the player dropped the card.
-	private bool dropped;
+	protected bool dropped;
 	//The time it takes for the card to be casted
 	public float castTime;
-	private float currentTime;
+	protected float currentTime;
 	public Text summonZoneTextBox;
 	//Something for the dragging of cards
 	private Vector3 screenPoint;
 	//Something fo the dragging of cards
 	private Vector3 offset;
 	//The game object for player 1 manager
-	private GameObject p1Manager;
+	protected GameObject p1Manager;
 	//The game object for player 2 manager
-	private GameObject p2Manager;
+	protected GameObject p2Manager;
 	//The position that the card was at when the player picks up the card. 
 	//This is used for when a player makes an invalid placement the card is placed back in it's original hand position
-	private Vector3 cardHandPos;
+	protected Vector3 cardHandPos;
 	// Use this for initialization
 	public void Start ()				//Abstract method for start
 	{
@@ -44,7 +44,7 @@ public abstract class Card : MonoBehaviour {
 		inSummonZone = false;
 		summonZoneTextBox = null;
 	}
-	public void Update ()				//Abstract method for Update
+	public virtual void Update ()				//Abstract method for Update
 	{
 		//If the card is Not in the graveyard and is in the summon zone
 		if (!inGraveyard && inSummonZone) 
@@ -54,14 +54,16 @@ public abstract class Card : MonoBehaviour {
 			summonZoneTextBox.text = currentTime.ToString ("F1");
 			//cardTimerBox.text = currentTime.ToString ("F1");
 			//IF the current time is larger than or equal to the cast time
-			if (currentTime <= 0) {
-				//reset the timer
-				currentTime = 0;
-				//Set state of card to being in the graveyard
-				inGraveyard = true;
-				//Set state of card to not being in the summon zone
-				inSummonZone = false;
-			}
+			if (currentTime <= 0) 
+			{
+					//reset the timer
+					currentTime = 0;
+					//Set state of card to being in the graveyard
+					inGraveyard = true;
+					//Set state of card to not being in the summon zone
+					inSummonZone = false;
+				}
+
 		}
 		//If the card is in the graveyard and manager code hasn't been executed yet
 		if (inGraveyard && doneAddingToGraveyard == false) 
@@ -96,11 +98,12 @@ public abstract class Card : MonoBehaviour {
 	}
 
 	//Registers that the player has let go of the card
-	public void OnMouseUp()			
+	public virtual void OnMouseUp()			
 	{
 		dropped = true;
-		if (playerID == 1)
-			p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject,cardHandPos);
+		if (playerID == 1) {
+			p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject, cardHandPos);
+		}
 		else
 			p2Manager.GetComponent<Player2Manager> ().cardIsDropped (gameObject,cardHandPos);
 		//finds the text box that corresponds to the summon zone
@@ -122,6 +125,24 @@ public abstract class Card : MonoBehaviour {
 		Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
 		Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
 		transform.position = curPosition;
+	}
+	//Registers what card is under the mouse
+	public void OnMouseOver()
+	{
+		Debug.Log (gameObject.name);
+		if (playerID == 1) 
+		{
+			p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
+		} 
+		else 
+		{
+			p2Manager.GetComponent<Player2Manager> ().setMousedOverCard (gameObject);
+		}
+	}
+	//Registers what card is under the mouse
+	public void OnMouseExit()
+	{
+		Debug.Log ("test");
 	}
 
 	//method to return the dropped variable

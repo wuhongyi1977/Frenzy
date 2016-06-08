@@ -18,7 +18,7 @@ public class DamageCard : Card
 	{
 		doneAddingToGraveyard = false;
 		currentTime = castTime;
-		//cardTimerBox = GameObject.Find ("cardTimerBox").GetComponent<Text> ();;
+		//cardTimerBox = GameObject.Find ("cardTimerBox").GetComponent<Text> ();
 	}
 
 	public override void Update()

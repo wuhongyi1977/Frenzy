@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Player1SummonZone
   - Player2SummonZone
+  - Card
   layers:
   - Default
   - TransparentFX
