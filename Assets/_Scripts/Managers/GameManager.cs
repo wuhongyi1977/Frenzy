@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour {
     void Start ()
     {
         Debug.Log("Running start function!!!!");
+        Debug.Log("Spawning player object");
+        PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
         //get this manager's photon view
         photonView = GetComponent<PhotonView>();
 
@@ -54,9 +56,9 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-	
-	}
-   
+        
+    }
+    
 	//Method for when a damage card is done casting
 	public void dealDamage(int damage, int playerID)
 	{

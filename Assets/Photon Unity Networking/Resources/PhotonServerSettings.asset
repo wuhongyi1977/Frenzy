@@ -40,4 +40,5 @@ MonoBehaviour:
   - drawFromLibrary
   - Win
   - SetOpponentName
+  - Hey
   DisableAutoOpenWizard: 1
