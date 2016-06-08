@@ -13,7 +13,7 @@ GameObject:
   - 50: {fileID: 5038176}
   - 114: {fileID: 11432474}
   m_Layer: 0
-  m_Name: 
+  m_Name: Essence Drain
   m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

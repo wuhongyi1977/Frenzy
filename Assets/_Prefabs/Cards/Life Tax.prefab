@@ -13,7 +13,7 @@ GameObject:
   - 50: {fileID: 5022494}
   - 114: {fileID: 11481678}
   m_Layer: 0
-  m_Name: 
+  m_Name: Life Tax
   m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

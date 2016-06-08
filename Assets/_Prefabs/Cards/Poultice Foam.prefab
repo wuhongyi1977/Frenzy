@@ -13,7 +13,7 @@ GameObject:
   - 50: {fileID: 5031834}
   - 114: {fileID: 11472474}
   m_Layer: 0
-  m_Name: 
+  m_Name: Poultice Foam
   m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

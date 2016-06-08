@@ -13,7 +13,7 @@ GameObject:
   - 50: {fileID: 5019608}
   - 114: {fileID: 11401428}
   m_Layer: 0
-  m_Name: 
+  m_Name: Magma Bolt
   m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
