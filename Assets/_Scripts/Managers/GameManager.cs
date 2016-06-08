@@ -39,9 +39,8 @@ public class GameManager : MonoBehaviour {
         {
             //set bool to indicate real player
             versusAi = false;
-            //set username to opponents username
-            photonView.RPC("SetOpponentName", PhotonTargets.OthersBuffered, PlayFabDataStore.userName);
-            //player2Username.text = PhotonNetwork.otherPlayers[0].name;
+            //set username to opponents username           
+           player2Username.text = PlayFabDataStore.opponentUserName;
         }
         else // if the opponent is a computer controlled player
         {
@@ -100,12 +99,7 @@ public class GameManager : MonoBehaviour {
         //leave the current room
         PhotonNetwork.LeaveRoom();
     }
-    [PunRPC]
-    void SetOpponentName(string name)
-    {
-        //set username to opponents username
-        player2Username.text = name;
-    }
+   
     //Handle the player quitting or crashing mid game
     void OnApplicationQuit()
     {

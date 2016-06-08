@@ -138,7 +138,7 @@ public class PlayfabLogin : MonoBehaviour
         connectPanel.SetActive(true);
         //wait until network is connected
         StartCoroutine(WaitForConnection());
-        
+       
         /*
         //hide connecting panel
         connectPanel.SetActive(false);
@@ -160,9 +160,12 @@ public class PlayfabLogin : MonoBehaviour
         //set main menu panel active
         connectPanel.SetActive(false);
         mainMenuPanel.SetActive(true);
+        //Set photon nickname to player username
+        PhotonNetwork.player.name = PlayFabDataStore.userName;
         //set main menu account name to the player's username
         accountName.text = "User: " + PlayFabDataStore.userName;
-        Debug.Log(PlayFabDataStore.userName);
+        Debug.Log("PlayFabDataStore Username: "+PlayFabDataStore.userName);
+        Debug.Log("Photon Username: " + PhotonNetwork.player.name);
         yield return null;
     }
     //begin searching for an opponent
@@ -224,6 +227,7 @@ public class PlayfabLogin : MonoBehaviour
             searchText.text = "Opponent Found! \n "+ PhotonNetwork.otherPlayers[0].name;
             Debug.Log(PhotonNetwork.otherPlayers);
             Debug.Log("Opponent is: " + PhotonNetwork.otherPlayers[0].name);
+            PlayFabDataStore.opponentUserName = PhotonNetwork.otherPlayers[0].name;
             //jump to gameplay scene
             StartCoroutine(BeginGame());
 
@@ -234,16 +238,17 @@ public class PlayfabLogin : MonoBehaviour
     //on another player joining this room
     void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
     {
-        if (PhotonNetwork.countOfPlayers == 2)
-        {
-            Debug.Log("Opponent is: " + newPlayer.name);
-        }
+        PlayFabDataStore.opponentUserName = newPlayer.name;
+       Debug.Log("New Player Joined Room: " + newPlayer.name);
+        
     }
     IEnumerator BeginGame()
     {
         //wait so user can read success indication
         yield return new WaitForSeconds(2);
         PhotonNetwork.LoadLevel("Test");
+      
+        yield return null;
     }
     //Wait for a set number of seconds in a room for an opponent before leaving
     IEnumerator WaitForOpponent()
