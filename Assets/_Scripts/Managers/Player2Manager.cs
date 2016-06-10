@@ -101,7 +101,7 @@ public class Player2Manager : MonoBehaviour {
 			//the first card (starting at index 0) in the players deck
 			//playerHand.Add(library[currentCardIndex]);
 			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
-			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
+			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 			//increment the index of the deck (since a card has now been taken)
 			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;
@@ -214,7 +214,7 @@ public class Player2Manager : MonoBehaviour {
     }
 
 	//This method is called when the card is done casting
-	public void cardDoneCasting(GameObject card)
+	public void sendToGraveyard(GameObject card)
 	{
 
 		//Find the zone that the card is in and set it to unoccupied
@@ -239,7 +239,8 @@ public class Player2Manager : MonoBehaviour {
 		//If the card is a damage card
 		if (card.GetComponent<DamageCard> () != null) 
 		{
-			gameManager.dealDamage (card.GetComponent<DamageCard> ().damageToDeal, playerID);
+			if(card.GetComponent<CreatureCard>().isCreature == false)
+				gameManager.dealDamage (card.GetComponent<DamageCard> ().damageToDeal, playerID);
 		}
 		//If the card heals the player
 		if (card.GetComponent<HealCard> () != null) 
@@ -265,8 +266,8 @@ public class Player2Manager : MonoBehaviour {
 				//Get's the position of the zone
 				Vector3 zonePosition = SummonZones [i].transform.position;
 				//Checks if the card is within a square surrounding the zone
-				if (card.transform.position.x > (zonePosition.x - 1) && card.transform.position.x < (zonePosition.x + 1)) {
-					if (card.transform.position.y > (zonePosition.y - 1) && card.transform.position.y < (zonePosition.y + 1)) {
+				if (card.transform.position.x > (zonePosition.x - 3) && card.transform.position.x < (zonePosition.x + 3)) {
+					if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3)) {
 						textBoxToReturn = SummonZones [i].GetComponent<SummonZone>().textBox;
 					}
 				}				
@@ -294,11 +295,12 @@ public class Player2Manager : MonoBehaviour {
 	{
 		if(currentHandSize < startingHandSize)
 		{
+			
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
 			//playerHand.Add(library[currentCardIndex]);
 			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
-			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
+			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 			//increment the index of the deck (since a card has now been taken)
 			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;

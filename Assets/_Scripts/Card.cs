@@ -7,6 +7,8 @@ using UnityEngine.UI;
 /// base for all refined cards
 /// </summary>
 public abstract class Card : MonoBehaviour {
+	//The name of the card
+	public string cardTitle;
 	//Used to prevent staying step out of a chunk of code in derived Card Update methods
 	public bool doneAddingToGraveyard = false;
 	//If the card is in the graveyard or not
@@ -23,10 +25,11 @@ public abstract class Card : MonoBehaviour {
 	public float castTime;
 	protected float currentTime;
 	public Text summonZoneTextBox;
+	public Text cardTitleTextBox;
 	//Something for the dragging of cards
-	private Vector3 screenPoint;
+	protected Vector3 screenPoint;
 	//Something fo the dragging of cards
-	private Vector3 offset;
+	protected Vector3 offset;
 	//The game object for player 1 manager
 	protected GameObject p1Manager;
 	//The game object for player 2 manager
@@ -35,7 +38,8 @@ public abstract class Card : MonoBehaviour {
 	//This is used for when a player makes an invalid placement the card is placed back in it's original hand position
 	protected Vector3 cardHandPos;
 	// Use this for initialization
-	public void Start ()				//Abstract method for start
+	protected bool isDraggable;
+	public virtual void Start ()				//Abstract method for start
 	{
 		p1Manager = GameObject.Find ("Player1Manager");
 		p2Manager = GameObject.Find ("Player2Manager");
@@ -43,17 +47,24 @@ public abstract class Card : MonoBehaviour {
 		currentTime = castTime;
 		inSummonZone = false;
 		summonZoneTextBox = null;
+		isDraggable = true;
+		//gameObject.GetComponentInChildren<Text>();
+		cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
+		cardTitleTextBox.text = cardTitle;
 	}
 	public virtual void Update ()				//Abstract method for Update
 	{
+		
 		//If the card is Not in the graveyard and is in the summon zone
 		if (!inGraveyard && inSummonZone) 
 		{
+			
 			//Increment the current Time
 			currentTime -= Time.deltaTime;
 			summonZoneTextBox.text = currentTime.ToString ("F1");
 			//cardTimerBox.text = currentTime.ToString ("F1");
 			//IF the current time is larger than or equal to the cast time
+			isDraggable = false;
 			if (currentTime <= 0) 
 			{
 					//reset the timer
@@ -75,7 +86,7 @@ public abstract class Card : MonoBehaviour {
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
 				//Execute the game manager code
-				p1Manager.GetComponent<Player1Manager> ().cardDoneCasting (gameObject);
+				p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
 			} 
 			else 
 			{
@@ -84,17 +95,21 @@ public abstract class Card : MonoBehaviour {
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
 				//Execute the game manager code
-				p2Manager.GetComponent<Player2Manager> ().cardDoneCasting (gameObject);
+				p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
 			}
 		}
 	}
 
 	//Registers that the player has clicked on the card
-	public void OnMouseDown()			
+	public virtual void OnMouseDown()			
 	{
-		cardHandPos = gameObject.transform.position;
-		screenPoint = Camera.main.WorldToScreenPoint (gameObject.transform.position);
-		offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+		if (isDraggable == true) 
+		{
+			cardHandPos = gameObject.transform.position;
+			screenPoint = Camera.main.WorldToScreenPoint (gameObject.transform.position);
+			offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+
+		}
 	}
 
 	//Registers that the player has let go of the card
@@ -122,12 +137,14 @@ public abstract class Card : MonoBehaviour {
 	//Registers that the card is being dragged
 	public  void OnMouseDrag()			
 	{
-		Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
-		Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
-		transform.position = curPosition;
+		if (isDraggable == true) {
+			Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+			Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
+			transform.position = curPosition;
+		}
 	}
 	//Registers what card is under the mouse
-	public void OnMouseOver()
+	public virtual void OnMouseOver()
 	{
 		Debug.Log (gameObject.name);
 		if (playerID == 1) 
@@ -140,7 +157,7 @@ public abstract class Card : MonoBehaviour {
 		}
 	}
 	//Registers what card is under the mouse
-	public void OnMouseExit()
+	public virtual void OnMouseExit()
 	{
 		Debug.Log ("test");
 	}

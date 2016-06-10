@@ -42,12 +42,14 @@ public class Player1Manager : MonoBehaviour {
 	Vector3 graveyardPos;
 	//The card that the player is moused over
 	private GameObject mousedOverCard;
-
+	private GameObject line;
+	private GameObject enemyObjectUnderMouse;
     //NETWORK COMPONENTS
     PhotonView photonView;
 
 	// Use this for initialization
 	void Start () {
+		line = GameObject.Find ("Player1Line");
         //get this manager's photon view
         photonView = GetComponent<PhotonView>();
 		//Find the game manager
@@ -79,10 +81,11 @@ public class Player1Manager : MonoBehaviour {
 		{
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
-			playerHand.Add(library[currentCardIndex]);
-
+			//playerHand.Add(library[currentCardIndex]);
+			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
+			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 			//increment the index of the deck (since a card has now been taken)
-			Instantiate(library[currentCardIndex], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
+			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;
 			currentCardIndex++;
 		}
@@ -147,8 +150,8 @@ public class Player1Manager : MonoBehaviour {
 				//Get's the position of the zone
 				Vector3 zonePosition = SummonZones [i].transform.position;
 				//Checks if the card is within a square surrounding the zone
-				if (card.transform.position.x > (zonePosition.x - 1) && card.transform.position.x < (zonePosition.x + 1)) {
-					if (card.transform.position.y > (zonePosition.y - 1) && card.transform.position.y < (zonePosition.y + 1)) {
+				if (card.transform.position.x > (zonePosition.x - 3) && card.transform.position.x < (zonePosition.x + 3)) {
+					if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3)) {
                         //Play card, pass the card, the position of the zone, and the index of the zone
                         PlayCard(card, zonePosition, i);
                         //NETWORK CODE
@@ -177,13 +180,27 @@ public class Player1Manager : MonoBehaviour {
 	}
 	public void creatureCardIsDropped(GameObject card, Vector3 cardHandPos)
 	{
-		card.transform.position = cardHandPos;
+		//card.transform.position = cardHandPos;
 
-		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-		RaycastHit hit;
-		Debug.Log ("ray: " + ray.direction);
-		if(Physics.Raycast(ray, out hit))
-			Debug.DrawLine (ray.origin, hit.point, Color.red);
+		Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+		RaycastHit2D hit=Physics2D.Raycast(rayPos, Vector2.zero, 0f);
+
+		if (hit)
+		{
+			enemyObjectUnderMouse = hit.transform.gameObject;
+			if (enemyObjectUnderMouse.tag == "CreatureCard") {
+				card.GetComponent<CreatureCard> ().creatureCanAttack = false;
+				card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
+				enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
+				Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
+				Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
+			} 
+			else if (enemyObjectUnderMouse.tag == "Player2") 
+			{
+				card.GetComponent<CreatureCard> ().creatureCanAttack = false;
+				gameManager.dealDamage (card.GetComponent<DamageCard> ().damageToDeal, playerID);
+			}
+		}
 
 		//Debug.Log ("HERE - " + objectHit.name);
 
@@ -200,7 +217,7 @@ public class Player1Manager : MonoBehaviour {
     }
 
     //This method is called when the card is done casting
-    public void cardDoneCasting(GameObject card)
+    public void sendToGraveyard(GameObject card)
 	{
 		
 		//Find the zone that the card is in and set it to unoccupied
@@ -223,12 +240,16 @@ public class Player1Manager : MonoBehaviour {
 
 			}
 		}
-
+		//If the card is a creature card
+		if (card.GetComponent<CreatureCard> () != null) {
+			//Do nothing, creature card has its own damage mechanic
+		} 
 		//If the card is a damage card
-		if (card.GetComponent<DamageCard> () != null) 
+		else if(card.GetComponent<DamageCard> () != null)
 		{
 			gameManager.dealDamage (card.GetComponent<DamageCard> ().damageToDeal, playerID);
 		}
+
 		//If the card heals the player
 		if (card.GetComponent<HealCard> () != null) 
 		{
@@ -284,11 +305,11 @@ public class Player1Manager : MonoBehaviour {
 		{
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
+			//playerHand.Add(library[currentCardIndex]);
 			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
-			playerHand.Add(library[currentCardIndex]);
-
+			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 			//increment the index of the deck (since a card has now been taken)
-			Instantiate(library[currentCardIndex], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
+			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;
 			currentCardIndex++;
 		}
@@ -301,4 +322,16 @@ public class Player1Manager : MonoBehaviour {
     {
 
     }
+	public void drawLineOn()
+	{
+		line.GetComponent<DrawLine> ().isDrawing = true;
+	}
+	public void drawLineOff()
+	{
+		line.GetComponent<DrawLine> ().isDrawing = false;
+	}
+	public void makeLineInvisible()
+	{
+		line.GetComponent<DrawLine> ().makeLineInvisible ();
+	}
 }
