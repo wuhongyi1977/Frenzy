@@ -41,4 +41,5 @@ MonoBehaviour:
   - Win
   - SetOpponentName
   - Hey
+  - ChangeHealth
   DisableAutoOpenWizard: 1

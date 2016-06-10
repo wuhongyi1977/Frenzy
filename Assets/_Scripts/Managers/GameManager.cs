@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour {
 	int player1Health = 20;
 	int player2Health = 20;
 
+    //The panel and text box for when a player wins or loses
+    public GameObject gameEndPanel;
+    public Text gameEndText;
     //NETWORK COMPONENTS
     PhotonView photonView;
 
@@ -94,14 +97,23 @@ public class GameManager : MonoBehaviour {
 		}
 
 	}
-    [PunRPC]
-    void Win()
+    
+    public void Win()
     {
         Debug.Log("You Win!!");
-        //leave the current room
-        PhotonNetwork.LeaveRoom();
+        gameEndPanel.SetActive(true);
+        gameEndText.text = "You Win!";
+        
     }
-   
+
+    public void Lose()
+    {
+        Debug.Log("You Lost");
+        gameEndPanel.SetActive(true);
+        gameEndText.text = "You Lost";
+      
+    }
+
     //Handle the player quitting or crashing mid game
     void OnApplicationQuit()
     {
