@@ -16,15 +16,29 @@ public class PlayerController : MonoBehaviour
         photonView = GetComponent<PhotonView>();
         health = startingHealth;
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        //if this controller belongs to the local player
+        if(photonView.isMine)
+        {
+            gameObject.name = "LocalPlayer";
+        }
+        else //if this controller belongs to the opponent
+        {
+            gameObject.name = "NetworkOpponent";
+        }
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(health <= 0)
+        //if this is the local player
+        if(photonView.isMine && health <= 0)
         {
             Lose();
             //photonView.RPC("ChatMessage", PhotonTargets.All, "jup", "and jup!");
+        }
+        else if(!photonView.isMine && health <= 0) // if this is the opponent
+        {
+            Win();
         }
 	}
     void Lose()
@@ -36,7 +50,16 @@ public class PlayerController : MonoBehaviour
         //wait for a set number of seconds before returning to menu
         StartCoroutine("FinishingGame");
     }
-    
+    void Win()
+    {
+        Debug.Log("YOU WIN!!!");
+        //call lose function on gamemanager
+        //displays ending panel and message
+        gameManager.Win();
+        //wait for a set number of seconds before returning to menu
+        StartCoroutine("FinishingGame");
+    }
+
     IEnumerator FinishingGame()
     {
         yield return new WaitForSeconds(3);
@@ -44,7 +67,7 @@ public class PlayerController : MonoBehaviour
         PhotonNetwork.LeaveRoom();
 
     }
-
+    /*
     [PunRPC]
     void ChangeHealth(int amount)
     {
@@ -57,17 +80,20 @@ public class PlayerController : MonoBehaviour
     {
         health += amount;
     }
+    */
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.isWriting)
         {
             //We own this player: send the others our data
-            
+            //sync health
+            stream.SendNext(health);
+
         }
         else
         {
             //Network player, receive data          
-           
+           health = (int)stream.ReceiveNext();
         }
        
     }
