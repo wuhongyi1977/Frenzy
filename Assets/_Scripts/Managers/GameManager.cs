@@ -32,10 +32,13 @@ public class GameManager : MonoBehaviour {
         //get this manager's photon view
         photonView = GetComponent<PhotonView>();
 
+        ///COMMENTED OUT TEMPORARILY SINCE PLAYERCONTROLLERS WILL HANDLE THIS
+        /*
         player1HealthTextBox = GameObject.Find("Player1HealthBox").GetComponent<Text>();
         player1HealthTextBox.text = "Life: " + 20;
         player2HealthTextBox = GameObject.Find("Player2HealthBox").GetComponent<Text>();
         player2HealthTextBox.text = "Enemy Life: " + 20;
+        */
 
         //set your username to the stored username on playfabdatastore
         player1Username.text = PlayFabDataStore.userName;
@@ -71,15 +74,17 @@ public class GameManager : MonoBehaviour {
 			//Subtract the health of player 2
 			player2Health -= damage;
 			Debug.Log ("Player 2 Health: " + player2Health);
+            //COMMENTED OUT TEMPORARILY
 			//Update the text box
-			player2HealthTextBox.text = "Enemy Life: " + player2Health;
+			//player2HealthTextBox.text = "Enemy Life: " + player2Health;
 		} 
 		//If the card belongs to player 2
 		else 
 		{
 			player1Health -= damage;
 			Debug.Log ("Player 1 Health: " + player1Health);
-			player1HealthTextBox.text = "Life: " + player1Health;
+            //COMMENTED OUT TEMPORARILY
+           // player1HealthTextBox.text = "Life: " + player1Health;
 		}
 	}
 
