@@ -23,15 +23,26 @@ public class GameManager : MonoBehaviour {
     //NETWORK COMPONENTS
     PhotonView photonView;
 
+
     // Use this for initialization
     void Start ()
     {
         Debug.Log("Running start function!!!!");
         Debug.Log("Spawning player object");
-        PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
+       
+       
+
         //get this manager's photon view
         photonView = GetComponent<PhotonView>();
-
+        StartCoroutine("TimedCall");
+        //if this is the 2nd player joining
+        /*
+        if (!PhotonNetwork.isMasterClient)
+        {
+            photonView.RPC("SpawnPlayers", PhotonTargets.All);
+        }
+        */
+        //PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
         ///COMMENTED OUT TEMPORARILY SINCE PLAYERCONTROLLERS WILL HANDLE THIS
         /*
         player1HealthTextBox = GameObject.Find("Player1HealthBox").GetComponent<Text>();
@@ -64,7 +75,20 @@ public class GameManager : MonoBehaviour {
     {
         
     }
-    
+    //TEMP CALL TO SPAWN PLAYERS
+    IEnumerator TimedCall()
+    {
+        
+        yield return new WaitForSeconds(2);
+        SpawnPlayers();
+      
+        yield return null;
+    }
+    ///////////////////////////
+    public void SpawnPlayers()
+    {
+        PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
+    }
 	//Method for when a damage card is done casting
 	public void dealDamage(int damage, int playerID)
 	{
@@ -134,8 +158,10 @@ public class GameManager : MonoBehaviour {
             PhotonNetwork.Disconnect();
         }
     }
+    
 	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
 
 	}
+    
 }

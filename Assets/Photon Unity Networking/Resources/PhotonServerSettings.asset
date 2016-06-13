@@ -42,4 +42,5 @@ MonoBehaviour:
   - SetOpponentName
   - Hey
   - ChangeHealth
+  - SpawnPlayers
   DisableAutoOpenWizard: 1
