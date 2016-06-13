@@ -39,8 +39,14 @@ public abstract class Card : MonoBehaviour {
 	protected Vector3 cardHandPos;
 	// Use this for initialization
 	protected bool isDraggable;
+
+	public GameObject localPlayer;
+	public GameObject networkOpponent;
+
 	public virtual void Start ()				//Abstract method for start
 	{
+		localPlayer = GameObject.Find ("LocalPlayer");
+		networkOpponent = GameObject.Find ("NetworkOpponent");
 		p1Manager = GameObject.Find ("Player1Manager");
 		p2Manager = GameObject.Find ("Player2Manager");
 		doneAddingToGraveyard = false;
@@ -51,10 +57,10 @@ public abstract class Card : MonoBehaviour {
 		//gameObject.GetComponentInChildren<Text>();
 		cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
 		cardTitleTextBox.text = cardTitle;
+
 	}
 	public virtual void Update ()				//Abstract method for Update
 	{
-		
 		//If the card is Not in the graveyard and is in the summon zone
 		if (!inGraveyard && inSummonZone) 
 		{

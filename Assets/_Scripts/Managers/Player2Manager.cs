@@ -174,8 +174,8 @@ public class Player2Manager : MonoBehaviour {
 				//Get's the position of the zone
 				Vector3 zonePosition = SummonZones [i].transform.position;
 				//Checks if the card is within a square surrounding the zone
-				if (card.transform.position.x > (zonePosition.x - 1) && card.transform.position.x < (zonePosition.x + 1)) {
-					if (card.transform.position.y > (zonePosition.y - 1) && card.transform.position.y < (zonePosition.y + 1)) {
+				if (card.transform.position.x > (zonePosition.x - 3) && card.transform.position.x < (zonePosition.x + 3)) {
+					if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3)) {
                         //Play card, pass the card, the position of the zone, and the index of the zone
                         PlayCard(card, zonePosition, i);						
 						

@@ -274,8 +274,9 @@ public class Player1Manager : MonoBehaviour {
 				//Get's the position of the zone
 				Vector3 zonePosition = SummonZones [i].transform.position;
 				//Checks if the card is within a square surrounding the zone
-				if (card.transform.position.x > (zonePosition.x - 1) && card.transform.position.x < (zonePosition.x + 1)) {
-					if (card.transform.position.y > (zonePosition.y - 1) && card.transform.position.y < (zonePosition.y + 1)) {
+				if (card.transform.position.x > (zonePosition.x - 4) && card.transform.position.x < (zonePosition.x + 4)) {
+					if (card.transform.position.y > (zonePosition.y - 4) && card.transform.position.y < (zonePosition.y + 4)) {
+						Debug.Log (""+SummonZones [i].GetComponent<SummonZone>().textBox.name);
 						textBoxToReturn = SummonZones [i].GetComponent<SummonZone>().textBox;
 					}
 				}				

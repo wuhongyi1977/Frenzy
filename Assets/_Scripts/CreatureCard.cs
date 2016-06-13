@@ -14,6 +14,8 @@ public class CreatureCard : DamageCard {
 	public Text[] textBoxes;
 	public override void Start()
 	{
+		localPlayer = GameObject.Find ("LocalPlayer");
+		networkOpponent = GameObject.Find ("NetworkOpponent");
 		p1Manager = GameObject.Find ("Player1Manager");
 		p2Manager = GameObject.Find ("Player2Manager");
 		doneAddingToGraveyard = false;
@@ -32,6 +34,8 @@ public class CreatureCard : DamageCard {
 	}
 	public override void Update()
 	{
+		if(networkOpponent == null)
+			networkOpponent = GameObject.Find ("NetworkOpponent");
 		//If the card is Not in the graveyard and is in the summon zone
 		if (!inGraveyard && inSummonZone) {
 			
@@ -39,7 +43,10 @@ public class CreatureCard : DamageCard {
 				//Increment the current Time
 				isDraggable = false;
 				currentTime -= Time.deltaTime;
-				summonZoneTextBox.text = currentTime.ToString ("F1");
+				if(summonZoneTextBox == null)
+					summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+				else
+					summonZoneTextBox.text = currentTime.ToString ("F1");
 			}
 			//IF the current time is larger than or equal to the cast time
 			if (currentTime <= 0) 
@@ -94,7 +101,8 @@ public class CreatureCard : DamageCard {
 		{
 			
 			if (creatureCanAttack) 
-			{
+			{	
+				networkOpponent.GetComponent<PlayerController> ().ChangeHealth (damageToDeal * -1);
 				Debug.Log ("HERE");
 				p1Manager.GetComponent<Player1Manager> ().creatureCardIsDropped (gameObject, cardHandPos);
 			}

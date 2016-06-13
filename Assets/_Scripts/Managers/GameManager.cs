@@ -134,4 +134,8 @@ public class GameManager : MonoBehaviour {
             PhotonNetwork.Disconnect();
         }
     }
+	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+
+	}
 }
