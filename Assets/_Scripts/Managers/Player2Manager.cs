@@ -347,11 +347,11 @@ public class Player2Manager : MonoBehaviour {
 		//clear the list for a new set of unoccupied zones
 		unoccupiedZones.Clear();
 	}
-    void OnPhotonSerializeView()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
 
     }
-	public void setMousedOverCard(GameObject card)
+    public void setMousedOverCard(GameObject card)
 	{
 		mousedOverCard = card;
 	}

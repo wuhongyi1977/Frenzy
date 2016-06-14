@@ -319,11 +319,11 @@ public class Player1Manager : MonoBehaviour {
 	{
 		mousedOverCard = card;
 	}
-    void OnPhotonSerializeView()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
 
     }
-	public void drawLineOn()
+    public void drawLineOn()
 	{
 		line.GetComponent<DrawLine> ().isDrawing = true;
 	}

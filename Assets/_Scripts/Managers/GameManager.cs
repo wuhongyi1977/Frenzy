@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour {
     IEnumerator TimedCall()
     {
         
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(5);
         SpawnPlayers();
       
         yield return null;
@@ -87,7 +87,9 @@ public class GameManager : MonoBehaviour {
     ///////////////////////////
     public void SpawnPlayers()
     {
-        PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
+     
+            PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
+        
     }
 	//Method for when a damage card is done casting
 	public void dealDamage(int damage, int playerID)
