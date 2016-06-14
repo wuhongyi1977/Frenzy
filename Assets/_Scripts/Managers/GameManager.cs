@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour {
     public GameObject gameEndPanel;
     public Text gameEndText;
     //NETWORK COMPONENTS
-    PhotonView photonView;
+    //PhotonView photonView;
 
 
     // Use this for initialization
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour {
        
 
         //get this manager's photon view
-        photonView = GetComponent<PhotonView>();
+        //photonView = GetComponent<PhotonView>();
         StartCoroutine("TimedCall");
         //if this is the 2nd player joining
         /*
@@ -147,7 +147,7 @@ public class GameManager : MonoBehaviour {
     void OnApplicationQuit()
     {
         //notify other player that they won
-        photonView.RPC("Win", PhotonTargets.Others);
+        //photonView.RPC("Win", PhotonTargets.Others);
 
         //if the player is connected to the network
         if (PhotonNetwork.connected)
@@ -158,10 +158,10 @@ public class GameManager : MonoBehaviour {
             PhotonNetwork.Disconnect();
         }
     }
-    
+    /*
 	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
 
 	}
-    
+    */
 }
