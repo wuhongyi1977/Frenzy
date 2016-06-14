@@ -88,7 +88,12 @@ public class GameManager : MonoBehaviour {
     public void SpawnPlayers()
     {
      
-            PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
+        PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
+        //Spawn AI if this is a single player game
+        if(PhotonNetwork.isMasterClient && PhotonNetwork.room.maxPlayers == 1)
+        {
+            PhotonNetwork.Instantiate("AIController", Vector3.zero, Quaternion.identity, 0);
+        }
         
     }
 	//Method for when a damage card is done casting

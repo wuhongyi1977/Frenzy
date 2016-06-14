@@ -196,6 +196,11 @@ public class PlayfabLogin : MonoBehaviour
         //create a room with random name, the previous options, and no specification for typed lobby
         PhotonNetwork.CreateRoom(null, roomOptions, null);// this can make room name same as username(PlayFabDataStore.userName);
     }
+    //when player presses deck builder button on main menu
+    public void DeckBuilder()
+    {
+        PhotonNetwork.LoadLevel("DeckBuilder");
+    }
     //if the player fails to join a random room
     public void OnPhotonRandomJoinFailed()
     {
