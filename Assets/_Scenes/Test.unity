@@ -1040,38 +1040,37 @@ MonoBehaviour:
   playerHand: []
   graveyard: []
   library: []
-  currentHandSize: 0
   cardDeck:
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
-  - {fileID: 143746, guid: 9b2d7c396135fc148a281300883ac3fc, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 165052, guid: dce460f3e4ac11845ad9a2983884261a, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
+  - {fileID: 157676, guid: 2002c769e7d0a65408304fb78dfa38d4, type: 2}
 --- !u!114 &671678957
 MonoBehaviour:
   m_ObjectHideFlags: 0

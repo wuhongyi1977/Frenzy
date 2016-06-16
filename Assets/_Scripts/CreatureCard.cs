@@ -36,6 +36,8 @@ public class CreatureCard : DamageCard {
 	{
 		if(networkOpponent == null)
 			networkOpponent = GameObject.Find ("NetworkOpponent");
+		if(localPlayer == null)
+			localPlayer = GameObject.Find ("LocalPlayer");
 		//If the card is Not in the graveyard and is in the summon zone
 		if (!inGraveyard && inSummonZone) {
 			

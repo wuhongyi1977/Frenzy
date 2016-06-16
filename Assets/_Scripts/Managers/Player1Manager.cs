@@ -79,15 +79,7 @@ public class Player1Manager : MonoBehaviour {
 		//draw a hand of (startingHandSize) cards
 		for(int i = 0; i < startingHandSize; i++)
 		{
-			//set the first card (starting at index 0) of the players hand to
-			//the first card (starting at index 0) in the players deck
-			//playerHand.Add(library[currentCardIndex]);
-			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
-			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
-			//increment the index of the deck (since a card has now been taken)
-			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
-			currentHandSize++;
-			currentCardIndex++;
+			drawFromLibrary ();
 		}
 		//after this resolves, the player's hand should have 5 cards and the current card index 
 		//should be at 5 (since indecies 0-4 have been taken)
@@ -242,6 +234,7 @@ public class Player1Manager : MonoBehaviour {
 
 			}
 		}*/
+		/*
 		//If the card is a creature card
 		if (card.GetComponent<CreatureCard> () != null) {
 			//Do nothing, creature card has its own damage mechanic
@@ -262,7 +255,7 @@ public class Player1Manager : MonoBehaviour {
 			gameManager.dealDamage (card.GetComponent<DamageHealCard> ().damageToDeal, playerID);
 			gameManager.healPlayer (card.GetComponent<DamageHealCard> ().healAmount, playerID);
 		}
-
+		*/
 		//Moves card to the graveyard
 		card.transform.position = graveyardPos;
 	}
@@ -308,11 +301,9 @@ public class Player1Manager : MonoBehaviour {
 		{
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
-			//playerHand.Add(library[currentCardIndex]);
 			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
-			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
+			drawCard (library [currentCardIndex]);
 			//increment the index of the deck (since a card has now been taken)
-			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;
 			currentCardIndex++;
 		}
@@ -343,5 +334,9 @@ public class Player1Manager : MonoBehaviour {
 		{
 			playerHand [i].transform.position = new Vector3 (handZone.transform.position.x + (i*5f), handZone.transform.position.y, 0);
 		}
+	}
+	public void drawCard(GameObject card)
+	{
+		playerHand.Add ((GameObject)Instantiate (card,new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 	}
 }
