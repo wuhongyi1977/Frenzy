@@ -124,12 +124,14 @@ public class GameManager : MonoBehaviour {
 		if (playerID == 1) 
 		{
 			player1Health += healAmount;
-			player1HealthTextBox.text = "Life: " + player1Health;
+			//COMMENTED OUT TEMPORARILY
+			//player1HealthTextBox.text = "Life: " + player1Health;
 		} 
 		else 
 		{
 			player2Health += healAmount;
-			player2HealthTextBox.text = "Enemy Life: " + player2Health;
+			//COMMENTED OUT TEMPORARILY
+			//player2HealthTextBox.text = "Enemy Life: " + player2Health;
 		}
 
 	}

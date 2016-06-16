@@ -154,6 +154,7 @@ public class Player1Manager : MonoBehaviour {
 					if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3)) {
                         //Play card, pass the card, the position of the zone, and the index of the zone
                         PlayCard(card, zonePosition, i);
+						shiftCardsDown ();
                         //NETWORK CODE
                         if (PhotonNetwork.connected && !gameManager.versusAi)
                         {
@@ -213,6 +214,7 @@ public class Player1Manager : MonoBehaviour {
         SummonZones[i].GetComponent<SummonZone>().isOccupied = true;
         //Sets the state of the card to being in a summon zone
         card.GetComponent<Card>().inSummonZone = true;
+		playerHand.Remove (card);
         currentHandSize--;
     }
 
@@ -231,7 +233,7 @@ public class Player1Manager : MonoBehaviour {
 
 		//Add card to graveyard
 		graveyard.Add(card);
-
+		/*
 		//remove from hand
 		for (int i = 0; i < playerHand.Count; i++) {
 			if (playerHand [i].GetComponent<Card> ().cardNumber == card.GetComponent<Card> ().cardNumber) 
@@ -239,7 +241,7 @@ public class Player1Manager : MonoBehaviour {
 				playerHand.RemoveAt (i);
 
 			}
-		}
+		}*/
 		//If the card is a creature card
 		if (card.GetComponent<CreatureCard> () != null) {
 			//Do nothing, creature card has its own damage mechanic
@@ -334,5 +336,12 @@ public class Player1Manager : MonoBehaviour {
 	public void makeLineInvisible()
 	{
 		line.GetComponent<DrawLine> ().makeLineInvisible ();
+	}
+	public void shiftCardsDown()
+	{
+		for (int i = 0; i < playerHand.Count; i++) 
+		{
+			playerHand [i].transform.position = new Vector3 (handZone.transform.position.x + (i*5f), handZone.transform.position.y, 0);
+		}
 	}
 }

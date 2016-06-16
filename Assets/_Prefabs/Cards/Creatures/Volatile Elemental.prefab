@@ -11,7 +11,7 @@ GameObject:
   - 212: {fileID: 21237204}
   - 61: {fileID: 6128886}
   - 50: {fileID: 5079756}
-  - 114: {fileID: 11423474}
+  - 114: {fileID: 11405404}
   m_Layer: 0
   m_Name: Volatile Elemental
   m_TagString: CreatureCard
@@ -115,7 +115,7 @@ BoxCollider2D:
   m_Offset: {x: 0.00044731598, y: -0.00034718632}
   serializedVersion: 2
   m_Size: {x: 0.14121215, y: 0.14287578}
---- !u!114 &11423474
+--- !u!114 &11405404
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -123,24 +123,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 122534}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 617293a87b757374f9e6e0960db15e5d, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ec20c5884ee97542a5047ed3a328010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardTitle: 
+  cardTitle: Volatile Elemental
   doneAddingToGraveyard: 0
   inGraveyard: 0
   inSummonZone: 0
-  playerID: 2
+  playerID: 1
   cardNumber: 29
   castTime: 6
   summonZoneTextBox: {fileID: 0}
   cardTitleTextBox: {fileID: 0}
-  damageToDeal: 3
-  health: 3
-  attackSpeed: 5
+  localPlayer: {fileID: 0}
+  networkOpponent: {fileID: 0}
+  damageToDeal: 2
+  health: 1
+  attackSpeed: 6
   isCreature: 1
   creatureCanAttack: 0
   textBoxes: []
+  damageToDealOnEnter: 3
 --- !u!114 &11441616
 MonoBehaviour:
   m_ObjectHideFlags: 1

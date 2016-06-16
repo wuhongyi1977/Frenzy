@@ -67,7 +67,10 @@ public abstract class Card : MonoBehaviour {
 			
 			//Increment the current Time
 			currentTime -= Time.deltaTime;
-			summonZoneTextBox.text = currentTime.ToString ("F1");
+			if(summonZoneTextBox == null)
+				summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+			else
+				summonZoneTextBox.text = currentTime.ToString ("F1");
 			//cardTimerBox.text = currentTime.ToString ("F1");
 			//IF the current time is larger than or equal to the cast time
 			isDraggable = false;

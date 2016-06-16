@@ -8,9 +8,9 @@ public class CreatureCard : DamageCard {
 	//IF the card is a creature card
 	public bool isCreature = true;
 	//The bool variable that turns off the summoning timer after the creature has been summoned
-	private bool stopCastingTimer = false;
+	protected bool stopCastingTimer = false;
 	public bool creatureCanAttack = false;
-	private float creatureAttackSpeedTimer;
+	protected float creatureAttackSpeedTimer;
 	public Text[] textBoxes;
 	public override void Start()
 	{
