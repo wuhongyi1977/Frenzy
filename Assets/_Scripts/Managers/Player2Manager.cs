@@ -42,8 +42,10 @@ public class Player2Manager : MonoBehaviour {
 	Vector3 graveyardPos;
 	//The card that the player is moused over
 	private GameObject mousedOverCard;
-    //NETWORK COMPONENTS
-    PhotonView photonView;
+	private GameObject line;
+	private GameObject enemyObjectUnderMouse;
+	//NETWORK COMPONENTS
+	PhotonView photonView;
 
 
 	//Turn on the AI
@@ -58,10 +60,15 @@ public class Player2Manager : MonoBehaviour {
 	private int cardAIHandIndex;
 	//The temp variable for the index of the randomly chosen summon zone
 	private int zoneAIIndex;
-
-
+	private List<GameObject> playedCreatureCardsAI = new List<GameObject>(3);
+	public int percentChanceAttkOpp = 50;
+	private int roll;
+	private GameObject opponent;
+	private GameObject[] currentCreatureCards;
+	private List<GameObject> opponentCreatureCards = new List<GameObject>(16);
     // Use this for initialization
     void Start () {
+		opponent = GameObject.FindGameObjectWithTag ("Player1");
         //get this manager's photon view
         photonView = GetComponent<PhotonView>();
         //Check if this against computer or network player
@@ -176,22 +183,13 @@ public class Player2Manager : MonoBehaviour {
 				//Checks if the card is within a square surrounding the zone
 				if (card.transform.position.x > (zonePosition.x - 3) && card.transform.position.x < (zonePosition.x + 3)) {
 					if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3)) {
-                        //Play card, pass the card, the position of the zone, and the index of the zone
-                        PlayCard(card, zonePosition, i);						
-						
+						//Play card, pass the card, the position of the zone, and the index of the zone
+						PlayCard(card, zonePosition, i);
+						shiftCardsDown ();
 					}
 				}				
 			} 
-			//If the player tries to put the card into an occupied summoning zone
-			//else if (SummonZones [i].GetComponent<SummonZone> ().isOccupied == true)
-			//{
-			//	Debug.Log ("Zone is occupied");
-			//The card will be placed back in the hand zone
-			//	card.transform.position = handZone.transform.position;
-			//}
-
 		}
-
 
 		//If the player picks up the card and drops it anywhere else the card will be placed back in the hand zone
 		if(card.GetComponent<Card>().inSummonZone == false)
@@ -200,18 +198,42 @@ public class Player2Manager : MonoBehaviour {
 
 	public void creatureCardIsDropped(GameObject card, Vector3 cardHandPos)
 	{
-		card.transform.position = cardHandPos;
+		//card.transform.position = cardHandPos;
+
+		Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+		RaycastHit2D hit=Physics2D.Raycast(rayPos, Vector2.zero, 0f);
+
+		if (hit)
+		{
+			enemyObjectUnderMouse = hit.transform.gameObject;
+			if (enemyObjectUnderMouse.tag == "CreatureCard") {
+				card.GetComponent<CreatureCard> ().creatureCanAttack = false;
+				card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
+				enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
+				Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
+				Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
+			} 
+			else if (enemyObjectUnderMouse.tag == "Player2") 
+			{
+				card.GetComponent<CreatureCard> ().creatureCanAttack = false;
+				gameManager.dealDamage (card.GetComponent<DamageCard> ().damageToDeal, playerID);
+			}
+		}
+
+		//Debug.Log ("HERE - " + objectHit.name);
+
 	}
-    public void PlayCard(GameObject card, Vector3 zonePosition, int i)
-    {
-        //Puts the card in the summoning zone
-        card.transform.position = zonePosition;
-        //Sets the state of the zone to be occupied
-        SummonZones[i].GetComponent<SummonZone>().isOccupied = true;
-        //Sets the state of the card to being in a summon zone
-        card.GetComponent<Card>().inSummonZone = true;
-        currentHandSize--;
-    }
+	public void PlayCard(GameObject card, Vector3 zonePosition, int i)
+	{
+		//Puts the card in the summoning zone
+		card.transform.position = zonePosition;
+		//Sets the state of the zone to be occupied
+		SummonZones[i].GetComponent<SummonZone>().isOccupied = true;
+		//Sets the state of the card to being in a summon zone
+		card.GetComponent<Card>().inSummonZone = true;
+		playerHand.Remove (card);
+		currentHandSize--;
+	}
 
 	//This method is called when the card is done casting
 	public void sendToGraveyard(GameObject card)
@@ -219,39 +241,15 @@ public class Player2Manager : MonoBehaviour {
 
 		//Find the zone that the card is in and set it to unoccupied
 		for (int i = 0; i < SummonZones.Count; i++) {
+			//Debug.Log ("HERE");
 			if (card.transform.position.x == SummonZones [i].transform.position.x) {
+				//Debug.Log ("HERE2");
 				SummonZones [i].GetComponent<SummonZone> ().isOccupied = false;
 			}
 		}
 
 		//Add card to graveyard
 		graveyard.Add(card);
-
-		//remove from hand
-		for (int i = 0; i < playerHand.Count; i++) {
-			if (playerHand [i].GetComponent<Card> ().cardNumber == card.GetComponent<Card> ().cardNumber) 
-			{
-				playerHand.RemoveAt (i);
-
-			}
-		}
-
-		//If the card is a damage card
-		if (card.GetComponent<DamageCard> () != null) 
-		{
-			if(card.GetComponent<CreatureCard>().isCreature == false)
-				gameManager.dealDamage (card.GetComponent<DamageCard> ().damageToDeal, playerID);
-		}
-		//If the card heals the player
-		if (card.GetComponent<HealCard> () != null) 
-		{
-			gameManager.healPlayer (card.GetComponent<HealCard> ().healAmount, playerID);
-		}
-		if (card.GetComponent<DamageHealCard>() != null) 
-		{
-			gameManager.dealDamage (card.GetComponent<DamageHealCard> ().damageToDeal, playerID);
-			gameManager.healPlayer (card.GetComponent<DamageHealCard> ().healAmount, playerID);
-		}
 
 		//Moves card to the graveyard
 		card.transform.position = graveyardPos;
@@ -291,18 +289,15 @@ public class Player2Manager : MonoBehaviour {
 		return library;
 	}
     [PunRPC]
-    public void drawFromLibrary()
+	public void drawFromLibrary()
 	{
 		if(currentHandSize < startingHandSize)
 		{
-			
 			//set the first card (starting at index 0) of the players hand to
 			//the first card (starting at index 0) in the players deck
-			//playerHand.Add(library[currentCardIndex]);
 			library[currentCardIndex].GetComponent<Card>().playerID = playerID;
-			playerHand.Add ((GameObject)Instantiate (library [currentCardIndex],new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
+			drawCard (library [currentCardIndex]);
 			//increment the index of the deck (since a card has now been taken)
-			//Instantiate(playerHand[i], new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity);
 			currentHandSize++;
 			currentCardIndex++;
 		}
@@ -337,15 +332,78 @@ public class Player2Manager : MonoBehaviour {
 
 			//get a random index for unoccupied zones
 			zoneAIIndex = Random.Range (0, unoccupiedZones.Count);
+
 			//perform the actual card movements
-			if (playerHand [cardAIHandIndex].GetComponent<Card> ().inSummonZone == false && playerHand [cardAIHandIndex].GetComponent<Card> ().inGraveyard == false) {
+			if (playerHand [cardAIHandIndex].GetComponent<Card> ().inSummonZone == false && playerHand [cardAIHandIndex].GetComponent<Card> ().inGraveyard == false && unoccupiedZones.Count > 0) 
+			{
+				if(playedCreatureCardsAI.Count<3)
+					if(playerHand [cardAIHandIndex].GetComponent<CreatureCard>() != null)
+						playedCreatureCardsAI.Add (playerHand [cardAIHandIndex]);
 				playerHand [cardAIHandIndex].GetComponent<Card> ().OnMouseDown ();
 				playerHand [cardAIHandIndex].transform.position = unoccupiedZones [zoneAIIndex].transform.position;
 				playerHand [cardAIHandIndex].GetComponent<Card> ().OnMouseUp ();
 			}
 		}
+
+		//If the list of AI-played creature cards is bigger than 0
+		if (playedCreatureCardsAI.Count > 0) 
+		{	//check each creature card
+			for (int i = 0; i < playedCreatureCardsAI.Count; i++) 
+			{
+				//If the creature card in the list is ready to attack
+				if (playedCreatureCardsAI [i].GetComponent<CreatureCard> ().creatureCanAttack) 
+				{
+					//make a roll
+					roll = Random.Range (0, 100);
+					//If the roll is bigger than the percent chance to attack the opponent, then attack the opponent
+					if (roll < percentChanceAttkOpp) 
+					{
+						//make the attack
+						gameManager.dealDamage(playedCreatureCardsAI [i].GetComponent<CreatureCard>().damageToDeal,playerID);
+						playedCreatureCardsAI [i].GetComponent<CreatureCard>().creatureCanAttack = false;
+					} 
+					//else attempt to attack an enemy creature
+					else 
+					{
+						//get creature card game objects
+						currentCreatureCards = GameObject.FindGameObjectsWithTag("CreatureCard");
+						//go through the list
+						for(int j = 0; j < currentCreatureCards.Length; j++)
+						{
+							//if the playerID of the creature card is 1
+							if(currentCreatureCards[j].GetComponent<CreatureCard>().playerID == 1)
+							{
+								//If the creature is in the battlefield
+								if(currentCreatureCards[j].GetComponent<CreatureCard>().inBattlefield)
+								{
+									//add it to the list
+									opponentCreatureCards.Add(currentCreatureCards [j]);
+								}
+							}
+						}
+						//make them attack
+						for (int j = 0; j < opponentCreatureCards.Count; j++) 
+						{
+							roll = Random.Range (0, opponentCreatureCards.Count);
+							playedCreatureCardsAI [i].GetComponent<CreatureCard> ().health -= opponentCreatureCards[roll].GetComponent<CreatureCard> ().damageToDeal;
+							opponentCreatureCards[roll].GetComponent<CreatureCard> ().health -= playedCreatureCardsAI [i].GetComponent<CreatureCard> ().damageToDeal;
+							Debug.Log ("Your creature's health: " + playedCreatureCardsAI [i].GetComponent<CreatureCard> ().health);
+							Debug.Log ("Enemy creature's health: " + opponentCreatureCards[j].GetComponent<CreatureCard> ().health);
+							playedCreatureCardsAI [i].GetComponent<CreatureCard> ().creatureCanAttack = false;
+							if (playedCreatureCardsAI [i].GetComponent<CreatureCard> ().health == 0)
+								playedCreatureCardsAI.Remove (playedCreatureCardsAI [i]);
+						}
+					}
+				}
+			}
+		}
 		//clear the list for a new set of unoccupied zones
 		unoccupiedZones.Clear();
+		//clear the list of AI creature cards
+		//playedCreatureCardsAI.Clear();
+		//clear the list of opponent creature cards
+		opponentCreatureCards.Clear();
+		currentCreatureCards = new GameObject[16];
 	}
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -354,5 +412,28 @@ public class Player2Manager : MonoBehaviour {
     public void setMousedOverCard(GameObject card)
 	{
 		mousedOverCard = card;
+	}
+	public void drawLineOn()
+	{
+		line.GetComponent<DrawLine> ().isDrawing = true;
+	}
+	public void drawLineOff()
+	{
+		line.GetComponent<DrawLine> ().isDrawing = false;
+	}
+	public void makeLineInvisible()
+	{
+		line.GetComponent<DrawLine> ().makeLineInvisible ();
+	}
+	public void shiftCardsDown()
+	{
+		for (int i = 0; i < playerHand.Count; i++) 
+		{
+			playerHand [i].transform.position = new Vector3 (handZone.transform.position.x + (i*5f), handZone.transform.position.y, 0);
+		}
+	}
+	public void drawCard(GameObject card)
+	{
+		playerHand.Add ((GameObject)Instantiate (card,new Vector3(handZone.transform.position.x+(currentHandSize*5f),handZone.transform.position.y,handZone.transform.position.z),Quaternion.identity));
 	}
 }

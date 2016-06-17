@@ -156,16 +156,7 @@ public class Player1Manager : MonoBehaviour {
                     }
 				}				
 			} 
-			//If the player tries to put the card into an occupied summoning zone
-			//else if (SummonZones [i].GetComponent<SummonZone> ().isOccupied == true)
-			//{
-			//	Debug.Log ("Zone is occupied");
-				//The card will be placed back in the hand zone
-			//	card.transform.position = handZone.transform.position;
-			//}
-
 		}
-
 
 		//If the player picks up the card and drops it anywhere else the card will be placed back in the hand zone
 		if(card.GetComponent<Card>().inSummonZone == false)
@@ -182,11 +173,14 @@ public class Player1Manager : MonoBehaviour {
 		{
 			enemyObjectUnderMouse = hit.transform.gameObject;
 			if (enemyObjectUnderMouse.tag == "CreatureCard") {
-				card.GetComponent<CreatureCard> ().creatureCanAttack = false;
-				card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
-				enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
-				Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
-				Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
+				if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().inBattlefield) 
+				{
+					card.GetComponent<CreatureCard> ().creatureCanAttack = false;
+					card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
+					enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
+					Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
+					Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
+				}
 			} 
 			else if (enemyObjectUnderMouse.tag == "Player2") 
 			{
@@ -225,37 +219,7 @@ public class Player1Manager : MonoBehaviour {
 
 		//Add card to graveyard
 		graveyard.Add(card);
-		/*
-		//remove from hand
-		for (int i = 0; i < playerHand.Count; i++) {
-			if (playerHand [i].GetComponent<Card> ().cardNumber == card.GetComponent<Card> ().cardNumber) 
-			{
-				playerHand.RemoveAt (i);
 
-			}
-		}*/
-		/*
-		//If the card is a creature card
-		if (card.GetComponent<CreatureCard> () != null) {
-			//Do nothing, creature card has its own damage mechanic
-		} 
-		//If the card is a damage card
-		else if(card.GetComponent<DamageCard> () != null)
-		{
-			gameManager.dealDamage (card.GetComponent<DamageCard> ().damageToDeal, playerID);
-		}
-
-		//If the card heals the player
-		if (card.GetComponent<HealCard> () != null) 
-		{
-			gameManager.healPlayer (card.GetComponent<HealCard> ().healAmount, playerID);
-		}
-		if (card.GetComponent<DamageHealCard>() != null) 
-		{
-			gameManager.dealDamage (card.GetComponent<DamageHealCard> ().damageToDeal, playerID);
-			gameManager.healPlayer (card.GetComponent<DamageHealCard> ().healAmount, playerID);
-		}
-		*/
 		//Moves card to the graveyard
 		card.transform.position = graveyardPos;
 	}

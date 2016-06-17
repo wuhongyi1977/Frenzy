@@ -12,6 +12,7 @@ public class CreatureCard : DamageCard {
 	public bool creatureCanAttack = false;
 	protected float creatureAttackSpeedTimer;
 	public Text[] textBoxes;
+	public bool inBattlefield = false;
 	public override void Start()
 	{
 		localPlayer = GameObject.Find ("LocalPlayer");
@@ -57,6 +58,7 @@ public class CreatureCard : DamageCard {
 					stopCastingTimer = true;
 					summonZoneTextBox.text = "";
 					creatureCanAttack = true;
+					inBattlefield = true;
 				}
 
 				if (creatureCanAttack == false) {

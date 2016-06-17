@@ -49,7 +49,7 @@ GameObject:
   - 114: {fileID: 11497848}
   m_Layer: 0
   m_Name: Magma Bolt
-  m_TagString: CreatureCard
+  m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -190,6 +190,8 @@ MonoBehaviour:
   castTime: 5
   summonZoneTextBox: {fileID: 0}
   cardTitleTextBox: {fileID: 0}
+  localPlayer: {fileID: 0}
+  networkOpponent: {fileID: 0}
   damageToDeal: 3
 --- !u!212 &21205668
 SpriteRenderer:

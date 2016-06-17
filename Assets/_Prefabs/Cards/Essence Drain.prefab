@@ -31,7 +31,7 @@ GameObject:
   - 114: {fileID: 11461370}
   m_Layer: 0
   m_Name: Essence Drain
-  m_TagString: CreatureCard
+  m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -153,6 +153,8 @@ MonoBehaviour:
   castTime: 5
   summonZoneTextBox: {fileID: 0}
   cardTitleTextBox: {fileID: 0}
+  localPlayer: {fileID: 0}
+  networkOpponent: {fileID: 0}
   healAmount: 2
   damageToDeal: 2
 --- !u!114 &11480900

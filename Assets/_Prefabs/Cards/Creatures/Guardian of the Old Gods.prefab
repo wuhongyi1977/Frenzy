@@ -142,20 +142,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 617293a87b757374f9e6e0960db15e5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardTitle: 
+  cardTitle: Guardian of the Old Gods
   doneAddingToGraveyard: 0
   inGraveyard: 0
   inSummonZone: 0
-  playerID: 2
-  cardNumber: 29
-  castTime: 6
+  playerID: 1
+  cardNumber: 3
+  castTime: 20
   summonZoneTextBox: {fileID: 0}
   cardTitleTextBox: {fileID: 0}
-  damageToDeal: 3
-  health: 3
-  attackSpeed: 5
+  localPlayer: {fileID: 0}
+  networkOpponent: {fileID: 0}
+  damageToDeal: 10
+  health: 10
+  attackSpeed: 7
   isCreature: 1
   creatureCanAttack: 0
+  textBoxes: []
+  inBattlefield: 0
 --- !u!114 &11455030
 MonoBehaviour:
   m_ObjectHideFlags: 1
