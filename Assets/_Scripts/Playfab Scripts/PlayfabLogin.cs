@@ -39,8 +39,9 @@ public class PlayfabLogin : MonoBehaviour
     //Text for searching progress
     public Text searchText;
     //The number of seconds to wait for an opponent before returning to main menu
-    int searchingTime = 10;
-
+    int searchingTime = 120;
+    //check if search has been cancelled
+    bool searchCancelled = false;
 
     void Awake()
     {
@@ -270,6 +271,12 @@ public class PlayfabLogin : MonoBehaviour
         Debug.Log("Waiting for an opponent");
         for(int i = 0; i <= searchingTime; i++)
         {
+            //if search is cancelled, end the coroutine
+            if(searchCancelled == true)
+            {
+                searchCancelled = false;
+                yield break;
+            }
             Debug.Log("Time Elapsed: "+i);
             
             //if you are in a room and another player has joined
@@ -302,7 +309,23 @@ public class PlayfabLogin : MonoBehaviour
         mainMenuPanel.SetActive(true);
         yield return null;
     }
-
+    public void EndSearch()
+    {
+        searchCancelled = true;
+        Debug.Log("Cancelled search");
+        //leave current room (room is empty because no one joined)
+        if (PhotonNetwork.inRoom)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
+        //indicate that a player was not found 
+        searchText.text = "Opponent Not Found";
+        //wait so user can read failure indication
+        
+        //set main menu panel active
+        searchPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
+    }
     /// <summary>
     /// Registers a new user on playfab website
     /// </summary>
