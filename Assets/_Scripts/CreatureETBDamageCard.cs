@@ -27,19 +27,29 @@ public class CreatureETBDamageCard : CreatureCard {
 
 	public override void Update()
 	{
-		if(networkOpponent == null)
-			networkOpponent = GameObject.Find ("NetworkOpponent");
-		//If the card is Not in the graveyard and is in the summon zone
-		if (!inGraveyard && inSummonZone) {
+        if (networkOpponent == null)
+            networkOpponent = GameObject.Find("NetworkOpponent");
+        if (localPlayer == null)
+            localPlayer = GameObject.Find("LocalPlayer");
+        //If the card is Not in the graveyard and is in the summon zone
+        if (!inGraveyard && inSummonZone) {
 
 			if (!stopCastingTimer) {
 				//Increment the current Time
 				isDraggable = false;
 				currentTime -= Time.deltaTime;
 				if(summonZoneTextBox == null)
-					summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+                {
+                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                    //TEST
+                    //summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
+                }
+					
 				else
-					summonZoneTextBox.text = currentTime.ToString ("F1");
+                {
+                    summonZoneTextBox.text = currentTime.ToString("F1");
+                }
+					
 				
 
 			}
@@ -72,13 +82,18 @@ public class CreatureETBDamageCard : CreatureCard {
 					summonZoneTextBox.text = "";
 					inGraveyard = true;
 					inSummonZone = false;
-					if (playerID == 1) {
-						p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
-					} 
+					if (playerID == 1)
+                    {
+                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        //TEST
+                        //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
+                    } 
 					else 
 					{
-						p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
-					}
+                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        //TEST
+                        //p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
+                    }
 				}
 			}
 		}

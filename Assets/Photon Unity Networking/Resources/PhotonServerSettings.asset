@@ -43,4 +43,7 @@ MonoBehaviour:
   - Hey
   - ChangeHealth
   - SpawnPlayers
+  - drawCard
+  - LoadDeck
+  - PlayCardNetwork
   DisableAutoOpenWizard: 1

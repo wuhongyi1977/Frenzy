@@ -140,18 +140,33 @@ public class GameManager : MonoBehaviour {
     {
         Debug.Log("You Win!!");
         gameEndPanel.SetActive(true);
-        gameEndText.text = "You Win!";
-        
+        gameEndText.text = "You Win! \n Returning To Menu";
+        StartCoroutine("WaitForExit");
     }
 
     public void Lose()
     {
         Debug.Log("You Lost");
         gameEndPanel.SetActive(true);
-        gameEndText.text = "You Lost";
+        gameEndText.text = "You Lost \n Returning To Menu";
+        StartCoroutine("WaitForExit");
       
     }
-
+    public IEnumerator WaitForExit()
+    {
+        yield return new WaitForSeconds(4);
+        ExitGame();
+        yield return null;
+    }
+    public void ExitGame()
+    {
+        //leave the current room
+        if(PhotonNetwork.inRoom)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
+        PhotonNetwork.LoadLevel("Login");
+    }
     //Handle the player quitting or crashing mid game
     void OnApplicationQuit()
     {

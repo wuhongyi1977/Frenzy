@@ -43,6 +43,9 @@ public abstract class Card : MonoBehaviour {
 	public GameObject localPlayer;
 	public GameObject networkOpponent;
 
+    //ADDED CODE FOR HAND INDEX
+    public int handIndex;
+
 	public virtual void Start ()				//Abstract method for start
 	{
 		localPlayer = GameObject.Find ("LocalPlayer");
@@ -68,9 +71,12 @@ public abstract class Card : MonoBehaviour {
 			//Increment the current Time
 			currentTime -= Time.deltaTime;
 			if(summonZoneTextBox == null)
-				summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+            { summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject); }
+                //TEST
+				//summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
 			else
-				summonZoneTextBox.text = currentTime.ToString ("F1");
+            { summonZoneTextBox.text = currentTime.ToString("F1"); }
+				
 			//cardTimerBox.text = currentTime.ToString ("F1");
 			//IF the current time is larger than or equal to the cast time
 			isDraggable = false;
@@ -94,18 +100,22 @@ public abstract class Card : MonoBehaviour {
 				summonZoneTextBox.text = "";
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
-				//Execute the game manager code
-				p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
-			} 
+                //Execute the game manager code
+                localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                //TEST
+                //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
+            } 
 			else 
 			{
 				//Logic for player2
 				summonZoneTextBox.text = "";
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
-				//Execute the game manager code
-				p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
-			}
+                //Execute the game manager code
+                networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                //TEST
+                //p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
+            }
 		}
 	}
 
@@ -125,18 +135,35 @@ public abstract class Card : MonoBehaviour {
 	public virtual void OnMouseUp()			
 	{
 		dropped = true;
-		if (playerID == 1) {
-			p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject, cardHandPos);
-		}
+		if (playerID == 1)
+        {
+            localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+            //TEST
+            //p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject, cardHandPos);
+        }
 		else
-			p2Manager.GetComponent<Player2Manager> ().cardIsDropped (gameObject,cardHandPos);
+        {
+            networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+            //TEST
+            //p2Manager.GetComponent<Player2Manager>().cardIsDropped(gameObject, cardHandPos);
+        }
+			
 		//finds the text box that corresponds to the summon zone
 		if (summonZoneTextBox == null) 
 		{
 			if (playerID == 1)
-				summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+            {
+                summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                //TEST
+                //summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
+            }
 			else
-				summonZoneTextBox = p2Manager.GetComponent<Player2Manager> ().getSummonZone (gameObject);
+            {
+                summonZoneTextBox =networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
+                //TEST
+                //summonZoneTextBox = p2Manager.GetComponent<Player2Manager>().getSummonZone(gameObject);
+            }
+				
 		}
 		//if(playerID == 2)
 			//GameObject.Find ("Player2Manager").GetComponent<Player2Manager> ().cardIsDropped (gameObject);
@@ -158,12 +185,16 @@ public abstract class Card : MonoBehaviour {
 		Debug.Log (gameObject.name);
 		if (playerID == 1) 
 		{
-			p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
-		} 
+            localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            //TEST
+            //p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
+        } 
 		else 
 		{
-			p2Manager.GetComponent<Player2Manager> ().setMousedOverCard (gameObject);
-		}
+            networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            //TEST
+            //p2Manager.GetComponent<Player2Manager> ().setMousedOverCard (gameObject);
+        }
 	}
 	//Registers what card is under the mouse
 	public virtual void OnMouseExit()

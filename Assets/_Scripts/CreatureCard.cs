@@ -47,9 +47,16 @@ public class CreatureCard : DamageCard {
 				isDraggable = false;
 				currentTime -= Time.deltaTime;
 				if(summonZoneTextBox == null)
-					summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+                {
+                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                    //TEST
+                    //summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
+                }
 				else
-					summonZoneTextBox.text = currentTime.ToString ("F1");
+                {
+                    summonZoneTextBox.text = currentTime.ToString("F1");
+                }
+					
 			}
 			//IF the current time is larger than or equal to the cast time
 			if (currentTime <= 0) 
@@ -76,13 +83,18 @@ public class CreatureCard : DamageCard {
 					summonZoneTextBox.text = "";
 					inGraveyard = true;
 					inSummonZone = false;
-					if (playerID == 1) {
-						p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
-					} 
+					if (playerID == 1)
+                    {
+                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        //TEST
+                        //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
+                    } 
 					else 
 					{
-						p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
-					}
+                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        //TEST
+                        //p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
+                    }
 				}
 			}
 		}
@@ -98,9 +110,12 @@ public class CreatureCard : DamageCard {
 	}
 	public override void OnMouseUp()			
 	{
-		p1Manager.GetComponent<Player1Manager> ().makeLineInvisible ();
-		p1Manager.GetComponent<Player1Manager> ().drawLineOff ();
-		dropped = true;
+        localPlayer.GetComponent<PlayerController>().makeLineInvisible();
+        localPlayer.GetComponent<PlayerController> ().drawLineOff ();
+        //TEST
+        //p1Manager.GetComponent<Player1Manager> ().makeLineInvisible ();
+        //p1Manager.GetComponent<Player1Manager> ().drawLineOff ();
+        dropped = true;
 		if (playerID == 1) 
 		{
 			
@@ -108,24 +123,41 @@ public class CreatureCard : DamageCard {
 			{	
 				networkOpponent.GetComponent<PlayerController> ().ChangeHealth (damageToDeal * -1);
 				Debug.Log ("HERE");
-				p1Manager.GetComponent<Player1Manager> ().creatureCardIsDropped (gameObject, cardHandPos);
-			}
+                localPlayer.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
+                //TEST
+                //p1Manager.GetComponent<Player1Manager> ().creatureCardIsDropped (gameObject, cardHandPos);
+            }
 			else
-				p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject, cardHandPos);
-
+            {
+                localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+                //TEST
+                //p1Manager.GetComponent<Player1Manager>().cardIsDropped(gameObject, cardHandPos);
+            }
 		} 
 		else 
 		{
-			p2Manager.GetComponent<Player2Manager> ().cardIsDropped (gameObject, cardHandPos);
-			//p2Manager.GetComponent<Player2Manager> ().creatureCardIsDropped (gameObject, cardHandPos);
-		}
+            networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+            //TEST
+            //p2Manager.GetComponent<Player2Manager> ().cardIsDropped (gameObject, cardHandPos);
+
+        }
 		//finds the text box that corresponds to the summon zone
 		if (summonZoneTextBox == null) 
 		{
 			if (playerID == 1)
-				summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+            {
+                summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                //TEST
+                //summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
+            }
+				
 			else
-				summonZoneTextBox = p2Manager.GetComponent<Player2Manager> ().getSummonZone (gameObject);
+            {
+                summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
+                //TEST
+                //summonZoneTextBox = p2Manager.GetComponent<Player2Manager>().getSummonZone(gameObject);
+            }
+				
 		}
 
 	}
@@ -133,22 +165,34 @@ public class CreatureCard : DamageCard {
 	{
 		if (creatureCanAttack) {
 			if (Input.GetMouseButtonDown (0))
-				p1Manager.GetComponent<Player1Manager> ().drawLineOn ();
+            {
+                localPlayer.GetComponent<PlayerController>().drawLineOn();
+                //TEST
+                //p1Manager.GetComponent<Player1Manager>().drawLineOn();
+            }
+				
 		}
 		Debug.Log (gameObject.name);
 		if (playerID == 1) 
 		{
-			p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
-		} 
+            localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            //TEST
+            //p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
+        } 
 		else 
 		{
-			p2Manager.GetComponent<Player2Manager> ().setMousedOverCard (gameObject);
-		}
+            networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            //TEST
+            //p2Manager.GetComponent<Player2Manager> ().setMousedOverCard (gameObject);
+        }
 		if(creatureCanAttack)
 		{
-			if (playerID == 1) {
-				p1Manager.GetComponent<Player1Manager> ().drawLineOn ();
-			}
+			if (playerID == 1)
+            {
+                localPlayer.GetComponent<PlayerController>().drawLineOn();
+                //TEST
+                //p1Manager.GetComponent<Player1Manager> ().drawLineOn ();
+            }
 		}
 	}/*
 	public virtual void OnMouseExit()

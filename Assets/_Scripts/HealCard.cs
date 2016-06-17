@@ -39,9 +39,16 @@ public class HealCard : Card {
 			//Increment the current Time
 			currentTime -= Time.deltaTime;
 			if(summonZoneTextBox == null)
-				summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
+            {
+                summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                //TEST
+                //summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
+            }		
 			else
-				summonZoneTextBox.text = currentTime.ToString ("F1");
+            {
+                summonZoneTextBox.text = currentTime.ToString("F1");
+            }
+				
 			//cardTimerBox.text = currentTime.ToString ("F1");
 			//IF the current time is larger than or equal to the cast time
 			isDraggable = false;
@@ -63,8 +70,10 @@ public class HealCard : Card {
 			//Set this to false to prevent multiple executions of this block
 			doneAddingToGraveyard = true;
 			localPlayer.GetComponent<PlayerController> ().ChangeHealth (healAmount);
-			p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
-			/*
+            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+            //TEST
+            //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
+            /*
 			//If the card beings to player 1
 			if (playerID == 1) 
 			{
@@ -83,6 +92,6 @@ public class HealCard : Card {
 				//Execute the game manager code
 				p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
 			}*/
-		}
+        }
 	}
 }
