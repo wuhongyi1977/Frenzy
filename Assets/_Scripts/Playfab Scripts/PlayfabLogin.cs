@@ -46,6 +46,7 @@ public class PlayfabLogin : MonoBehaviour
     void Awake()
     {
         PlayFabSettings.TitleId = "57F4";
+        
         //make sure login panel is the only active panel
         registerPanel.SetActive(false);
         mainMenuPanel.SetActive(false);
@@ -352,6 +353,8 @@ public class PlayfabLogin : MonoBehaviour
             Debug.Log("New Account Created!");
             //save user data for rapid login
             ChangeSavedLogin(email, password);
+            //Initialize cloud script
+            PlayfabApiCalls.PlayFabInitialize();
             //get photon token
             GetPhotonToken();
             //set main menu active on successful login
@@ -393,6 +396,8 @@ public class PlayfabLogin : MonoBehaviour
             PlayFabDataStore.sessionTicket = result.SessionTicket;
             //save user data for rapid login
             ChangeSavedLogin(email, password);
+            //Initialize cloud script
+            PlayfabApiCalls.PlayFabInitialize();
             //get photon token
             GetPhotonToken();
 

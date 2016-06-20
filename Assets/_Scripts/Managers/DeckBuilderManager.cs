@@ -10,6 +10,10 @@ public class DeckBuilderManager : MonoBehaviour {
 
     public GameObject deckButton;
 
+    //UI Panels
+    public GameObject deckSelectPanel;
+    public GameObject deckBuildPanel;
+
  
 	// Use this for initialization
 	void Start ()
@@ -22,8 +26,13 @@ public class DeckBuilderManager : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+        string[] cards = { "Cardset_Cardname_Holo" };
+	    if(Input.GetKeyDown(KeyCode.P))
+        {
+            ConstructDeck("963057C83DDE4583", cards);
+        }
 	}
 
     
@@ -36,6 +45,7 @@ public class DeckBuilderManager : MonoBehaviour {
         {
             string deckName = "Deck " + (PlayFabDataStore.numberOfDecks + 1);
             //send the default name of the deck for the name
+            Debug.Log(deckName);
             CreateDeck(deckName);
         }
     }
@@ -44,40 +54,51 @@ public class DeckBuilderManager : MonoBehaviour {
     //Deck is a "character" on playfab granted to user
     public static void CreateDeck(string name)
     {
-        var request = new ExecuteCloudScriptRequest()
+        var request = new RunCloudScriptRequest()
         {
-            FunctionName = "newDeck", // Arbitrary function name (must exist in your uploaded cloud.js file)
-            FunctionParameter = new { deckName = name, characterType = "Deck" }, // The parameter provided to your function
-            //ActionId = "newDeck",
-            //Params = new { deckName = name, characterType = "Deck" }//set to whatever default class is
+            ActionId = "newDeck",
+            Params = new { characterName = name, characterType = "Deck" }
         };
-
-        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
+        PlayFabClientAPI.RunCloudScript(request, (result) =>
         {
             Debug.Log("Deck Created");
-            //Debug.Log(result.FunctionResult);
-            //PlayFabDataStore.currentDeck = result.characterID;
+            //string[] splitResult = result.ResultsEncoded.Split('"'); //19th element is the itemInstanceId
+            //Debug.Log("Split Result " + splitResult[59]); // 63th element is the itemId of the item granted from the drop table
+           // Debug.Log("Split Result " + splitResult[63]); // 63th element is the itemInstanceId of the item granted from the drop table
+           // Debug.Log("Split Result " + splitResult[67]); // 67st element is the item class  
 
-            // Cloudscript returns arbitrary results, so you have to evaluate them one step and one parameter at a time
-            Debug.Log(PlayFab.SimpleJson.SerializeObject(result));
-            Debug.Log(PlayFab.SimpleJson.SerializeObject(result.FunctionResult));
-            Debug.Log(result.FunctionResult);
-            /*
-            JsonObject jsonResult = (JsonObject)result.FunctionResult;
-            object messageValue;
-            jsonResult.TryGetValue("messageValue", out messageValue); // note how "messageValue" directly corresponds to the JSON values set in Cloud Script
-
-            Debug.Log((string)messageValue);
-            */
-
-        }, (error) =>
+        },
+        (error) =>
         {
-           
-            Debug.Log("Can't create deck!");
+            Debug.Log("Deck Not Created!");
             Debug.Log(error.ErrorMessage);
             Debug.Log(error.ErrorDetails);
         });
-       
+    }
+
+
+    public static void ConstructDeck(string deckIdNum, string[] itemsToAdd)
+    {
+        var request = new RunCloudScriptRequest()
+        {
+            ActionId = "fillDeck",
+            Params = new { deckId = deckIdNum, items = itemsToAdd }
+        };
+        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        {
+            Debug.Log("Cards Added To Deck");
+            //string[] splitResult = result.ResultsEncoded.Split('"'); //19th element is the itemInstanceId
+            //Debug.Log("Split Result " + splitResult[59]); // 63th element is the itemId of the item granted from the drop table
+            // Debug.Log("Split Result " + splitResult[63]); // 63th element is the itemInstanceId of the item granted from the drop table
+            // Debug.Log("Split Result " + splitResult[67]); // 67st element is the item class  
+
+        },
+        (error) =>
+        {
+            Debug.Log("Cards Not Added To Deck");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
     }
     //Creates a new deck for the player
     //Deck is a "character" on playfab granted to user
@@ -130,7 +151,15 @@ public class DeckBuilderManager : MonoBehaviour {
     }
     public void DeckButtonClicked(string name)
     {
-
+       
+        deckSelectPanel.SetActive(false);
+        deckBuildPanel.SetActive(true);
+        //retrieve deck info and populate build panel
+    }
+    public void BackToDeckSelect()
+    {
+        deckBuildPanel.SetActive(false);
+        deckSelectPanel.SetActive(true);
     }
     public void BackToMenu()
     {
