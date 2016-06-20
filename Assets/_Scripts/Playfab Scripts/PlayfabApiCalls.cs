@@ -3,9 +3,10 @@ using System.Collections;
 using PlayFab;
 using PlayFab.ClientModels;
 
-public class PlayfabApiCalls : MonoBehaviour {
+public class PlayfabApiCalls : MonoBehaviour
+{
 
-	
+
     //Access the newest version of cloud script
     public static void PlayFabInitialize()
     {
@@ -53,7 +54,7 @@ public class PlayfabApiCalls : MonoBehaviour {
             }
             //store the number of saved decks
             PlayFabDataStore.numberOfDecks = numberOfDecks;
-         
+
 
 
         }, (error) =>
@@ -79,6 +80,45 @@ public class PlayfabApiCalls : MonoBehaviour {
         (error) =>
         {
             Debug.Log("Cards Not Granted To User");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+    //Retrieve all cards in user's inventory
+    public static void RetrieveCardCollection()
+    {
+        var request = new GetUserInventoryRequest()
+        {
+        };
+
+        PlayFabClientAPI.GetUserInventory(request, (result) =>
+        {
+            Debug.Log("Inventory Retrieved");
+            //clear the card collection list to prevent duplicates
+            PlayFabDataStore.cardCollection.Clear();
+            //get all items
+            foreach(var item in result.Inventory)
+            {
+                //if the item is a card
+                if(item.ItemClass == "Card")
+                {
+                    //add the card's item id to the collection list
+                    PlayFabDataStore.cardCollection.Add(item.ItemId);
+                    //add a reference to the name associated with that id if it hasnt been added
+                    if(!PlayFabDataStore.cardList.ContainsKey(item.ItemId))
+                    {
+                        PlayFabDataStore.cardList.Add(item.ItemId, item.DisplayName);
+                    }
+                    
+                    Debug.Log("Found: "+ item.ItemId +" -> "+item.DisplayName);
+                }
+                
+            }
+            
+        },
+        (error) =>
+        {
+            Debug.Log("Inventory was not retrieved");
             Debug.Log(error.ErrorMessage);
             Debug.Log(error.ErrorDetails);
         });

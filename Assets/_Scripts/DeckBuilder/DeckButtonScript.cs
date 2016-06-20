@@ -6,6 +6,7 @@ public class DeckButtonScript : MonoBehaviour
 {
 
     private string Name;
+    private string itemId;
     public Text ButtonText;
     public DeckBuilderScrollView scrollView;
 
@@ -14,9 +15,12 @@ public class DeckButtonScript : MonoBehaviour
         Name = name;
         ButtonText.text = name;
     }
+    public void SetId(string id)
+    {
+        itemId = id;
+    }
     public void ButtonClick()
     {
-       scrollView.ButtonClicked(Name);
-
+       scrollView.ButtonClicked(itemId, Name);
     }
 }
