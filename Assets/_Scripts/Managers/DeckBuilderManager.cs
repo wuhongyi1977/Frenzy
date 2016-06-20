@@ -14,16 +14,20 @@ public class DeckBuilderManager : MonoBehaviour {
     public GameObject deckSelectPanel;
     public GameObject deckBuildPanel;
 
+    public GameObject scrollView;
+    DeckBuilderScrollView scrollViewScript;
  
 	// Use this for initialization
 	void Start ()
     {
+        scrollViewScript = scrollView.GetComponent<DeckBuilderScrollView>();
         //retrieve all decks the user has made
-        RetrieveDecks(PlayFabDataStore.playFabId);
-        //create buttons for all decks
-        //PUT CODE HERE
+        //NO LONGER NECESSARY, DONE AT START
+        //RetrieveDecks(PlayFabDataStore.playFabId);
 
-	}
+       
+
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -47,12 +51,15 @@ public class DeckBuilderManager : MonoBehaviour {
             //send the default name of the deck for the name
             Debug.Log(deckName);
             CreateDeck(deckName);
+           
+           
         }
     }
   
+   
     //Creates a new deck for the player
     //Deck is a "character" on playfab granted to user
-    public static void CreateDeck(string name)
+    public void CreateDeck(string name)
     {
         var request = new RunCloudScriptRequest()
         {
@@ -62,10 +69,13 @@ public class DeckBuilderManager : MonoBehaviour {
         PlayFabClientAPI.RunCloudScript(request, (result) =>
         {
             Debug.Log("Deck Created");
-            //string[] splitResult = result.ResultsEncoded.Split('"'); //19th element is the itemInstanceId
-            //Debug.Log("Split Result " + splitResult[59]); // 63th element is the itemId of the item granted from the drop table
-           // Debug.Log("Split Result " + splitResult[63]); // 63th element is the itemInstanceId of the item granted from the drop table
-           // Debug.Log("Split Result " + splitResult[67]); // 67st element is the item class  
+            string[] splitResult = result.ResultsEncoded.Split('"'); //19th element is the itemInstanceId
+            Debug.Log("Split Result " + splitResult[59]); // 63th element is the itemId of the item granted from the drop table
+            Debug.Log("Split Result " + splitResult[63]); // 63th element is the itemInstanceId of the item granted from the drop table
+            Debug.Log("Split Result " + splitResult[67]); // 67st element is the item class  
+
+            //delete all deck buttons and reload list
+            scrollViewScript.ReloadList();
 
         },
         (error) =>
@@ -100,55 +110,7 @@ public class DeckBuilderManager : MonoBehaviour {
             Debug.Log(error.ErrorDetails);
         });
     }
-    //Creates a new deck for the player
-    //Deck is a "character" on playfab granted to user
-    public static void RetrieveDecks(string playfabId)
-    {
-        var request = new ListUsersCharactersRequest()
-        {
-            PlayFabId = playfabId
-        };
-
-        PlayFabClientAPI.GetAllUsersCharacters(request, (result) =>
-        {
-            int numberOfDecks = 0;
-            foreach (var deck in result.Characters)
-            {
-                numberOfDecks++;
-                //store all retrieved deck ids in the playfabdatastore list
-                if (!PlayFabDataStore.deckIds.Contains(deck.CharacterId))
-                {
-                    PlayFabDataStore.deckIds.Add(deck.CharacterId);
-                }
-            }
-            //store the number of saved decks
-            PlayFabDataStore.numberOfDecks = numberOfDecks;
-
-        }, (error) =>
-        {
-            Debug.Log("Can't create deck!");
-            Debug.Log(error.ErrorMessage);
-            Debug.Log(error.ErrorDetails);
-        });
-    }
-    //load buttons for each deck that has been created already
-    public void LoadDeckButtons()
-    {
-        foreach (string deckId in PlayFabDataStore.deckIds)
-        {
-            //instantiate a new button for this deck
-            GameObject button = Instantiate(deckButton) as GameObject;
-            //set it active
-            button.SetActive(true);
-            //store the button's script
-            DeckButtonScript DB = button.GetComponent<DeckButtonScript>();
-            //call the set name function for that button
-            DB.SetName(deckId);
-            //set 
-            button.transform.SetParent(deckButton.transform.parent);
-
-        }
-    }
+    
     public void DeckButtonClicked(string name)
     {
        

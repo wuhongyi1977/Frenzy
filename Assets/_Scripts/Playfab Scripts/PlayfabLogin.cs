@@ -404,6 +404,9 @@ public class PlayfabLogin : MonoBehaviour
             //get account info (username) to save in PlayFabDataStore
             //jumps to main menu in GetAccountInfo to avoid jumping before retrieving data
             GetAccountInfo(email);
+
+            //Retrieve player decks
+            PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
         }, (error) =>
         {
             Debug.Log("Login Failed!");

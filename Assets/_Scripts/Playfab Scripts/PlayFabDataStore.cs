@@ -18,6 +18,8 @@ public class PlayFabDataStore : MonoBehaviour
     public static int numberOfDecks;
     //all deck ids
     public static List<string> deckIds = new List<string>();
+    //all decks organized by name and id associated with it
+    public static Dictionary<string, string> deckList = new Dictionary<string, string>();
     //user name for opponent
     //when not in game, stores last played opponent
     public static string opponentUserName;

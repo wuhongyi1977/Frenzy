@@ -7,7 +7,7 @@ public class DeckButtonScript : MonoBehaviour
 
     private string Name;
     public Text ButtonText;
-    public DeckBuilderManager deckManager;
+    public DeckBuilderScrollView scrollView;
 
     public void SetName(string name)
     {
@@ -16,7 +16,7 @@ public class DeckButtonScript : MonoBehaviour
     }
     public void ButtonClick()
     {
-       deckManager.DeckButtonClicked(Name);
+       scrollView.ButtonClicked(Name);
 
     }
 }
