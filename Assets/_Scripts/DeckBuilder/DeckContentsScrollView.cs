@@ -9,7 +9,9 @@ public class DeckContentsScrollView : MonoBehaviour
 
     public GameObject Button_Template;
     public GameObject scrollContent;
-    private List<string> NameList = new List<string>();
+    //this is populated with all of the cards currently in deck at start (item ids)
+    //The list is changed when cards are dragged in/ out
+    public List<string> DeckContentsList = new List<string>();
 
 
     // Use this for initialization
@@ -28,6 +30,8 @@ public class DeckContentsScrollView : MonoBehaviour
         foreach (string cardId in PlayFabDataStore.cardsInDeck)
         {
             Debug.Log("Found card for deck: " + cardId);
+            //Add the card to this deck's list
+            DeckContentsList.Add(cardId);
             //instantiate a new button for this deck
             GameObject button = Instantiate(Button_Template) as GameObject;
             //set it active
@@ -47,6 +51,27 @@ public class DeckContentsScrollView : MonoBehaviour
 
         }
 
+    }
+
+    public void AddCardToDeck(string newCardId)
+    {
+        //Add the card to this deck's list
+        DeckContentsList.Add(newCardId);
+    }
+    public void RemoveCardFromDeck(string cardId)
+    {
+        //Add the card to this deck's list
+        DeckContentsList.Remove(cardId);
+    }
+    //returns the list in array form
+    public string[] GetListOfCards()
+    {
+        string[] deckContentArray = null;
+        foreach (string cardId in DeckContentsList)
+        {
+           //save data to array
+        }
+        return deckContentArray;
     }
     /*
     public void ReloadList()

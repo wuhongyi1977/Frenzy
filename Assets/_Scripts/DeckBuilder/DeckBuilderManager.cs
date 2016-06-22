@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using PlayFab;
 using PlayFab.ClientModels;
@@ -8,6 +9,7 @@ public class DeckBuilderManager : MonoBehaviour {
 
     int maxDecks = 4;
     int currentDecks = 0;
+    int deckSize = 60;
 
     //UI Panels
     public GameObject deckSelectPanel;
@@ -22,6 +24,7 @@ public class DeckBuilderManager : MonoBehaviour {
     //Components for deck builder
     public InputField deckNameField;
     private string currentDeckId;
+    DeckContentsScrollView deckContentScript;
 
     // Use this for initialization
     void Start ()
@@ -186,6 +189,16 @@ public class DeckBuilderManager : MonoBehaviour {
         //update deck name
         UpdateDeckName(currentDeckId, newName);
         ////////////////////////////////////////////
+       
+        //retrieve all cards in the deck content list
+        string[] contentsList = deckContentScript.GetListOfCards();
+        //store all of the cards
+        PlayfabApiCalls.FillDeck(currentDeckId, contentsList);
+        if(contentsList.Length != deckSize)
+        {
+            //store a variable in the deck that it cannot be played until full
+        }
+        
 
 
     }

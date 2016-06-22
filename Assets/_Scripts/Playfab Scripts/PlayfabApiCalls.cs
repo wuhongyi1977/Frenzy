@@ -85,6 +85,28 @@ public class PlayfabApiCalls : MonoBehaviour
             Debug.Log(error.ErrorDetails);
         });
     }
+
+    //Fill a deck with cards
+    public static void FillDeck(string deck, string[] cardIdsToAdd)
+    {
+        var request = new RunCloudScriptRequest()
+        {
+            ActionId = "fillDeck",
+            Params = new { deckId = deck,items = cardIdsToAdd }
+        };
+
+        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        {
+            Debug.Log("Cards Granted To Deck");
+
+        },
+        (error) =>
+        {
+            Debug.Log("Cards Not Granted To Deck");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
     //Retrieve all cards in user's inventory
     public static void RetrieveCardCollection()
     {
