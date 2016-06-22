@@ -180,6 +180,7 @@ public class Player1Manager : MonoBehaviour {
 					enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
 					Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
 					Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
+						
 				}
 			} 
 			else if (enemyObjectUnderMouse.tag == "Player2") 

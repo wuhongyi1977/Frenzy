@@ -12,6 +12,7 @@ public class CreatureCard : DamageCard {
 	public bool creatureCanAttack = false;
 	protected float creatureAttackSpeedTimer;
 	public Text[] textBoxes;
+	private Text creatureStatsTextBox;
 	public bool inBattlefield = false;
 	public override void Start()
 	{
@@ -27,14 +28,17 @@ public class CreatureCard : DamageCard {
 		textBoxes = gameObject.GetComponentsInChildren<Text>();
 		for (int i = 0; i < textBoxes.Length; i++) {
 			if (textBoxes [i].name == "CardTitle")
-				textBoxes [i].text = cardTitle;
+				cardTitleTextBox = textBoxes [i];
 			if (textBoxes [i].name == "Stats")
-				textBoxes [i].text = damageToDeal + "/" + health + "/" + attackSpeed;
+				creatureStatsTextBox = textBoxes [i];
 		}
 		creatureAttackSpeedTimer = attackSpeed;
+		cardTitleTextBox.text = cardTitle;
+		creatureStatsTextBox.text = damageToDeal + "/" + health + "/" + attackSpeed;
 	}
 	public override void Update()
 	{
+		creatureStatsTextBox.text = damageToDeal + "/" + health + "/" + attackSpeed;
 		if(networkOpponent == null)
 			networkOpponent = GameObject.Find ("NetworkOpponent");
 		if(localPlayer == null)
@@ -79,19 +83,21 @@ public class CreatureCard : DamageCard {
 				}
 
 				//Add code here to deal damage to creature or player
-				if (health == 0 && !inGraveyard) {
+				if (health <= 0 && !inGraveyard) {
 					summonZoneTextBox.text = "";
 					inGraveyard = true;
 					inSummonZone = false;
 					if (playerID == 1)
                     {
                         localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+						localPlayer.GetComponent<PlayerController> ().creatureDied ();
                         //TEST
                         //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
                     } 
 					else 
 					{
                         networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+						networkOpponent.GetComponent<PlayerController> ().creatureDied ();
                         //TEST
                         //p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
                     }

@@ -59,6 +59,11 @@ public class PlayerController : MonoBehaviour
     private GameObject line;
     private GameObject enemyObjectUnderMouse;
 
+
+	public delegate void CreatureDied();
+	public static event CreatureDied creatureHasDied;
+
+
     void Awake()
     {
         //get this object's photon view component
@@ -119,6 +124,7 @@ public class PlayerController : MonoBehaviour
                 SummonZones.Add(zones[i]);
             }
             //load card deck
+			//StartCoroutine(DelayedLoadDeck(1.0f));
             photonView.RPC("LoadDeck", PhotonTargets.All);
             //LoadDeck(numberOfShuffles);
 
@@ -190,11 +196,18 @@ public class PlayerController : MonoBehaviour
         //put all card names here
         string[] cardNames =
         {
-            "Assassin Drone","Assassin Drone","Assassin Drone","Assassin Drone",
-            "Distraction","Distraction","Distraction","Distraction",
-            "Essence Drain","Essence Drain","Essence Drain","Essence Drain",
-            "Guardian of the Old Gods","Guardian of the Old Gods","Guardian of the Old Gods","Guardian of the Old Gods",
-            "Magma Bolt","Magma Bolt","Magma Bolt","Magma Bolt",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
+			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury"
         };
         for (int i = 0; i < deckSize; i++)
         {
@@ -527,6 +540,15 @@ public class PlayerController : MonoBehaviour
         }
        
     }
+
+
+	public void creatureDied()
+	{
+		if (photonView.isMine) {
+			if (creatureHasDied != null)
+				creatureHasDied ();
+		}
+	}
  
     
     /// <summary>
@@ -550,5 +572,11 @@ public class PlayerController : MonoBehaviour
            health = (int)stream.ReceiveNext();
         }
        
-    }
+	}
+
+	IEnumerator DelayedLoadDeck(float waitTime)
+	{
+		yield return new WaitForSeconds(waitTime);
+		photonView.RPC("LoadDeck", PhotonTargets.All);
+	}
 }

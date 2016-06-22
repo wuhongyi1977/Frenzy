@@ -46,6 +46,8 @@ public abstract class Card : MonoBehaviour {
     //ADDED CODE FOR HAND INDEX
     public int handIndex;
 
+	//The faction that the card belongs to. Neutral means it is available to all factions
+	public string faction = "Neutral";
 	public virtual void Start ()				//Abstract method for start
 	{
 		localPlayer = GameObject.Find ("LocalPlayer");
