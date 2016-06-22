@@ -3,6 +3,10 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class DraggableCard : MonoBehaviour {
+
+    private string Name;
+    private string itemId;
+
     bool isDraggable = false;
     bool dropped = false;
     Vector3 origPos;
@@ -26,7 +30,12 @@ public class DraggableCard : MonoBehaviour {
 	}
     public void SetName(string name)
     {
-        nameText.text = name; 
+        Name = name;
+        nameText.text = name;
+    }
+    public void SetId(string id)
+    {
+        itemId = id;
     }
     //Registers that the player has clicked on the card
     public void OnMouseDown()

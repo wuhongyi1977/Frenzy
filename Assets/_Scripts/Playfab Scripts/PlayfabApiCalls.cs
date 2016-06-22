@@ -6,6 +6,7 @@ using PlayFab.ClientModels;
 public class PlayfabApiCalls : MonoBehaviour
 {
 
+    public static bool cardRetrievalDone = false;
 
     //Access the newest version of cloud script
     public static void PlayFabInitialize()
@@ -87,6 +88,7 @@ public class PlayfabApiCalls : MonoBehaviour
     //Retrieve all cards in user's inventory
     public static void RetrieveCardCollection()
     {
+        
         var request = new GetUserInventoryRequest()
         {
         };
@@ -114,11 +116,55 @@ public class PlayfabApiCalls : MonoBehaviour
                 }
                 
             }
+           
             
         },
         (error) =>
         {
             Debug.Log("Inventory was not retrieved");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
+    //Retrieve all cards in a particular deck
+    public static void RetrieveCardsInDeck(string deckId)
+    {
+        cardRetrievalDone = false;
+        var request = new GetCharacterInventoryRequest()
+        {
+            CharacterId = deckId
+        };
+
+        PlayFabClientAPI.GetCharacterInventory(request, (result) =>
+        {
+            Debug.Log("Deck Inventory Retrieved");
+            //clear the cards in deck (in case deck has changed, list is being repopulated)
+            PlayFabDataStore.cardsInDeck.Clear();
+            //get all items
+            foreach (var item in result.Inventory)
+            {
+                //if the item is a card
+                if (item.ItemClass == "Card")
+                {
+                    //add the card's item id to the collection list
+                    PlayFabDataStore.cardsInDeck.Add(item.ItemId);
+                    //add a reference to the name associated with that id if it hasnt been added
+                    if (!PlayFabDataStore.cardList.ContainsKey(item.ItemId))
+                    {
+                        PlayFabDataStore.cardList.Add(item.ItemId, item.DisplayName);
+                    }
+
+                    Debug.Log("Found: " + item.ItemId + " -> " + item.DisplayName);
+                }
+
+            }
+            cardRetrievalDone = true;
+
+        },
+        (error) =>
+        {
+            Debug.Log("Deck Inventory was not retrieved");
             Debug.Log(error.ErrorMessage);
             Debug.Log(error.ErrorDetails);
         });

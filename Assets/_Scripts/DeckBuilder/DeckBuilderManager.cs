@@ -12,6 +12,7 @@ public class DeckBuilderManager : MonoBehaviour {
     //UI Panels
     public GameObject deckSelectPanel;
     public GameObject deckBuildPanel;
+    public GameObject loadingPanel;
 
     //components for deck selector
     public GameObject scrollView;
@@ -25,8 +26,10 @@ public class DeckBuilderManager : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        loadingPanel.SetActive(false);
         deckBuildPanel.SetActive(false);
         deckSelectPanel.SetActive(true);
+       
         scrollViewScript = scrollView.GetComponent<DeckBuilderScrollView>();
         //retrieve all decks the user has made
         //NO LONGER NECESSARY, DONE AT START
@@ -147,14 +150,33 @@ public class DeckBuilderManager : MonoBehaviour {
     }
     public void DeckButtonClicked(string id, string name)
     {
-       
+        StartCoroutine(LoadDeckBuilder(id, name));
+    }
+    IEnumerator LoadDeckBuilder(string id, string name)
+    {
+        //disable deck select panel
         deckSelectPanel.SetActive(false);
-        deckBuildPanel.SetActive(true);
+        //display loading screen
+        loadingPanel.SetActive(true);
         //retrieve deck info and populate build panel
+        PlayFabDataStore.currentDeck = id;
         currentDeckId = id;
         deckNameField.text = name;
-
+        //retrieve all cards in the selected deck
+        PlayfabApiCalls.RetrieveCardsInDeck(id);
+        //wait until retrieval is done
+        while(!PlayfabApiCalls.cardRetrievalDone)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+        //when cards are retrieved, activate build panel
+        loadingPanel.SetActive(false);
+        deckBuildPanel.SetActive(true);
     }
+   
+       
+
+       
     //saves cards in deck and deck name
     public void SaveDeck()
     {

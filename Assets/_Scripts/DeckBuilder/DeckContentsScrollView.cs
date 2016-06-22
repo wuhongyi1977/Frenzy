@@ -17,22 +17,23 @@ public class DeckContentsScrollView : MonoBehaviour
     {
         //store script for deck builder manager
         builderManagerScript = DeckBuilderManager.GetComponent<DeckBuilderManager>();
-        //load deck list into scroll view
-        //LoadList();
+        //load card list into scroll view
+        LoadList();
     }
 
     //Loads a list of all decks for this user
     //creates a button for each deck in the scrollview
     public void LoadList()
     {
-        foreach (string cardId in PlayFabDataStore.cardCollection)
+        foreach (string cardId in PlayFabDataStore.cardsInDeck)
         {
+            Debug.Log("Found card for deck: " + cardId);
             //instantiate a new button for this deck
             GameObject button = Instantiate(Button_Template) as GameObject;
             //set it active
             button.SetActive(true);
             //store the button's script
-            CardButtonScript CB = button.GetComponent<CardButtonScript>();
+            DraggableCard CB = button.GetComponent<DraggableCard>();
             //call the set name function for that button
             //use the name associated with the id key in the dictionary
             CB.SetName(PlayFabDataStore.cardList[cardId]);
