@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 public class CreatureCard : DamageCard {
+	PhotonView photonView;
 	public int health;
 	public int attackSpeed;
 
@@ -14,6 +15,10 @@ public class CreatureCard : DamageCard {
 	public Text[] textBoxes;
 	private Text creatureStatsTextBox;
 	public bool inBattlefield = false;
+
+	public int increaseDamageAmount, increaseAttackSpeedAmount, increaseHealthAmount;
+	private int startingDamage, startingAttackSpeed, startingHealth;
+
 	public override void Start()
 	{
 		localPlayer = GameObject.Find ("LocalPlayer");
@@ -35,6 +40,9 @@ public class CreatureCard : DamageCard {
 		creatureAttackSpeedTimer = attackSpeed;
 		cardTitleTextBox.text = cardTitle;
 		creatureStatsTextBox.text = damageToDeal + "/" + health + "/" + attackSpeed;
+		startingDamage = damageToDeal;
+		startingAttackSpeed = attackSpeed;
+		startingHealth = health;
 	}
 	public override void Update()
 	{
@@ -70,6 +78,7 @@ public class CreatureCard : DamageCard {
 					summonZoneTextBox.text = "";
 					creatureCanAttack = true;
 					inBattlefield = true;
+					localPlayer.GetComponent<PlayerController> ().creatureEntered ();
 				}
 
 				if (creatureCanAttack == false) {
@@ -87,6 +96,11 @@ public class CreatureCard : DamageCard {
 					summonZoneTextBox.text = "";
 					inGraveyard = true;
 					inSummonZone = false;
+					//reset creature's stats to default
+					damageToDeal = startingDamage;
+					attackSpeed = startingAttackSpeed;
+					health = startingHealth;
+
 					if (playerID == 1)
                     {
                         localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
@@ -200,7 +214,25 @@ public class CreatureCard : DamageCard {
                 //p1Manager.GetComponent<Player1Manager> ().drawLineOn ();
             }
 		}
-	}/*
+	}
+
+	public void increaseStats(int dmg, int attkSpd, int h)
+	{
+		if (photonView.isMine) {
+			damageToDeal += dmg;
+			attackSpeed -= attkSpd;
+			health += h;
+		}
+	}
+	public void decreaseStats(int dmg, int attkSpd, int h)
+	{
+		if (photonView.isMine) {
+			damageToDeal -= dmg;
+			attackSpeed += attkSpd;
+			health -= h;
+		}
+	}
+	/*
 	public virtual void OnMouseExit()
 	{
 			if (playerID == 1) {

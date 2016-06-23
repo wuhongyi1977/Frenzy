@@ -63,7 +63,12 @@ public class PlayerController : MonoBehaviour
 	public delegate void CreatureDied();
 	public static event CreatureDied creatureHasDied;
 
+	public delegate void CreatureEnteredBattlefield();
+	public static event CreatureEnteredBattlefield creatureHasEntered;
 
+	public int increaseDamageAmount, increaseAttackSpeedAmount, increaseHealthAmount;
+	public List<GameObject> creatureCardsInPlay = new List<GameObject>(3);
+	private GameObject creatureThatJustEntered;
     void Awake()
     {
         //get this object's photon view component
@@ -202,12 +207,13 @@ public class PlayerController : MonoBehaviour
 			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
 			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
 			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury"
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+
         };
         for (int i = 0; i < deckSize; i++)
         {
@@ -344,7 +350,11 @@ public class PlayerController : MonoBehaviour
 
                         PlayCard(card, zonePosition, i);
                         photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
-                        
+						//If the card is a creature card, add it to the list of creature cards in play
+						if (card.GetComponent<CreatureCard> () != null) {
+							creatureThatJustEntered = card;
+							creatureCardsInPlay.Add (card);
+						}
                     }
                 }
             }
@@ -438,6 +448,9 @@ public class PlayerController : MonoBehaviour
 
         //Moves card to the graveyard
         card.transform.position = graveyardPos;
+		//If the card being sent to the graveyard is a creature card, remove it from the list of creature cards in play
+		if (card.GetComponent<CreatureCard>() != null)
+			creatureCardsInPlay.Remove (card);
     }
     public Text getSummonZone(GameObject card)
     {
@@ -549,6 +562,13 @@ public class PlayerController : MonoBehaviour
 				creatureHasDied ();
 		}
 	}
+	public void creatureEntered()
+	{
+		if (photonView.isMine) {
+			if (creatureHasEntered != null)
+				creatureHasEntered ();
+		}
+	}
  
     
     /// <summary>
@@ -578,5 +598,38 @@ public class PlayerController : MonoBehaviour
 	{
 		yield return new WaitForSeconds(waitTime);
 		photonView.RPC("LoadDeck", PhotonTargets.All);
+	}
+	//When called it will increase the stats of all the creatures by the amount passed
+	public void increaseCreatureStats(int dmg, int attkSpd, int h)
+	{
+		if(photonView.isMine)
+		{
+			Debug.Log ("INCREASING CREATURE STATS");
+			increaseDamageAmount += dmg;
+			increaseAttackSpeedAmount += attkSpd;
+			increaseHealthAmount += h;
+			//increase the stats of creatures currently in play
+			for (int i = 0; i < creatureCardsInPlay.Count; i++) {
+				if(creatureCardsInPlay[i].GetComponent<CreatureCard>().playerID == 1)
+					creatureCardsInPlay [i].GetComponent<CreatureCard> ().increaseStats (dmg, attkSpd, h);
+				}
+		}
+	}
+	//When called it will decrease the stats of all the creatures by the amount passed
+	public void decreaseCreatureStats(int dmg, int attkSpd, int h)
+	{
+		if (photonView.isMine) {
+			increaseDamageAmount -= dmg;
+			increaseAttackSpeedAmount -= attkSpd;
+			increaseHealthAmount -= h;
+			for (int i = 0; i < creatureCardsInPlay.Count; i++) {
+				creatureCardsInPlay [i].GetComponent<CreatureCard> ().decreaseStats (dmg, attkSpd, h);
+			}
+		}
+	}
+	//Passes the card object of the creature that just entered
+	public GameObject getCreatureThatJustEntered()
+	{
+		return creatureThatJustEntered;
 	}
 }

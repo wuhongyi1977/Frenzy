@@ -46,7 +46,7 @@ GameObject:
   - 212: {fileID: 21212242}
   - 61: {fileID: 6148612}
   - 50: {fileID: 5053756}
-  - 114: {fileID: 11444814}
+  - 114: {fileID: 11479744}
   m_Layer: 0
   m_Name: Relic of Fury
   m_TagString: Card
@@ -99,7 +99,7 @@ BoxCollider2D:
   m_Offset: {x: 0.00044731598, y: -0.00034718632}
   serializedVersion: 2
   m_Size: {x: 0.14121215, y: 0.14287578}
---- !u!114 &11444814
+--- !u!114 &11479744
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -107,15 +107,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 191250}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 364d964abc6cfa94b9ebecfae1764ccf, type: 3}
+  m_Script: {fileID: 11500000, guid: bdcc4aaccdfad0448b2c2715cce82031, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cardTitle: Relic of Fury
   doneAddingToGraveyard: 0
   inGraveyard: 0
   inSummonZone: 0
-  playerID: 2
-  cardNumber: 59
+  playerID: 0
+  cardNumber: 0
   castTime: 8
   summonZoneTextBox: {fileID: 0}
   cardTitleTextBox: {fileID: 0}
@@ -125,6 +125,10 @@ MonoBehaviour:
   faction: Neutral
   isRelic: 1
   relicActive: 0
+  buffApplied: 0
+  changeDamageAmount: 0
+  changeAttackSpeedAmount: 1
+  changeHealthAmount: 0
 --- !u!114 &11489614
 MonoBehaviour:
   m_ObjectHideFlags: 1
