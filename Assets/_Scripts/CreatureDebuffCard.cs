@@ -11,7 +11,7 @@ public class CreatureDebuffCard : Card {
 	public int changeDamageAmt;
 	public int changeHealthAmt;
 	public int changeAttackSpeedAmt;
-	private GameObject theCreature;
+	protected GameObject theCreature;
 	// Use this for initialization
 	public override void Start ()				//Abstract method for start
 	{
@@ -56,6 +56,7 @@ public class CreatureDebuffCard : Card {
 				inGraveyard = true;
 				//Set state of card to not being in the summon zone
 				inSummonZone = false;
+				//Apply the debuff to the targeted creature
 				theCreature.GetComponent<CreatureCard> ().decreaseStats (changeDamageAmt, changeHealthAmt, changeAttackSpeedAmt);
 			}
 

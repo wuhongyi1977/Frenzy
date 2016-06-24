@@ -28,7 +28,7 @@ GameObject:
   - 212: {fileID: 21266714}
   - 61: {fileID: 6198644}
   - 50: {fileID: 5021892}
-  - 114: {fileID: 11481538}
+  - 114: {fileID: 11496526}
   m_Layer: 0
   m_Name: Unholy Assault
   m_TagString: Card
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Text: '
 
 '
---- !u!114 &11481538
+--- !u!114 &11496526
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 112088}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af0ecbf2973f3ae4dadbe005982a762a, type: 3}
+  m_Script: {fileID: 11500000, guid: ea27dfdda884eda4c99a5eff8e9ae4e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cardTitle: Unholy Assault

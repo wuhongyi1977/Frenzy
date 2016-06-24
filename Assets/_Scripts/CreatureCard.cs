@@ -96,6 +96,8 @@ public class CreatureCard : DamageCard {
 					summonZoneTextBox.text = "";
 					inGraveyard = true;
 					inSummonZone = false;
+					inBattlefield = false;
+					creatureCanAttack = false;
 					//reset creature's stats to default
 					damageToDeal = startingDamage;
 					attackSpeed = startingAttackSpeed;
