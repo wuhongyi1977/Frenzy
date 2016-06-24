@@ -218,4 +218,18 @@ public abstract class Card : MonoBehaviour {
 	{
 		return currentTime;
 	}
+	public void setGraveyardVariables()
+	{
+		inSummonZone = false;
+		inGraveyard = true;
+		doneAddingToGraveyard = true;
+	}
+	public void setSummonZoneTextBox(Text card)
+	{
+		summonZoneTextBox = card;
+	}
+	public Text getSummonZoneTextBox()
+	{
+		return summonZoneTextBox;
+	}
 }

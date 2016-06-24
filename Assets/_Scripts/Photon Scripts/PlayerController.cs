@@ -201,18 +201,19 @@ public class PlayerController : MonoBehaviour
         //put all card names here
         string[] cardNames =
         {
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury","Relic of Fury",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
+			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
+			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
+			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
+			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
+			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+
 
         };
         for (int i = 0; i < deckSize; i++)
@@ -426,6 +427,47 @@ public class PlayerController : MonoBehaviour
         //Debug.Log ("HERE - " + objectHit.name);
 
     }
+	public void creatureDebuffCardIsDropped(GameObject card, Vector3 cardHandPos)
+	{
+		Debug.Log ("IN FUNCTION");
+		card.transform.position = cardHandPos;
+		Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+		RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
+
+		if (hit) {
+			Debug.Log ("HIT");
+			enemyObjectUnderMouse = hit.transform.gameObject;
+			Debug.Log (enemyObjectUnderMouse.name);
+			//If the object is a creature card
+			if (enemyObjectUnderMouse.tag == "CreatureCard") {
+				Debug.Log ("A CREATURE");
+				//If the creature card is in the battlefield
+				if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().inBattlefield) 
+				{
+					//Find an open summoning slot
+					for (int i = 0; i < SummonZones.Count; i++) 
+					{
+						if (!SummonZones [i].GetComponent<SummonZone> ().isOccupied) 
+						{
+							//Get's the position of the zone
+							Vector3 zonePosition = SummonZones[i].transform.position;
+							//Play card, pass the card, the position of the zone, and the index of the zone
+							card.GetComponent<CreatureDebuffCard>().setSummonZoneTextBox(SummonZones[i].GetComponent<SummonZone>().textBox);
+							card.GetComponent<CreatureDebuffCard>().setValidCreatureToDebuff(enemyObjectUnderMouse);
+							PlayCard(card, zonePosition, i);
+							photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
+						}
+					}
+					if (card.GetComponent<CreatureDebuffCard> ().hasTextBox() == false) 
+					{
+						Debug.Log ("INVALID PLAY, SEND TO GY");
+						card.GetComponent<CreatureDebuffCard>().setGraveyardVariables();
+						sendToGraveyard (card);
+					}
+				}
+			}
+		}
+	}
    
 
     //This method is called when the card is done casting

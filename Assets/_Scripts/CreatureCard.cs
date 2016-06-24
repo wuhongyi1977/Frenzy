@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 public class CreatureCard : DamageCard {
-	PhotonView photonView;
+	//PhotonView photonView;
 	public int health;
 	public int attackSpeed;
 
@@ -192,7 +192,7 @@ public class CreatureCard : DamageCard {
             }
 				
 		}
-		Debug.Log (gameObject.name);
+		//Debug.Log (gameObject.name);
 		if (playerID == 1) 
 		{
             localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
@@ -216,21 +216,21 @@ public class CreatureCard : DamageCard {
 		}
 	}
 
-	public void increaseStats(int dmg, int attkSpd, int h)
+	public void increaseStats(int dmg, int h, int attkSpd)
 	{
-		if (photonView.isMine) {
+		//if (photonView.isMine) {
 			damageToDeal += dmg;
 			attackSpeed -= attkSpd;
 			health += h;
-		}
+		//}
 	}
-	public void decreaseStats(int dmg, int attkSpd, int h)
+	public void decreaseStats(int dmg, int h, int attkSpd)
 	{
-		if (photonView.isMine) {
+		//if (photonView.isMine) {
 			damageToDeal -= dmg;
 			attackSpeed += attkSpd;
 			health -= h;
-		}
+		//}
 	}
 	/*
 	public virtual void OnMouseExit()
