@@ -13,6 +13,8 @@ public class DraggableCard : MonoBehaviour {
     Vector3 screenPoint;
     Vector3 offset;
 
+    DeckContentsScrollView deckContents;
+
     public Text nameText;
 	// Use this for initialization
 	void Start ()
@@ -37,34 +39,46 @@ public class DraggableCard : MonoBehaviour {
     {
         itemId = id;
     }
+    public void SetScrollView(DeckContentsScrollView scrollView)
+    {
+        deckContents = scrollView;
+    }
     //Registers that the player has clicked on the card
     public void OnMouseDown()
     {
-        if (isDraggable == true)
-        {
-            origPos = gameObject.transform.position;
-            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+        Debug.Log("Clicked a card");
+        //Remove card from list while dragging 
+        //DeckContentsList.Remove(cardId);
 
-        }
+        //remove from scrollview
+        transform.SetParent(transform, false);
+        //if (isDraggable == true)
+        //{
+        origPos = gameObject.transform.position;
+        screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+        offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+
+        //}
     }
     //Registers that the player has let go of the card
     public void OnMouseUp()
     {
         dropped = true;
-        
+        //set the parent of this card to be the deck content scroll list
+        transform.SetParent(deckContents.scrollContent.transform, false);
     }
 
     //Registers that the card is being dragged
     public void OnMouseDrag()
     {
-        if (isDraggable == true)
-        {
+       // if (isDraggable == true)
+       // {
             Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
             Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
             transform.position = curPosition;
-        }
+       // }
     }
+    /*
     //Registers what card is under the mouse
     public virtual void OnMouseOver()
     {
@@ -76,4 +90,5 @@ public class DraggableCard : MonoBehaviour {
     {
         Debug.Log("test");
     }
+    */
 }

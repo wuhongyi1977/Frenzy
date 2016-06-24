@@ -38,6 +38,8 @@ public class DeckContentsScrollView : MonoBehaviour
             button.SetActive(true);
             //store the button's script
             DraggableCard CB = button.GetComponent<DraggableCard>();
+            //set the cards scrollview variable to be this script
+            CB.SetScrollView(this);
             //call the set name function for that button
             //use the name associated with the id key in the dictionary
             CB.SetName(PlayFabDataStore.cardList[cardId]);
