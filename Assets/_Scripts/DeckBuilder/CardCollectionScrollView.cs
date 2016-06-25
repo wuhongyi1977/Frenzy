@@ -9,12 +9,14 @@ public class CardCollectionScrollView : MonoBehaviour
 
     public GameObject Button_Template;
     public GameObject scrollContent;
+    public GameObject sceneCanvas;
     private List<string> NameList = new List<string>();
 
 
     // Use this for initialization
     void Start()
     {
+        sceneCanvas = GameObject.Find("Canvas");
         //store script for deck builder manager
         builderManagerScript = DeckBuilderManager.GetComponent<DeckBuilderManager>();
         //load deck list into scroll view

@@ -12,6 +12,7 @@ public class CardButtonScript : MonoBehaviour
     public DeckContentsScrollView deckScrollView;
 
     public GameObject draggableCard;
+   
 
     public void SetName(string name)
     {
@@ -22,7 +23,25 @@ public class CardButtonScript : MonoBehaviour
     {
         itemId = id;
     }
-    
+    public void OnMouseDown()
+    {
+        //instantiate a new button for this deck
+        GameObject card = Instantiate(draggableCard) as GameObject;
+        //set it active
+        card.SetActive(true);
+        //store the button's script
+        DraggableCard DC = card.GetComponent<DraggableCard>();
+        //call the set name function for that button
+        DC.SetName(Name);
+        DC.SetId(itemId);
+        //remove from scrollview
+        DC.transform.SetParent(cardScrollView.sceneCanvas.transform, false);
+
+        //needs to follow mouse!!!
+       
+
+    }
+    /*
     public void ButtonClick()
     {
         //instantiate a new button for this deck
@@ -33,9 +52,13 @@ public class CardButtonScript : MonoBehaviour
         DraggableCard DC = card.GetComponent<DraggableCard>();
         //call the set name function for that button
         DC.SetName(Name);
-       
-       
+        DC.SetId(itemId);
+        //remove from scrollview
+        DC.transform.SetParent(cardScrollView.sceneCanvas.transform, false);
+
+
 
     }
+    */
     
 }

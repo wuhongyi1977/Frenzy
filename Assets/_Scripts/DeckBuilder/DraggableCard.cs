@@ -31,6 +31,14 @@ public class DraggableCard : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        if(false)//change this to check position over scroll view
+        {
+            isOverScrollView = true;
+        }
+        else
+        {
+            isOverScrollView = false;
+        }
 	
 	}
     public void SetName(string name)
@@ -46,10 +54,9 @@ public class DraggableCard : MonoBehaviour {
     {
         deckContents = scrollView;
     }
-    public void OverScrollView(bool isOver)
-    {
-        isOverScrollView = isOver;
-    }
+    
+
+   
     //Registers that the player has clicked on the card
     public void OnMouseDown()
     {

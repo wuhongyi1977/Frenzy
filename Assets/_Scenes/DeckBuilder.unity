@@ -1089,6 +1089,7 @@ MonoBehaviour:
   DeckBuilderManager: {fileID: 771244596}
   Button_Template: {fileID: 1012428273}
   scrollContent: {fileID: 767977104}
+  sceneCanvas: {fileID: 0}
 --- !u!114 &766414683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1292,7 +1293,7 @@ GameObject:
   - 114: {fileID: 981357483}
   - 114: {fileID: 981357482}
   m_Layer: 5
-  m_Name: ScrollContent
+  m_Name: ScrollDeckContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1580,13 +1581,27 @@ MonoBehaviour:
   ButtonText: {fileID: 1012428275}
   cardScrollView: {fileID: 766414682}
   deckScrollView: {fileID: 1663925089}
-  draggableCard: {fileID: 123536, guid: eeb833f467429d144aa87d8b46204c41, type: 2}
+  draggableCard: {fileID: 138562, guid: eeb833f467429d144aa87d8b46204c41, type: 2}
 --- !u!114 &1012428275 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 11409842, guid: 887805e65347c7948b263e4a9cf8d2a3,
     type: 2}
   m_PrefabInternal: {fileID: 1012428271}
   m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+--- !u!61 &1012428276
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1012428273}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_Offset: {x: 50, y: 50}
+  serializedVersion: 2
+  m_Size: {x: 100, y: 100}
 --- !u!1 &1287942731
 GameObject:
   m_ObjectHideFlags: 0
