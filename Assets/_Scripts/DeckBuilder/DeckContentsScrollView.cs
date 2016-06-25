@@ -75,6 +75,26 @@ public class DeckContentsScrollView : MonoBehaviour
         }
         return deckContentArray;
     }
+
+    public void OnTriggerStay2D(Collider2D col)
+    {
+        //if a card enters the scroll view
+        if(col.name == "DragCardButton")
+        {
+            col.GetComponent<DraggableCard>().OverScrollView(true);
+        }
+       
+    }
+    public void OnTriggerExit2D(Collider2D col)
+    {
+        //if a card enters the scroll view
+        if (col.name == "DragCardButton")
+        {
+            col.GetComponent<DraggableCard>().OverScrollView(false);
+        }
+
+    }
+    
     /*
     public void ReloadList()
     {

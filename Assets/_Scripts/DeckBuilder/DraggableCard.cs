@@ -7,18 +7,21 @@ public class DraggableCard : MonoBehaviour {
     private string Name;
     private string itemId;
 
+    bool isOverScrollView = false;
     bool isDraggable = false;
     bool dropped = false;
     Vector3 origPos;
     Vector3 screenPoint;
     Vector3 offset;
 
+    public GameObject sceneCanvas;
     DeckContentsScrollView deckContents;
 
     public Text nameText;
 	// Use this for initialization
 	void Start ()
     {
+        sceneCanvas = GameObject.Find("Canvas");
         isDraggable = true;
         origPos = gameObject.transform.position;
         screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
@@ -43,29 +46,41 @@ public class DraggableCard : MonoBehaviour {
     {
         deckContents = scrollView;
     }
+    public void OverScrollView(bool isOver)
+    {
+        isOverScrollView = isOver;
+    }
     //Registers that the player has clicked on the card
     public void OnMouseDown()
     {
-        Debug.Log("Clicked a card");
-        //Remove card from list while dragging 
-        //DeckContentsList.Remove(cardId);
-
-        //remove from scrollview
-        transform.SetParent(transform, false);
-        //if (isDraggable == true)
-        //{
         origPos = gameObject.transform.position;
         screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+        //remove from scrollview
+        transform.SetParent(sceneCanvas.transform, false);
+        //Remove card from list while dragging 
+        deckContents.RemoveCardFromDeck(itemId);
 
-        //}
     }
     //Registers that the player has let go of the card
     public void OnMouseUp()
     {
-        dropped = true;
-        //set the parent of this card to be the deck content scroll list
-        transform.SetParent(deckContents.scrollContent.transform, false);
+        
+        //if the card is dropped off of the scroll contents
+        if(!isOverScrollView)
+        {
+            Destroy(this.gameObject);
+        }
+        //if the card is dropped over the scroll contents, set position and add it to list 
+        else
+        {
+            //set the parent of this card to be the deck content scroll list
+            transform.SetParent(deckContents.scrollContent.transform, false);
+            gameObject.transform.position = origPos;
+            //Remove card from list while dragging 
+            deckContents.AddCardToDeck(itemId);
+        }
+        
     }
 
     //Registers that the card is being dragged
