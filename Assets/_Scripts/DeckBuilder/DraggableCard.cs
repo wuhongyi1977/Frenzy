@@ -26,6 +26,10 @@ public class DraggableCard : MonoBehaviour {
         origPos = gameObject.transform.position;
         screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+        if(deckContents == null)
+        {
+            SetScrollView(GameObject.Find("ScrollDeckContent").GetComponent<DeckContentsScrollView>());
+        }
     }
 	
 	// Update is called once per frame
