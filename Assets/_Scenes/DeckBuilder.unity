@@ -162,7 +162,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &96169132
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1087,9 +1087,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeckBuilderManager: {fileID: 771244596}
-  Button_Template: {fileID: 1012428273}
+  Button_Template: {fileID: 138562, guid: eeb833f467429d144aa87d8b46204c41, type: 2}
   scrollContent: {fileID: 767977104}
-  sceneCanvas: {fileID: 0}
+  sceneCanvas: {fileID: 314013984}
 --- !u!114 &766414683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1177,7 +1177,7 @@ GameObject:
   - 114: {fileID: 767977107}
   - 114: {fileID: 767977106}
   m_Layer: 5
-  m_Name: ScrollContent
+  m_Name: ScrollCollectContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1314,7 +1314,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -79, y: 1}
-  m_SizeDelta: {x: 160, y: 301}
+  m_SizeDelta: {x: 0, y: 301}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &981357482
 MonoBehaviour:

@@ -13,7 +13,7 @@ public class CardButtonScript : MonoBehaviour
 
     public GameObject draggableCard;
    
-
+   
     public void SetName(string name)
     {
         Name = name;
@@ -25,6 +25,7 @@ public class CardButtonScript : MonoBehaviour
     }
     public void OnMouseDown()
     {
+        /*
         //instantiate a new button for this deck
         GameObject card = Instantiate(draggableCard) as GameObject;
         //set it active
@@ -34,11 +35,15 @@ public class CardButtonScript : MonoBehaviour
         //call the set name function for that button
         DC.SetName(Name);
         DC.SetId(itemId);
-        //remove from scrollview
+        //remove from scrollview (set the scene canvas as parent)
         DC.transform.SetParent(cardScrollView.sceneCanvas.transform, false);
-
+        //set to mouse position
+        DC.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, DC.transform.position.z));
         //needs to follow mouse!!!
-       
+
+        */
+        
+
 
     }
     /*

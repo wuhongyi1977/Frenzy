@@ -14,6 +14,7 @@ public class DeckContentsScrollView : MonoBehaviour
     public List<string> DeckContentsList = new List<string>();
 
 
+
     // Use this for initialization
     void Start()
     {
@@ -39,13 +40,15 @@ public class DeckContentsScrollView : MonoBehaviour
             //store the button's script
             DraggableCard CB = button.GetComponent<DraggableCard>();
             //set the cards scrollview variable to be this script
-            CB.SetScrollView(this);
+            CB.SetDeckScrollView(this);
             //call the set name function for that button
             //use the name associated with the id key in the dictionary
             CB.SetName(PlayFabDataStore.cardList[cardId]);
             //call the set id function for that button
             //stores item id for later use
             CB.SetId(cardId);
+            //indicate that this card is already in deck
+            CB.inDeck = true;
             //set parent to scroll view
             //second argument is worldPositionStays
             //setting to false retain local orientation and scale rather than world orientation and scale
@@ -54,7 +57,7 @@ public class DeckContentsScrollView : MonoBehaviour
         }
 
     }
-
+    
     public void AddCardToDeck(string newCardId)
     {
         //Add the card to this deck's list
