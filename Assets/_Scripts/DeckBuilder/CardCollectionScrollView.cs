@@ -25,9 +25,9 @@ public class CardCollectionScrollView : MonoBehaviour
     //creates a button for each deck in the scrollview
     public void LoadList()
     {
-       
         foreach (string cardId in PlayFabDataStore.cardCollection)
         {
+
             //instantiate a new button for this deck
             GameObject button = Instantiate(Button_Template) as GameObject;
             //set it active

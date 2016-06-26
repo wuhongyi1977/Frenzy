@@ -30,7 +30,6 @@ public class DeckContentsScrollView : MonoBehaviour
     {
         foreach (string cardId in PlayFabDataStore.cardsInDeck)
         {
-            Debug.Log("Found card for deck: " + cardId);
             //Add the card to this deck's list
             DeckContentsList.Add(cardId);
             //instantiate a new button for this deck
