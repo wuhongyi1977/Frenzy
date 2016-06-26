@@ -25,13 +25,17 @@ public class DeckBuilderManager : MonoBehaviour {
     public InputField deckNameField;
     private string currentDeckId;
     DeckContentsScrollView deckContentScript;
-
-    // Use this for initialization
-    void Start ()
+   
+    void Awake()
     {
         loadingPanel.SetActive(false);
         deckBuildPanel.SetActive(false);
         deckSelectPanel.SetActive(true);
+    }
+    // Use this for initialization
+    void Start ()
+    {
+       
        
         scrollViewScript = scrollView.GetComponent<DeckBuilderScrollView>();
         //retrieve all decks the user has made
@@ -199,7 +203,7 @@ public class DeckBuilderManager : MonoBehaviour {
             //store a variable in the deck that it cannot be played until full
         }
         
-
+        //display a popup to show deck saved
 
     }
     public void BackToDeckSelect()
