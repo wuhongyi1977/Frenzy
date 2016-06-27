@@ -59,7 +59,7 @@ public class PlayfabApiCalls : MonoBehaviour
             //store the number of saved decks
             PlayFabDataStore.numberOfDecks = numberOfDecks;
             deckRetrievalDone = true;
-
+            Debug.Log("Decks Retrieved");
 
 
         }, (error) =>
@@ -156,6 +156,7 @@ public class PlayfabApiCalls : MonoBehaviour
     //Retrieve all cards in a particular deck
     public static void RetrieveCardsInDeck(string deckId)
     {
+        Debug.Log("Trying to retrieve cards for: "+ deckId);
         cardRetrievalDone = false;
         var request = new GetCharacterInventoryRequest()
         {

@@ -109,13 +109,16 @@ public class DeckBuilderManager : MonoBehaviour {
             Debug.Log("Deck Created");
             PlayFabDataStore.numberOfDecks += 1;
             //Debug.Log(result.ResultsEncoded.Split);
-            string[] splitResult = result.ResultsEncoded.Split(':', '}');
-            string deckId = splitResult[1];
+            string[] splitResult = result.ResultsEncoded.Split(':','"','"', '}');
+            //grab the data at position 2 (which is the character id)
+            string deckId = splitResult[4];
+            Debug.Log(deckId);
             //store this deck in the decklist
+            PlayFabDataStore.deckIds.Add(deckId);
             PlayFabDataStore.deckList.Add(deckId, name);
-
+            
            //create a new button for this deck
-            scrollViewScript.CreateButton(splitResult[1]);
+            scrollViewScript.CreateButton(deckId);
             //delete all deck buttons and reload list
             //scrollViewScript.ReloadList();
 
