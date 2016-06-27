@@ -80,7 +80,27 @@ public class DeckBuilderScrollView : MonoBehaviour
 
 
     }
-    
+    public void CreateButton(string deckId)
+    {
+        //instantiate a new button for this deck
+        GameObject button = Instantiate(Button_Template) as GameObject;
+        //store a reference to this button
+        deckButtonList.Add(deckId, button);
+        //set it active
+        button.SetActive(true);
+        //store the button's script
+        DeckButtonScript DB = button.GetComponent<DeckButtonScript>();
+        //call the set name function for that button
+        //use the name associated with the id key in the dictionary
+        DB.SetName(PlayFabDataStore.deckList[deckId]);
+        //call the set id function for that button
+        //stores item id for later use
+        DB.SetId(deckId);
+        //set parent to scroll view
+        //second argument is worldPositionStays
+        //setting to false retain local orientation and scale rather than world orientation and scale
+        button.transform.SetParent(scrollContent.transform, false);
+    }
     public void ButtonClicked(string id, string name)
     {
         if(builderManagerScript.GetDelete() == true)

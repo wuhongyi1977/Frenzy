@@ -85,7 +85,8 @@ public class DeckBuilderManager : MonoBehaviour {
             string deckName = "Deck " + (PlayFabDataStore.numberOfDecks + 1);
             //send the default name of the deck for the name
             Debug.Log(deckName);
-            CreateDeck(deckName); 
+            //CreateDeck(deckName); 
+            CreateDeck("NewDeck");
         }
         else
         {
@@ -106,14 +107,17 @@ public class DeckBuilderManager : MonoBehaviour {
         PlayFabClientAPI.RunCloudScript(request, (result) =>
         {
             Debug.Log("Deck Created");
-            Debug.Log(result);
-            //string[] splitResult = result.ResultsEncoded.Split('"'); //19th element is the itemInstanceId
-            //Debug.Log("Split Result " + splitResult[59]); // 63th element is the itemId of the item granted from the drop table
-            //Debug.Log("Split Result " + splitResult[63]); // 63th element is the itemInstanceId of the item granted from the drop table
-            //Debug.Log("Split Result " + splitResult[67]); // 67st element is the item class  
+            PlayFabDataStore.numberOfDecks += 1;
+            //Debug.Log(result.ResultsEncoded.Split);
+            string[] splitResult = result.ResultsEncoded.Split(':', '}');
+            string deckId = splitResult[1];
+            //store this deck in the decklist
+            PlayFabDataStore.deckList.Add(deckId, name);
 
+           //create a new button for this deck
+            scrollViewScript.CreateButton(splitResult[1]);
             //delete all deck buttons and reload list
-            scrollViewScript.ReloadList();
+            //scrollViewScript.ReloadList();
 
         },
         (error) =>
