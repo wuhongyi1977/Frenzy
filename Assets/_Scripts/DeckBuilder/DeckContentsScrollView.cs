@@ -16,12 +16,22 @@ public class DeckContentsScrollView : MonoBehaviour
 
 
     // Use this for initialization
-    void Start()
+    void OnEnable()
     {
         //store script for deck builder manager
         builderManagerScript = DeckBuilderManager.GetComponent<DeckBuilderManager>();
         //load card list into scroll view
         LoadList();
+    }
+    //when panel is set inactive
+    void OnDisable()
+    {
+        //for every card button instantiated
+        foreach (Transform child in scrollContent.transform)
+        {
+            //destroy the button
+            Destroy(child.gameObject);
+        }
     }
 
     //Loads a list of all decks for this user

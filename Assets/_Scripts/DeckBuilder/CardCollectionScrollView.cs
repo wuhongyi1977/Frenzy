@@ -11,14 +11,24 @@ public class CardCollectionScrollView : MonoBehaviour
     public GameObject scrollContent;
     private List<string> NameList = new List<string>();
 
-
     // Use this for initialization
-    void Start()
+    void OnEnable()
     {
         //store script for deck builder manager
         builderManagerScript = DeckBuilderManager.GetComponent<DeckBuilderManager>();
         //load deck list into scroll view
         LoadList();
+    }
+    //when panel is set inactive
+    void OnDisable()
+    {
+        //for every card button instantiated
+        foreach (Transform child in scrollContent.transform)
+        {
+            //destroy the button
+            Destroy(child.gameObject);
+        }
+        
     }
 
     //Loads a list of all decks for this user

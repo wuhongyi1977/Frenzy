@@ -20,11 +20,15 @@ public class DeckBuilderManager : MonoBehaviour {
     public GameObject scrollView;
     DeckBuilderScrollView scrollViewScript;
     public GameObject deckButton;
+    private bool delete = false;
 
     //Components for deck builder
     public InputField deckNameField;
     private string currentDeckId;
     public DeckContentsScrollView deckContentScript;
+
+    public GameObject notePanel;
+    public Text noteText;
    
     void Awake()
     {
@@ -198,16 +202,35 @@ public class DeckBuilderManager : MonoBehaviour {
         string[] contentsList = deckContentScript.GetListOfCards();
         //store all of the cards
         PlayfabApiCalls.FillDeck(currentDeckId, contentsList);
-        if(contentsList.Length != deckSize)
+
+        //display a popup to show deck saved
+        notePanel.SetActive(true);
+       //if there are not enough cards to complete a deck
+        if (contentsList.Length != deckSize)
         {
             //store a variable in the deck that it cannot be played until full
+            noteText.text = "Deck Saved \n (Unfinished)";
         }
-        
-        //display a popup to show deck saved
-
+        else
+        {
+            noteText.text = "Deck Saved";
+        }
+        deckBuildPanel.SetActive(false);  
+    }
+    //changes value of delete bool
+    public void ToggleDelete()
+    {
+        delete = !delete;
+        Debug.Log("Delete is: " + delete);
+    }
+    //returns whether delete button is active
+    public bool GetDelete()
+    {
+        return delete;
     }
     public void BackToDeckSelect()
     {
+        notePanel.SetActive(false);
         deckBuildPanel.SetActive(false);
         deckSelectPanel.SetActive(true);
     }

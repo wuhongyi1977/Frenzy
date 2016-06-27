@@ -11,6 +11,9 @@ public class DeckBuilderScrollView : MonoBehaviour
     public GameObject scrollContent;
     private List<string> NameList = new List<string>();
 
+    //all decks organized by id and button associated with it
+    public static Dictionary<string, GameObject> deckButtonList = new Dictionary<string, GameObject>();
+
 
     // Use this for initialization
     void Start()
@@ -18,17 +21,24 @@ public class DeckBuilderScrollView : MonoBehaviour
         //store script for deck builder manager
         builderManagerScript = DeckBuilderManager.GetComponent<DeckBuilderManager>();
         //load deck list into scroll view
-        LoadList();
+        StartCoroutine(LoadList());
     }
 
     //Loads a list of all decks for this user
     //creates a button for each deck in the scrollview
-    public void LoadList()
+    public IEnumerator LoadList()
     {
+        yield return new WaitForSeconds(2f);
+        while(!PlayfabApiCalls.deckRetrievalDone)
+        {
+            yield return new WaitForSeconds(1f);
+        }
         foreach (string deckId in PlayFabDataStore.deckIds)
         {
             //instantiate a new button for this deck
             GameObject button = Instantiate(Button_Template) as GameObject;
+            //store a reference to this button
+            deckButtonList.Add(deckId, button);
             //set it active
             button.SetActive(true);
             //store the button's script
@@ -45,23 +55,49 @@ public class DeckBuilderScrollView : MonoBehaviour
             button.transform.SetParent(scrollContent.transform, false);
 
         }
+        yield return null;
 
     }
     public void ReloadList()
     {
+        //for every deck button instantiated
+        foreach (Transform child in scrollContent.transform)
+        {
+            //destroy the button
+            Destroy(child.gameObject);
+        }
         PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
-        var children = new List<GameObject>();
-        foreach (Transform child in scrollContent.transform) children.Add(child.gameObject);
-        children.ForEach(child => Destroy(child));
-        LoadList();
+        //var children = new List<GameObject>();
+        //foreach (Transform child in scrollContent.transform) children.Add(child.gameObject);
+        //children.ForEach(child => Destroy(child));
+        StartCoroutine(LoadList());
 
 
     }
     
     public void ButtonClicked(string id, string name)
     {
-        //send id and name of deck clicked to deck builder manager
-        builderManagerScript.DeckButtonClicked(id, name);
+        if(builderManagerScript.GetDelete() == true)
+        {
+            Debug.Log("Deleting Deck");
+            //delete deck
+            PlayfabApiCalls.DeleteDeck(id);
+            //delete deck button associated with this id
+            Destroy(deckButtonList[id]);
+            //remove deck from dictionary
+            deckButtonList.Remove(id);
+
+            //reload decks
+            PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
+
+
+        }
+        else
+        {
+            //send id and name of deck clicked to deck builder manager
+            builderManagerScript.DeckButtonClicked(id, name);
+        }
+       
 
     }
 }

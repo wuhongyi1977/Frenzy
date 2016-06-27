@@ -7,6 +7,8 @@ public class PlayfabApiCalls : MonoBehaviour
 {
 
     public static bool cardRetrievalDone = false;
+    public static bool deckRetrievalDone = false;
+
 
     //Access the newest version of cloud script
     public static void PlayFabInitialize()
@@ -30,6 +32,7 @@ public class PlayfabApiCalls : MonoBehaviour
 
     public static void RetrieveDecks(string playfabId)
     {
+        deckRetrievalDone = false;
         var request = new ListUsersCharactersRequest()
         {
             PlayFabId = playfabId
@@ -55,6 +58,7 @@ public class PlayfabApiCalls : MonoBehaviour
             }
             //store the number of saved decks
             PlayFabDataStore.numberOfDecks = numberOfDecks;
+            deckRetrievalDone = true;
 
 
 
@@ -191,4 +195,28 @@ public class PlayfabApiCalls : MonoBehaviour
             Debug.Log(error.ErrorDetails);
         });
     }
+
+    //Delete a deck
+    public static void DeleteDeck(string deck)
+    {
+        var request = new RunCloudScriptRequest()
+        {
+            ActionId = "deleteDeck",
+            Params = new { deckId = deck }
+        };
+
+        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        {
+            Debug.Log("Deck Deleted");
+
+        },
+        (error) =>
+        {
+            Debug.Log("Deck Not Deleted");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
+
 }
