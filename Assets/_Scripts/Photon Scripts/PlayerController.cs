@@ -201,12 +201,12 @@ public class PlayerController : MonoBehaviour
         //put all card names here
         string[] cardNames =
         {
-			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
-			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
-			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
-			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
-			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
-			"Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault","Unholy Assault",
+			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
+			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
+			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
+			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
+			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
+			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
@@ -427,7 +427,7 @@ public class PlayerController : MonoBehaviour
         //Debug.Log ("HERE - " + objectHit.name);
 
     }
-	public void creatureDebuffCardIsDropped(GameObject card, Vector3 cardHandPos)
+	public void creatureTargetCardIsDropped(GameObject card, Vector3 cardHandPos)
 	{
 		Debug.Log ("IN FUNCTION");
 		card.transform.position = cardHandPos;

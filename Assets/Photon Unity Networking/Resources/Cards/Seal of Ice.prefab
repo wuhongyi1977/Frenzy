@@ -11,7 +11,7 @@ GameObject:
   - 212: {fileID: 21289798}
   - 61: {fileID: 6182730}
   - 50: {fileID: 5051362}
-  - 114: {fileID: 11420548}
+  - 114: {fileID: 11487192}
   m_Layer: 0
   m_Name: Seal of Ice
   m_TagString: Card
@@ -115,30 +115,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &11420548
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 121994}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a45a3e44268bf1746afeb45a3597060c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardTitle: Seal of Ice
-  doneAddingToGraveyard: 0
-  inGraveyard: 0
-  inSummonZone: 0
-  playerID: 0
-  cardNumber: 0
-  castTime: 8
-  summonZoneTextBox: {fileID: 0}
-  cardTitleTextBox: {fileID: 0}
-  localPlayer: {fileID: 0}
-  networkOpponent: {fileID: 0}
-  handIndex: 0
-  faction: Neutral
 --- !u!114 &11447898
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -195,6 +171,34 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &11487192
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 121994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79940ce82f8f6a64a84c2c8d998c533b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardTitle: Seal of Ice
+  doneAddingToGraveyard: 0
+  inGraveyard: 0
+  inSummonZone: 0
+  playerID: 0
+  cardNumber: 0
+  castTime: 8
+  summonZoneTextBox: {fileID: 0}
+  cardTitleTextBox: {fileID: 0}
+  localPlayer: {fileID: 0}
+  networkOpponent: {fileID: 0}
+  handIndex: 0
+  faction: Neutral
+  changeDamageAmt: 0
+  changeHealthAmt: 0
+  changeAttackSpeedAmt: 0
+  secsToFreeze: 20
 --- !u!212 &21289798
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -2,16 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
-/// <summary>
-/// This is the basic creature debuff card. This card is dropped onto a creature
-/// from the hand and automatically is placed in an available summon slot.
-/// Once it is in a slot it begins its countdown timer until it becomes effective
-/// </summary>
-public class CreatureDebuffCard : CreatureTargetSpellCard {
-	public int changeDamageAmt;
-	public int changeHealthAmt;
-	public int changeAttackSpeedAmt;
-	// Use this for initialization
+
+public class CreatureDebuffFreezeCard : CreatureDebuffCard {
+	public int secsToFreeze;
+
 	public override void Start ()				//Abstract method for start
 	{
 		localPlayer = GameObject.Find ("LocalPlayer");
@@ -26,8 +20,11 @@ public class CreatureDebuffCard : CreatureTargetSpellCard {
 		//gameObject.GetComponentInChildren<Text>();
 		cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
 		cardTitleTextBox.text = cardTitle;
+		changeDamageAmt = 0;
+		changeHealthAmt = 0;
+		changeAttackSpeedAmt = 0;
 	}
-	
+
 	// Update is called once per frame
 	public override void Update ()				//Abstract method for Update
 	{
@@ -55,8 +52,10 @@ public class CreatureDebuffCard : CreatureTargetSpellCard {
 				inGraveyard = true;
 				//Set state of card to not being in the summon zone
 				inSummonZone = false;
-				//Apply the debuff to the targeted creature
-				theCreature.GetComponent<CreatureCard> ().decreaseStats (changeDamageAmt, changeHealthAmt, changeAttackSpeedAmt);
+				//Apply the freeze to the creature card
+				theCreature.GetComponent<CreatureCard>().freezeCreature(secsToFreeze);
+
+
 			}
 
 		}
