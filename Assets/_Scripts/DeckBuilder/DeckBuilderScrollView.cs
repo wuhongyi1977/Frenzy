@@ -11,6 +11,8 @@ public class DeckBuilderScrollView : MonoBehaviour
     public GameObject scrollContent;
     private List<string> NameList = new List<string>();
 
+    bool decksLoaded = false;
+
     //all decks organized by id and button associated with it
     public static Dictionary<string, GameObject> deckButtonList = new Dictionary<string, GameObject>();
 
@@ -28,6 +30,9 @@ public class DeckBuilderScrollView : MonoBehaviour
     //creates a button for each deck in the scrollview
     public IEnumerator LoadList()
     {
+        decksLoaded = false;
+        //clear list of decks to reload
+        deckButtonList.Clear();
         yield return new WaitForSeconds(2f);
         while(!PlayfabApiCalls.deckRetrievalDone)
         {
@@ -56,6 +61,7 @@ public class DeckBuilderScrollView : MonoBehaviour
 
         }
         yield return null;
+        decksLoaded = true;
 
     }
     public void ReloadList()
@@ -89,8 +95,6 @@ public class DeckBuilderScrollView : MonoBehaviour
 
             //reload decks
             PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
-
-
         }
         else
         {
@@ -99,5 +103,10 @@ public class DeckBuilderScrollView : MonoBehaviour
         }
        
 
+    }
+
+    public bool GetDecksLoaded()
+    {
+        return decksLoaded;
     }
 }

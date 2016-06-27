@@ -208,6 +208,16 @@ public class PlayfabApiCalls : MonoBehaviour
         PlayFabClientAPI.RunCloudScript(request, (result) =>
         {
             Debug.Log("Deck Deleted");
+            //store the number of saved decks
+            PlayFabDataStore.numberOfDecks -=1;
+            //Remove all references to deck
+            if (PlayFabDataStore.deckIds.Contains(deck))
+            {
+                //Remove deck id from list
+                PlayFabDataStore.deckIds.Remove(deck);
+                //remove deck id and associated name
+                PlayFabDataStore.deckList.Remove(deck);
+            }
 
         },
         (error) =>

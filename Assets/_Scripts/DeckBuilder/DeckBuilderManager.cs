@@ -32,9 +32,22 @@ public class DeckBuilderManager : MonoBehaviour {
    
     void Awake()
     {
-        loadingPanel.SetActive(false);
+        loadingPanel.SetActive(true);
         deckBuildPanel.SetActive(false);
+        deckSelectPanel.SetActive(false);
+        StartCoroutine(WaitForLoad());
+    }
+    public IEnumerator WaitForLoad()
+    {
         deckSelectPanel.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        //wait until decks are loaded to continue
+        while (!scrollViewScript.GetDecksLoaded())
+        {
+            yield return new WaitForSeconds(1f);
+        }
+        loadingPanel.SetActive(false);
+        
     }
     // Use this for initialization
     void Start ()
