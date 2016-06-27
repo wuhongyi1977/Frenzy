@@ -24,7 +24,7 @@ public class DeckBuilderManager : MonoBehaviour {
     //Components for deck builder
     public InputField deckNameField;
     private string currentDeckId;
-    DeckContentsScrollView deckContentScript;
+    public DeckContentsScrollView deckContentScript;
    
     void Awake()
     {
@@ -191,10 +191,10 @@ public class DeckBuilderManager : MonoBehaviour {
         //store new name from input text field
         string newName = deckNameField.text;
         //update deck name
-        UpdateDeckName(currentDeckId, newName);
+        //UpdateDeckName(currentDeckId, newName);
         ////////////////////////////////////////////
-       
         //retrieve all cards in the deck content list
+        Debug.Log("Deck script is: "+deckContentScript);
         string[] contentsList = deckContentScript.GetListOfCards();
         //store all of the cards
         PlayfabApiCalls.FillDeck(currentDeckId, contentsList);

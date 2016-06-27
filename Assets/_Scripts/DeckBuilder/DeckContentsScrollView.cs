@@ -70,9 +70,10 @@ public class DeckContentsScrollView : MonoBehaviour
     //returns the list in array form
     public string[] GetListOfCards()
     {
-        string[] deckContentArray = DeckContentsList.ToArray();
+        //string[] deckContentArray 
+           return (string[])DeckContentsList.ToArray();
         //set to strings?
-        return deckContentArray;
+       // return deckContentArray;
     }
 
   

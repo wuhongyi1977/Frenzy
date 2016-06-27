@@ -1269,6 +1269,7 @@ MonoBehaviour:
   scrollView: {fileID: 1331662449}
   deckButton: {fileID: 1967641356}
   deckNameField: {fileID: 1816622880}
+  deckContentScript: {fileID: 1663925089}
 --- !u!4 &771244598
 Transform:
   m_ObjectHideFlags: 0
