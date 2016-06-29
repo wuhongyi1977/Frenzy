@@ -196,7 +196,21 @@ public class PlayerController : MonoBehaviour
     [PunRPC]
     public void LoadDeck()
     {
+        //FINAL CODE TO REPLACE TEST CODE
+        //retrieves all cards in the cardsInDeck array (which should reference the current deck)
+        string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
+        //make a new array for prefabNames that is the same size as the cards in deck
+        string[] prefabNames = new string[cardIds.Length];
+        for(int i = 0; i < cardIds.Length; i++)
+        {
+            //assigns the prefab name at each index by calling the dictionary
+            //in playfabdatastore and sending the card id to get the prefab name
+            //associated with it
+            prefabNames[i] = PlayFabDataStore.cardPrefabs[cardIds[i]];
+        }
+        //by the end of this, all prefab names are stored      
 
+        //TEST CODE
         //will call playfab and retrieve currently active deck names as array later
         //put all card names here
         string[] cardNames =
@@ -218,6 +232,9 @@ public class PlayerController : MonoBehaviour
 
 
         };
+        ////////////////END TEST CODE
+
+        //Load all cards
         for (int i = 0; i < deckSize; i++)
         {
             //as long as there are enough cards in the list to load

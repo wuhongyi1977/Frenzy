@@ -168,15 +168,21 @@ public class PlayfabApiCalls : MonoBehaviour
             Debug.Log("Deck Inventory Retrieved");
             //clear the cards in deck (in case deck has changed, list is being repopulated)
             PlayFabDataStore.cardsInDeck.Clear();
+            PlayFabDataStore.cardPrefabs.Clear();
             //get all items
             foreach (var item in result.Inventory)
             {
+               
                 //if the item is a card
                 if (item.ItemClass == "Card")
                 {
+                    
+
                     //add the card's item id to the collection list
                     PlayFabDataStore.cardsInDeck.Add(item.ItemId);
+                    
                     //add a reference to the name associated with that id if it hasnt been added
+                    //All cards the player owns should be able to be referenced here
                     if (!PlayFabDataStore.cardList.ContainsKey(item.ItemId))
                     {
                         PlayFabDataStore.cardList.Add(item.ItemId, item.DisplayName);
@@ -224,6 +230,50 @@ public class PlayfabApiCalls : MonoBehaviour
         (error) =>
         {
             Debug.Log("Deck Not Deleted");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
+    //store all custom data for all cards
+    public static void RetrieveCatalogData()
+    {
+        var request = new GetCatalogItemsRequest()
+        {
+        };
+
+        PlayFabClientAPI.GetCatalogItems(request, (result) =>
+        {
+            Debug.Log("Card data retrieved");
+            //Debug.Log(result.Catalog);
+            
+            foreach (var item in result.Catalog)
+            {
+                //only store info if this is a card
+                if(item.ItemClass == "Card")
+                {
+                    //store custom data
+                    string customData = item.CustomData;
+                    Debug.Log("Heres custom data: " + customData);
+                    //split the string to get prefab name
+                    string[] splitResult =customData.Split(':', '"', '"', '}');
+                    //assign this to the prefab name from split
+                    string prefabName = splitResult[4];
+                    Debug.Log("Prefab name is: "+prefabName);
+
+                    //store all custom data to data store
+                    PlayFabDataStore.cardCustomData.Add(item.ItemId, item.CustomData);
+
+                    //store prefab names for all cards
+                    PlayFabDataStore.cardPrefabs.Add(item.ItemId, prefabName);
+                }
+               
+            }
+
+        },
+        (error) =>
+        {
+            Debug.Log("Card Data Not Retrieved");
             Debug.Log(error.ErrorMessage);
             Debug.Log(error.ErrorDetails);
         });

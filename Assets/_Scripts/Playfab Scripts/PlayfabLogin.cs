@@ -407,6 +407,7 @@ public class PlayfabLogin : MonoBehaviour
 
             //Retrieve player decks
             PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
+            PlayfabApiCalls.RetrieveCatalogData();
             
         }, (error) =>
         {
