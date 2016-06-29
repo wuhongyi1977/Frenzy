@@ -201,6 +201,7 @@ public class PlayerController : MonoBehaviour
         string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
         //make a new array for prefabNames that is the same size as the cards in deck
         string[] prefabNames = new string[cardIds.Length];
+        //for each card in the cardids array, find its prefab and add it to prefab names array
         for(int i = 0; i < cardIds.Length; i++)
         {
             //assigns the prefab name at each index by calling the dictionary
