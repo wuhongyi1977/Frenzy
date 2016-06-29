@@ -28,6 +28,8 @@ public class PlayfabLogin : MonoBehaviour
     //Error Text for Registration
     public Text registerError;
 
+    //panel to allow player to select deck
+    public GameObject selectionPanel;
     //panel to notify player that game is connecting
     public GameObject connectPanel;
     //panel for main menu UI
@@ -148,6 +150,11 @@ public class PlayfabLogin : MonoBehaviour
         mainMenuPanel.SetActive(true);
         */
        
+    }
+    public void DeckSelection()
+    {
+        //set other panels inactive
+        selectionPanel.SetActive(true);
     }
     //Wait for a set number of seconds in a room for an opponent before leaving
     IEnumerator WaitForConnection()
