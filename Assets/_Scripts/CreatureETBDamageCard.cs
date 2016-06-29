@@ -40,9 +40,15 @@ public class CreatureETBDamageCard : CreatureCard {
 				currentTime -= Time.deltaTime;
 				if(summonZoneTextBox == null)
                 {
-                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
-                    //TEST
-                    //summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
+                    //if this is the local object
+                    if (photonView.isMine)
+                    {
+                        summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                    }
+                    else //if this is the network copy
+                    {
+                        summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
+                    }
                 }
 					
 				else
@@ -82,7 +88,7 @@ public class CreatureETBDamageCard : CreatureCard {
 					summonZoneTextBox.text = "";
 					inGraveyard = true;
 					inSummonZone = false;
-					if (playerID == 1)
+					if (photonView.isMine)
                     {
                         localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
                         //TEST

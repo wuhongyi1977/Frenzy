@@ -29,6 +29,7 @@ GameObject:
   - 61: {fileID: 6170788}
   - 50: {fileID: 5015990}
   - 114: {fileID: 11444318}
+  - 114: {fileID: 11466294}
   m_Layer: 0
   m_Name: Assassin Drone
   m_TagString: CreatureCard
@@ -80,7 +81,6 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 37.04247, y: -16.736639, z: 38.15}
   m_LocalScale: {x: 37.450516, y: 54.854767, z: 2.4908087}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 22407548}
   m_Father: {fileID: 0}
@@ -201,6 +201,9 @@ MonoBehaviour:
   increaseDamageAmount: 0
   increaseAttackSpeedAmount: 0
   increaseHealthAmount: 0
+  isFrozen: 0
+  isSelectable: 0
+  isAttackable: 0
   damageToDealOnEnter: 3
 --- !u!114 &11460374
 MonoBehaviour:
@@ -223,6 +226,31 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &11466294
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 173926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  prefixBackup: -1
+  observed: {fileID: 0}
+  synchronization: 3
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 11444318}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  isRuntimeInstantiated: 0
 --- !u!114 &11482544
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -326,7 +354,6 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 22496848}
   - {fileID: 22498148}
@@ -346,7 +373,6 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 90}
   m_LocalScale: {x: 0.0012588345, y: 0.00094358216, z: 0.009836885}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22407548}
   m_RootOrder: 0
@@ -364,7 +390,6 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 90}
   m_LocalScale: {x: 0.0012588344, y: 0.00094358216, z: 0.009836885}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22407548}
   m_RootOrder: 1

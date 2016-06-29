@@ -78,8 +78,18 @@ public class CreatureCard : DamageCard {
 				//Increment the current Time
 				isDraggable = false;
 				currentTime -= Time.deltaTime;
-				if (summonZoneTextBox == null) {
-					summonZoneTextBox = localPlayer.GetComponent<PlayerController> ().getSummonZone (gameObject);
+				if (summonZoneTextBox == null)
+                {
+                    //if this is the local object
+                    if(photonView.isMine)
+                    {
+                        summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                    }
+                    else //if this is the network copy
+                    {
+                        summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
+                    }
+					
 					//TEST
 					//summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
 				} else {
@@ -130,8 +140,8 @@ public class CreatureCard : DamageCard {
 					damageToDeal = startingDamage;
 					attackSpeed = startingAttackSpeed;
 					health = startingHealth;
-
-					if (playerID == 1) {
+                    //if this is the local card object
+					if (photonView.isMine) {
 						localPlayer.GetComponent<PlayerController> ().sendToGraveyard (gameObject);
 						localPlayer.GetComponent<PlayerController> ().creatureDied ();
 						//TEST
@@ -164,7 +174,8 @@ public class CreatureCard : DamageCard {
 			//p1Manager.GetComponent<Player1Manager> ().makeLineInvisible ();
 			//p1Manager.GetComponent<Player1Manager> ().drawLineOff ();
 			dropped = true;
-			if (playerID == 1) 
+            //if this is the local card object
+			if (photonView.isMine) 
 			{
 			
 				if (creatureCanAttack) 
@@ -184,14 +195,26 @@ public class CreatureCard : DamageCard {
 			} 
 			else 
 			{
-				networkOpponent.GetComponent<PlayerController> ().cardIsDropped (gameObject, cardHandPos);
+                if (creatureCanAttack)
+                {
+                   
+                    networkOpponent.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
+                    //TEST
+                    //p1Manager.GetComponent<Player1Manager> ().creatureCardIsDropped (gameObject, cardHandPos);
+                }
+                else
+                {
+                    networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+                }
+                
 				//TEST
 				//p2Manager.GetComponent<Player2Manager> ().cardIsDropped (gameObject, cardHandPos);
 
 			}
 			//finds the text box that corresponds to the summon zone
 			if (summonZoneTextBox == null) {
-				if (playerID == 1) {
+                //if this is the local card object
+				if (photonView.isMine) {
 					summonZoneTextBox = localPlayer.GetComponent<PlayerController> ().getSummonZone (gameObject);
 					//TEST
 					//summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
@@ -217,7 +240,7 @@ public class CreatureCard : DamageCard {
 				
 		}
 		//Debug.Log (gameObject.name);
-		if (playerID == 1) 
+		if (photonView.isMine) 
 		{
             localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
             //TEST
@@ -231,7 +254,7 @@ public class CreatureCard : DamageCard {
         }
 		if(creatureCanAttack)
 		{
-			if (playerID == 1)
+			if (photonView.isMine)
             {
                 localPlayer.GetComponent<PlayerController>().drawLineOn();
                 //TEST

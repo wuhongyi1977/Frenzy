@@ -201,6 +201,7 @@ public class PlayerController : MonoBehaviour
         //put all card names here
         string[] cardNames =
         {
+            
 			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
 			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
 			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
@@ -213,6 +214,7 @@ public class PlayerController : MonoBehaviour
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
+            
 
 
         };
@@ -331,6 +333,7 @@ public class PlayerController : MonoBehaviour
     //Method called for when a card is dropped
     public void cardIsDropped(GameObject card, Vector3 cardHandPos)
     {
+
         //Set the state of being dropped to false
         card.GetComponent<Card>().setDroppedState(false);
 
@@ -348,9 +351,9 @@ public class PlayerController : MonoBehaviour
                     if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3))
                     {
                         //Play card, pass the card, the position of the zone, and the index of the zone
-
-                        PlayCard(card, zonePosition, i);
-                        photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
+                        photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  i);
+                        //PlayCard(card, zonePosition, i);
+                        //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
 						//If the card is a creature card, add it to the list of creature cards in play
 						if (card.GetComponent<CreatureCard> () != null) {
 							creatureThatJustEntered = card;
@@ -365,23 +368,13 @@ public class PlayerController : MonoBehaviour
         if (card.GetComponent<Card>().inSummonZone == false)
             card.transform.position = cardHandPos;
     }
-    public void PlayCard(GameObject card, Vector3 zonePosition, int i)
-    {
-        //Puts the card in the summoning zone
-        card.transform.position = zonePosition;
-        //Sets the state of the zone to be occupied
-        SummonZones[i].GetComponent<SummonZone>().isOccupied = true;
-        //Sets the state of the card to being in a summon zone
-        card.GetComponent<Card>().inSummonZone = true;
-        playerHand.Remove(card);
-        currentHandSize--;
-        shiftCardsDown();
-        
-    }
+   
+    //New Play Card Function
     [PunRPC]
-    public void PlayCardNetwork(int cardIndex, int i)
+    public void PlayCard(int cardId, int i)
     {
-        GameObject card = playerHand[cardIndex];
+        //find the spawned card
+        GameObject card = PhotonView.Find(cardId).gameObject;
         //Puts the card in the summoning zone
         card.transform.position = SummonZones[i].transform.position;
         //Sets the state of the zone to be occupied
@@ -391,10 +384,9 @@ public class PlayerController : MonoBehaviour
         playerHand.Remove(card);
         currentHandSize--;
         shiftCardsDown();
-        //call OnMouseUp on network clone to simulate dropping card
-        card.GetComponent<Card>().OnMouseUp();
 
     }
+   
 	[PunRPC]
 	public void ResolveCreatureDamage(GameObject creature, GameObject otherCreature)
 	{
@@ -465,9 +457,10 @@ public class PlayerController : MonoBehaviour
 							//Play card, pass the card, the position of the zone, and the index of the zone
 							card.GetComponent<CreatureTargetSpellCard>().setSummonZoneTextBox(SummonZones[i].GetComponent<SummonZone>().textBox);
 							card.GetComponent<CreatureTargetSpellCard>().setValidCreatureToDebuff(enemyObjectUnderMouse);
-							PlayCard(card, zonePosition, i);
-							photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
-						}
+                            //PlayCard(card, zonePosition, i);
+                            //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
+                            photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID, SummonZones[i].transform.position, i);
+                        }
 					}
 					if (card.GetComponent<CreatureTargetSpellCard> ().hasTextBox() == false) 
 					{
@@ -558,15 +551,27 @@ public class PlayerController : MonoBehaviour
             //get name of drawn card
             string cardToDraw = library[currentCardIndex].name;
             //send name of drawn card to clones
-            photonView.RPC("drawCard", PhotonTargets.All,cardToDraw);
-           
+            //photonView.RPC("drawCard", PhotonTargets.All,cardToDraw);
+
+            //MODIFIED TO INSTANTIATE ON NETWORK
+            //Instantiate the passed card over photon network
+            GameObject cardToAdd = PhotonNetwork.Instantiate(("Cards/" + cardToDraw), Vector3.zero, Quaternion.identity, 0);
+            //get the card's view Id to reference the same card
+            int cardId = cardToAdd.GetComponent<PhotonView>().viewID;
+            //Put the card into proper place
+            photonView.RPC("DrawCard", PhotonTargets.All, cardId);
+
         }
     }
+//NEW CARD DRAWING FUNCTION
+    //Sets up card variables and position of card in hand
     [PunRPC]
-    public void drawCard(string card)
+    public void DrawCard(int cardId)
     {
-        //Instantiate the passed card
-        GameObject cardToAdd = (GameObject)Instantiate(Resources.Load("Cards/" + card), new Vector3(handZone.transform.position.x + (currentHandSize * 5f), handZone.transform.position.y, handZone.transform.position.z), Quaternion.identity);
+        //find the spawned card
+        GameObject cardToAdd = PhotonView.Find(cardId).gameObject;
+        //Set cards position
+        cardToAdd.transform.position = new Vector3(handZone.transform.position.x + (currentHandSize * 5f), handZone.transform.position.y, handZone.transform.position.z);
         //set the card's player id
         cardToAdd.GetComponent<Card>().playerID = playerID;
         //add it to the player's hand
@@ -579,6 +584,8 @@ public class PlayerController : MonoBehaviour
         currentHandSize++;
 
     }
+
+   
     public void setMousedOverCard(GameObject card)
     {
         mousedOverCard = card;

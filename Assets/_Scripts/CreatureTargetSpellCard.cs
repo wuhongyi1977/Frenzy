@@ -34,7 +34,17 @@ public class CreatureTargetSpellCard : Card {
 			//Increment the current Time
 			currentTime -= Time.deltaTime;
 			if(summonZoneTextBox == null)
-			{ summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject); }
+			{
+                //if this is the local object
+                if (photonView.isMine)
+                {
+                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                }
+                else //if this is the network copy
+                {
+                    summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
+                }
+            }
 			//TEST
 			//summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
 			else
@@ -58,7 +68,7 @@ public class CreatureTargetSpellCard : Card {
 		if (inGraveyard && doneAddingToGraveyard == false) 
 		{
 			//If the card beings to player 1
-			if (playerID == 1) 
+			if (photonView.isMine) 
 			{
 				summonZoneTextBox.text = "";
 				//Set this to false to prevent multiple executions of this block
@@ -97,7 +107,7 @@ public class CreatureTargetSpellCard : Card {
 	public override void OnMouseUp()			
 	{
 		dropped = true;
-		if (playerID == 1)
+		if (photonView.isMine)
 		{
 			localPlayer.GetComponent<PlayerController>().creatureTargetCardIsDropped(gameObject, cardHandPos);
 			//TEST
@@ -113,7 +123,7 @@ public class CreatureTargetSpellCard : Card {
 		//finds the text box that corresponds to the summon zone
 		if (summonZoneTextBox == null) 
 		{
-			if (playerID == 1)
+			if (photonView.isMine)
 			{
 				summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
 				//TEST
@@ -136,7 +146,7 @@ public class CreatureTargetSpellCard : Card {
 	public override void OnMouseOver()
 	{
 		Debug.Log (gameObject.name);
-		if (playerID == 1) 
+		if (photonView.isMine) 
 		{
 			localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
 			//TEST

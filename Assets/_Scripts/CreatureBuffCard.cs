@@ -60,7 +60,7 @@ public class CreatureBuffCard : CreatureTargetSpellCard {
 		if (inGraveyard && doneAddingToGraveyard == false) 
 		{
 			//If the card beings to player 1
-			if (playerID == 1) 
+			if (photonView.isMine) 
 			{
 				summonZoneTextBox.text = "";
 				//Set this to false to prevent multiple executions of this block

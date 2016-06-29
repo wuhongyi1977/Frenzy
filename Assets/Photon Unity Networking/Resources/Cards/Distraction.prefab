@@ -29,6 +29,7 @@ GameObject:
   - 61: {fileID: 6167134}
   - 50: {fileID: 5000482}
   - 114: {fileID: 11452144}
+  - 114: {fileID: 11436670}
   m_Layer: 0
   m_Name: Distraction
   m_TagString: Card
@@ -149,6 +150,31 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &11436670
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 121114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  prefixBackup: -1
+  observed: {fileID: 0}
+  synchronization: 3
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 11452144}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  isRuntimeInstantiated: 0
 --- !u!114 &11452144
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -171,6 +197,8 @@ MonoBehaviour:
   cardTitleTextBox: {fileID: 0}
   localPlayer: {fileID: 0}
   networkOpponent: {fileID: 0}
+  handIndex: 0
+  faction: Neutral
 --- !u!114 &11455306
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -46,10 +46,22 @@ public abstract class Card : MonoBehaviour {
     //ADDED CODE FOR HAND INDEX
     public int handIndex;
 
+    //PHOTON COMPONENTS
+    protected PhotonView photonView;
+
 	//The faction that the card belongs to. Neutral means it is available to all factions
 	public string faction = "Neutral";
+
+    //This can be used for initialization code that is identical on ALL cards
+    public virtual void Awake()
+    {
+        //get photon view component of this card
+        photonView = GetComponent<PhotonView>();
+    }
 	public virtual void Start ()				//Abstract method for start
 	{
+       
+
 		localPlayer = GameObject.Find ("LocalPlayer");
 		networkOpponent = GameObject.Find ("NetworkOpponent");
 		p1Manager = GameObject.Find ("Player1Manager");
@@ -97,7 +109,7 @@ public abstract class Card : MonoBehaviour {
 		if (inGraveyard && doneAddingToGraveyard == false) 
 		{
 			//If the card beings to player 1
-			if (playerID == 1) 
+			if (photonView.isMine) 
 			{
 				summonZoneTextBox.text = "";
 				//Set this to false to prevent multiple executions of this block
@@ -136,24 +148,29 @@ public abstract class Card : MonoBehaviour {
 	//Registers that the player has let go of the card
 	public virtual void OnMouseUp()			
 	{
-		dropped = true;
-		if (playerID == 1)
+        
+       
+        dropped = true;
+		if (photonView.isMine)
         {
+            
             localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
             //TEST
             //p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject, cardHandPos);
         }
+        
 		else
         {
             networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
             //TEST
             //p2Manager.GetComponent<Player2Manager>().cardIsDropped(gameObject, cardHandPos);
         }
+        
 			
 		//finds the text box that corresponds to the summon zone
 		if (summonZoneTextBox == null) 
 		{
-			if (playerID == 1)
+			if (photonView.isMine)
             {
                 summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
                 //TEST
@@ -185,7 +202,7 @@ public abstract class Card : MonoBehaviour {
 	public virtual void OnMouseOver()
 	{
 		Debug.Log (gameObject.name);
-		if (playerID == 1) 
+		if (photonView.isMine) 
 		{
             localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
             //TEST
@@ -232,4 +249,23 @@ public abstract class Card : MonoBehaviour {
 	{
 		return summonZoneTextBox;
 	}
+
+    //Photon Serialize View
+    //Registers that the player has clicked on the card
+    public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            //We own this player: send the others our data
+            //sync health
+            //stream.SendNext(health);
+
+        }
+        else
+        {
+            //Network player, receive data          
+            //health = (int)stream.ReceiveNext();
+        }
+
+    }
 }

@@ -29,6 +29,7 @@ GameObject:
   - 61: {fileID: 6163532}
   - 50: {fileID: 5022494}
   - 114: {fileID: 11477458}
+  - 114: {fileID: 11441220}
   m_Layer: 0
   m_Name: Life Tax
   m_TagString: Card
@@ -98,6 +99,31 @@ BoxCollider2D:
   m_Offset: {x: 0.00044731598, y: -0.00034718632}
   serializedVersion: 2
   m_Size: {x: 0.14121215, y: 0.14287578}
+--- !u!114 &11441220
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 154334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  prefixBackup: -1
+  observed: {fileID: 0}
+  synchronization: 3
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 11477458}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  isRuntimeInstantiated: 0
 --- !u!114 &11477458
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -120,6 +146,8 @@ MonoBehaviour:
   cardTitleTextBox: {fileID: 0}
   localPlayer: {fileID: 0}
   networkOpponent: {fileID: 0}
+  handIndex: 0
+  faction: Neutral
   healAmount: 1
   damageToDeal: 1
 --- !u!114 &11477752

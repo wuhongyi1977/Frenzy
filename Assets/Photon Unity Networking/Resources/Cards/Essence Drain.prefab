@@ -29,6 +29,7 @@ GameObject:
   - 61: {fileID: 6111132}
   - 50: {fileID: 5038176}
   - 114: {fileID: 11461370}
+  - 114: {fileID: 11480442}
   m_Layer: 0
   m_Name: Essence Drain
   m_TagString: Card
@@ -155,8 +156,35 @@ MonoBehaviour:
   cardTitleTextBox: {fileID: 0}
   localPlayer: {fileID: 0}
   networkOpponent: {fileID: 0}
+  handIndex: 0
+  faction: Neutral
   healAmount: 2
   damageToDeal: 2
+--- !u!114 &11480442
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 165052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  prefixBackup: -1
+  observed: {fileID: 0}
+  synchronization: 3
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 11461370}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  isRuntimeInstantiated: 0
 --- !u!114 &11480900
 MonoBehaviour:
   m_ObjectHideFlags: 1
