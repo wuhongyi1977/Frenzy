@@ -46,4 +46,5 @@ MonoBehaviour:
   - drawCard
   - LoadDeck
   - PlayCardNetwork
+  - ResolveCreatureDamage
   DisableAutoOpenWizard: 1

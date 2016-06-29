@@ -201,12 +201,12 @@ public class PlayerController : MonoBehaviour
         //put all card names here
         string[] cardNames =
         {
-			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
-			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
-			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
-			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
-			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
-			"Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice","Seal of Ice",
+			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
+			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
+			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
+			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
+			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
+			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
 			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
@@ -395,6 +395,12 @@ public class PlayerController : MonoBehaviour
         card.GetComponent<Card>().OnMouseUp();
 
     }
+	[PunRPC]
+	public void ResolveCreatureDamage(GameObject creature, GameObject otherCreature)
+	{
+		creature.GetComponent<CreatureCard> ().health -= otherCreature.GetComponent<CreatureCard> ().damageToDeal;
+		otherCreature.GetComponent<CreatureCard> ().health -= creature.GetComponent<CreatureCard> ().damageToDeal;
+	}
     
     public void creatureCardIsDropped(GameObject card, Vector3 cardHandPos)
     {
@@ -410,11 +416,16 @@ public class PlayerController : MonoBehaviour
             {
                 if (enemyObjectUnderMouse.GetComponent<CreatureCard>().inBattlefield)
                 {
-                    card.GetComponent<CreatureCard>().creatureCanAttack = false;
-                    card.GetComponent<CreatureCard>().health -= enemyObjectUnderMouse.GetComponent<CreatureCard>().damageToDeal;
-                    enemyObjectUnderMouse.GetComponent<CreatureCard>().health -= card.GetComponent<CreatureCard>().damageToDeal;
-                    Debug.Log("Your creature's health: " + card.GetComponent<CreatureCard>().health);
-                    Debug.Log("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard>().health);
+					if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().isAttackable) {
+						card.GetComponent<CreatureCard> ().creatureCanAttack = false;
+						card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
+						enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
+						Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
+						Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
+						photonView.RPC ("ResolveCreatureDamage", PhotonTargets.Others, card, enemyObjectUnderMouse);
+					} 
+					else
+						Debug.Log ("NOT ATTACKABLE");
                 }
             }
             else if (enemyObjectUnderMouse.tag == "Player2")
@@ -452,16 +463,16 @@ public class PlayerController : MonoBehaviour
 							//Get's the position of the zone
 							Vector3 zonePosition = SummonZones[i].transform.position;
 							//Play card, pass the card, the position of the zone, and the index of the zone
-							card.GetComponent<CreatureDebuffCard>().setSummonZoneTextBox(SummonZones[i].GetComponent<SummonZone>().textBox);
-							card.GetComponent<CreatureDebuffCard>().setValidCreatureToDebuff(enemyObjectUnderMouse);
+							card.GetComponent<CreatureTargetSpellCard>().setSummonZoneTextBox(SummonZones[i].GetComponent<SummonZone>().textBox);
+							card.GetComponent<CreatureTargetSpellCard>().setValidCreatureToDebuff(enemyObjectUnderMouse);
 							PlayCard(card, zonePosition, i);
 							photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
 						}
 					}
-					if (card.GetComponent<CreatureDebuffCard> ().hasTextBox() == false) 
+					if (card.GetComponent<CreatureTargetSpellCard> ().hasTextBox() == false) 
 					{
 						Debug.Log ("INVALID PLAY, SEND TO GY");
-						card.GetComponent<CreatureDebuffCard>().setGraveyardVariables();
+						card.GetComponent<CreatureTargetSpellCard>().setGraveyardVariables();
 						sendToGraveyard (card);
 					}
 				}

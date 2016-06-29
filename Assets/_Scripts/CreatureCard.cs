@@ -21,6 +21,7 @@ public class CreatureCard : DamageCard {
 
 	public bool isFrozen;
 	public bool isSelectable;
+	public bool isAttackable;
 	public override void Start()
 	{
 		localPlayer = GameObject.Find ("LocalPlayer");
@@ -47,6 +48,7 @@ public class CreatureCard : DamageCard {
 		startingHealth = health;
 		isSelectable = true;
 		isFrozen = false;
+		isAttackable = true;
 	}
 	public override void Update()
 	{
@@ -86,7 +88,18 @@ public class CreatureCard : DamageCard {
 					
 			}
 			//IF the current time is larger than or equal to the cast time
-			if (currentTime <= 0) {
+			if (!isAttackable) 
+			{
+				currentTime -= Time.deltaTime;
+				summonZoneTextBox.text = currentTime.ToString ("F1");
+				if(currentTime <= 0)
+				{
+					summonZoneTextBox.text = "";
+				}
+			}
+
+			if (currentTime <= 0) 
+			{
 				if (!stopCastingTimer) {
 					stopCastingTimer = true;
 					summonZoneTextBox.text = "";
@@ -151,20 +164,26 @@ public class CreatureCard : DamageCard {
 			//p1Manager.GetComponent<Player1Manager> ().makeLineInvisible ();
 			//p1Manager.GetComponent<Player1Manager> ().drawLineOff ();
 			dropped = true;
-			if (playerID == 1) {
+			if (playerID == 1) 
+			{
 			
-				if (creatureCanAttack) {	
+				if (creatureCanAttack) 
+				{	
 					networkOpponent.GetComponent<PlayerController> ().ChangeHealth (damageToDeal * -1);
 					Debug.Log ("HERE");
 					localPlayer.GetComponent<PlayerController> ().creatureCardIsDropped (gameObject, cardHandPos);
 					//TEST
 					//p1Manager.GetComponent<Player1Manager> ().creatureCardIsDropped (gameObject, cardHandPos);
-				} else {
+				} 
+				else 
+				{
 					localPlayer.GetComponent<PlayerController> ().cardIsDropped (gameObject, cardHandPos);
 					//TEST
 					//p1Manager.GetComponent<Player1Manager>().cardIsDropped(gameObject, cardHandPos);
 				}
-			} else {
+			} 
+			else 
+			{
 				networkOpponent.GetComponent<PlayerController> ().cardIsDropped (gameObject, cardHandPos);
 				//TEST
 				//p2Manager.GetComponent<Player2Manager> ().cardIsDropped (gameObject, cardHandPos);
@@ -242,6 +261,11 @@ public class CreatureCard : DamageCard {
 		isFrozen = true;
 		isSelectable = false;
 		creatureCanAttack = false;
+		currentTime = numbSecs;
+	}
+	public void makeUnattackable(int numbSecs)
+	{
+		isAttackable = false;
 		currentTime = numbSecs;
 	}
 	/*
