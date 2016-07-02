@@ -6,6 +6,7 @@ public class DraggableCard : MonoBehaviour {
 
     private string Name;
     private string itemId;
+    private string instanceId;
 
     bool isOverScrollView = false;
     bool isDraggable = false;
@@ -72,6 +73,14 @@ public class DraggableCard : MonoBehaviour {
     public string GetId()
     {
         return itemId;
+    }
+    public void SetInstanceId(string id)
+    {
+        instanceId = id;
+    }
+    public string GetInstanceId()
+    {
+        return instanceId;
     }
     //set this object's deck scroll view 
     public void SetDeckScrollView(DeckContentsScrollView scrollView)

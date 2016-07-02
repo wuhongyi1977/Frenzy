@@ -156,6 +156,8 @@ public class PlayfabApiCalls : MonoBehaviour
                 {
                     //add the card's item id to the collection list
                     PlayFabDataStore.cardCollection.Add(item.ItemId);
+                    //add the cards instance id to its own list
+                    PlayFabDataStore.instanceCollection.Add(item.ItemId, item.ItemInstanceId);
                     //add a reference to the name associated with that id if it hasnt been added
                     if(!PlayFabDataStore.cardList.ContainsKey(item.ItemId))
                     {
