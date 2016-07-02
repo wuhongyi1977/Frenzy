@@ -114,6 +114,7 @@ public class PlayfabApiCalls : MonoBehaviour
     //remove a card from a deck
     public static void RemoveCardFromDeck(string deck, string cardIdToRemove)
     {
+        Debug.Log("Trying to remove: "+ cardIdToRemove+ " from: "+deck);
         var request = new RunCloudScriptRequest()
         {
             ActionId = "removeCardFromDeck",
