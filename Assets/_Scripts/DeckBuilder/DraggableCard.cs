@@ -69,6 +69,10 @@ public class DraggableCard : MonoBehaviour {
     {
         itemId = id;
     }
+    public string GetId()
+    {
+        return itemId;
+    }
     //set this object's deck scroll view 
     public void SetDeckScrollView(DeckContentsScrollView scrollView)
     {
@@ -148,14 +152,14 @@ public class DraggableCard : MonoBehaviour {
     public virtual void OnMouseOver()
     {
         //show a large, detailed version of card after a few seconds
-        Debug.Log("Show Details of: "+gameObject.name);
+        //Debug.Log("Show Details of: "+gameObject.name);
        
     }
     //Registers what card is under the mouse
     public virtual void OnMouseExit()
     {
         //hide large, detailed version of card
-        Debug.Log("Hide Details of: "+ gameObject.name);
+        //Debug.Log("Hide Details of: "+ gameObject.name);
     }
     
 }

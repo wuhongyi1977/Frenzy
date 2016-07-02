@@ -2308,6 +2308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeckBuilderManager: {fileID: 771244596}
+  cardCollection: {fileID: 766414680}
   Button_Template: {fileID: 138562, guid: eeb833f467429d144aa87d8b46204c41, type: 2}
   scrollContent: {fileID: 981357480}
   DeckContentsList: []

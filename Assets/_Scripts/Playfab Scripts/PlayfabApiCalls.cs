@@ -111,6 +111,29 @@ public class PlayfabApiCalls : MonoBehaviour
             Debug.Log(error.ErrorDetails);
         });
     }
+    //remove all cards from a deck
+    public static void EmptyDeck(string deck, string[] cardIdsToRemove)
+    {
+        var request = new RunCloudScriptRequest()
+        {
+            ActionId = "emptyDeck",
+            Params = new { deckId = deck, items = cardIdsToRemove }
+        };
+
+        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        {
+            Debug.Log("Cards Removed From Deck");
+
+        },
+        (error) =>
+        {
+            Debug.Log("Cards Not Removed From Deck");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
+
     //Retrieve all cards in user's inventory
     public static void RetrieveCardCollection()
     {

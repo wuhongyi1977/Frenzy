@@ -219,7 +219,13 @@ public class DeckBuilderManager : MonoBehaviour {
         ////////////////////////////////////////////
         //retrieve all cards in the deck content list
         Debug.Log("Deck script is: "+deckContentScript);
+        //get the list of cards to add as an array
         string[] contentsList = deckContentScript.GetListOfCards();
+        //get the list of the original deck as an array
+        string[] oldContents = deckContentScript.GetOldCards();
+        //empty deck first
+        PlayfabApiCalls.EmptyDeck(currentDeckId, oldContents);
+       
         //store all of the cards
         PlayfabApiCalls.FillDeck(currentDeckId, contentsList);
 
