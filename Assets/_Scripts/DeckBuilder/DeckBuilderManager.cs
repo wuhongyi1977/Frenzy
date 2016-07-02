@@ -224,7 +224,11 @@ public class DeckBuilderManager : MonoBehaviour {
         //get the list of the original deck as an array
         string[] oldContents = deckContentScript.GetOldCards();
         //empty deck first
-        PlayfabApiCalls.EmptyDeck(currentDeckId, oldContents);
+        foreach(string id in oldContents)
+        {
+            PlayfabApiCalls.RemoveCardFromDeck(currentDeckId, id);
+        }
+       
        
         //store all of the cards
         PlayfabApiCalls.FillDeck(currentDeckId, contentsList);
