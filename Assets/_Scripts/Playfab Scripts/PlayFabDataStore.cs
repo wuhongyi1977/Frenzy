@@ -26,7 +26,7 @@ public class PlayFabDataStore : MonoBehaviour
     //all cards owned
     public static List<string> cardCollection = new List<string>();
     //all cards owned by instance id
-    public static Dictionary<string, string> instanceCollection = new Dictionary<string, string>;
+    public static Dictionary<string, string> instanceCollection = new Dictionary<string, string>();
     //all card names stored by id
     public static Dictionary<string, string> cardList = new Dictionary<string, string>();
 
