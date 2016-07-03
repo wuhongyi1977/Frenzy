@@ -198,7 +198,6 @@ public class PlayfabApiCalls : MonoBehaviour
             Debug.Log("Deck Inventory Retrieved");
             //clear the cards in deck (in case deck has changed, list is being repopulated)
             PlayFabDataStore.cardsInDeck.Clear();
-            PlayFabDataStore.cardPrefabs.Clear();
             //get all items
             foreach (var item in result.Inventory)
             {

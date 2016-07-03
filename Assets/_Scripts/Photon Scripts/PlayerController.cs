@@ -199,18 +199,25 @@ public class PlayerController : MonoBehaviour
         //FINAL CODE TO REPLACE TEST CODE
         //retrieves all cards in the cardsInDeck array (which should reference the current deck)
         string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
+        
         //make a new array for prefabNames that is the same size as the cards in deck
         string[] prefabNames = new string[cardIds.Length];
         //for each card in the cardids array, find its prefab and add it to prefab names array
         for(int i = 0; i < cardIds.Length; i++)
         {
+            //retrieve item id for this item instance id
+            string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
+           //CARD ID IS ITS INSTANCE ID< NEED TO BE ITEM ID
+            Debug.Log(itemId);
+            Debug.Log(PlayFabDataStore.cardPrefabs[itemId]);
             //assigns the prefab name at each index by calling the dictionary
             //in playfabdatastore and sending the card id to get the prefab name
             //associated with it
-            prefabNames[i] = PlayFabDataStore.cardPrefabs[cardIds[i]];
+            prefabNames[i] = PlayFabDataStore.cardPrefabs[itemId];
         }
         //by the end of this, all prefab names are stored      
 
+        /*
         //TEST CODE
         //will call playfab and retrieve currently active deck names as array later
         //put all card names here
@@ -234,15 +241,17 @@ public class PlayerController : MonoBehaviour
 
         };
         ////////////////END TEST CODE
+        */
 
         //Load all cards
         for (int i = 0; i < deckSize; i++)
         {
+            
             //as long as there are enough cards in the list to load
-            if(cardNames.Length > i)
+            if(prefabNames.Length > i)
             {
                 //load each card name from resources folder and add them to card deck
-                cardDeck.Add((GameObject)Resources.Load("Cards/" + cardNames[i]));
+                cardDeck.Add((GameObject)Resources.Load("Cards/" + prefabNames[i]));
             }
             else
             {

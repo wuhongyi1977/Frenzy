@@ -22,6 +22,8 @@ public class PlayFabDataStore : MonoBehaviour
 
     //All data for catalog cards on playfab (cardId, string of custom data )
     public static Dictionary<string, string> cardCustomData = new Dictionary<string, string>();
+    //all prefab names for all cards
+    public static Dictionary<string, string> cardPrefabs = new Dictionary<string, string>();
 
     //all cards owned by instance id (unique to every object)
     public static List<string> cardCollection = new List<string>();
@@ -32,10 +34,9 @@ public class PlayFabDataStore : MonoBehaviour
 
     //current selected deck id
     public static string currentDeck;
-    //all cards in current deck
+    //all cards in current deck 
     public static List<string> cardsInDeck = new List<string>();
-    //all prefab names for the current deck
-    public static Dictionary<string, string> cardPrefabs = new Dictionary<string, string>();
+    
     
 
 
