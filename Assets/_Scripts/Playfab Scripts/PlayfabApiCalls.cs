@@ -42,6 +42,10 @@ public class PlayfabApiCalls : MonoBehaviour
         {
             Debug.Log("Retrieving Decks...");
             int numberOfDecks = 0;
+            //clear deck info
+            PlayFabDataStore.deckIds.Clear();
+            PlayFabDataStore.deckList.Clear();
+            //retrive results
             foreach (var deck in result.Characters)
             {
                 numberOfDecks++;
