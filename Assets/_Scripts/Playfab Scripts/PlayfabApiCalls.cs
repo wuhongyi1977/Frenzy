@@ -154,14 +154,16 @@ public class PlayfabApiCalls : MonoBehaviour
                 //if the item is a card
                 if(item.ItemClass == "Card")
                 {
-                    //add the card's item id to the collection list
-                    PlayFabDataStore.cardCollection.Add(item.ItemId);
-                    //add the cards instance id to its own list
-                    PlayFabDataStore.instanceCollection.Add(item.ItemId, item.ItemInstanceId);
+                    //add the card's item instance id to the collection list
+                    //PlayFabDataStore.cardCollection.Add(item.ItemId);
+                    PlayFabDataStore.cardCollection.Add(item.ItemInstanceId);
+
+                    //allow each cards item id to be referenced from its item instancde id
+                    PlayFabDataStore.itemIdCollection.Add(item.ItemInstanceId,item.ItemId);
                     //add a reference to the name associated with that id if it hasnt been added
-                    if(!PlayFabDataStore.cardList.ContainsKey(item.ItemId))
+                    if(!PlayFabDataStore.cardNameList.ContainsKey(item.ItemId))
                     {
-                        PlayFabDataStore.cardList.Add(item.ItemId, item.DisplayName);
+                        PlayFabDataStore.cardNameList.Add(item.ItemId, item.DisplayName);
                     }
                     
                     Debug.Log("Found: "+ item.ItemId +" -> "+item.DisplayName);
@@ -202,16 +204,19 @@ public class PlayfabApiCalls : MonoBehaviour
                 //if the item is a card
                 if (item.ItemClass == "Card")
                 {
-                    
+
 
                     //add the card's item id to the collection list
-                    PlayFabDataStore.cardsInDeck.Add(item.ItemId);
-                    
+                    //PlayFabDataStore.cardsInDeck.Add(item.ItemId);
+                    PlayFabDataStore.cardsInDeck.Add(item.ItemInstanceId);
+                    //allow each cards item id to be referenced from its item instancde id
+                    PlayFabDataStore.itemIdCollection.Add(item.ItemInstanceId, item.ItemId);
+
                     //add a reference to the name associated with that id if it hasnt been added
                     //All cards the player owns should be able to be referenced here
-                    if (!PlayFabDataStore.cardList.ContainsKey(item.ItemId))
+                    if (!PlayFabDataStore.cardNameList.ContainsKey(item.ItemId))
                     {
-                        PlayFabDataStore.cardList.Add(item.ItemId, item.DisplayName);
+                        PlayFabDataStore.cardNameList.Add(item.ItemId, item.DisplayName);
                     }
 
                     Debug.Log("Found: " + item.ItemId + " -> " + item.DisplayName);
@@ -288,10 +293,16 @@ public class PlayfabApiCalls : MonoBehaviour
                     Debug.Log("Prefab name is: "+prefabName);
 
                     //store all custom data to data store
-                    PlayFabDataStore.cardCustomData.Add(item.ItemId, item.CustomData);
+                    if (!PlayFabDataStore.cardCustomData.ContainsKey(item.ItemId))
+                    {
+                        PlayFabDataStore.cardCustomData.Add(item.ItemId, item.CustomData);
+                    }
 
                     //store prefab names for all cards
-                    PlayFabDataStore.cardPrefabs.Add(item.ItemId, prefabName);
+                    if (!PlayFabDataStore.cardPrefabs.ContainsKey(item.ItemId))
+                    {
+                        PlayFabDataStore.cardPrefabs.Add(item.ItemId, prefabName);
+                    }
                 }
                
             }

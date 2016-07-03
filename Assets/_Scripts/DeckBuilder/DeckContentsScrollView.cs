@@ -52,39 +52,48 @@ public class DeckContentsScrollView : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
         //begin loading deck
+        Debug.Log("Loading deck contents");
         foreach (string cardId in PlayFabDataStore.cardsInDeck)
         {
-            //remove card from collection list
-            cardCollectionScript.RemoveCard(cardId);
+            //get item id of this card
+            string itemId = PlayFabDataStore.itemIdCollection[cardId]; 
+            
             //get a reference to a button of this card
-            GameObject button = cardCollectionScript.GetButton(cardId);
-            //Add the card to this deck's list
-            DeckContentsList.Add(cardId);
-            //THIS MAY BE UNNECESSARY NOW
-            //instantiate a new button for this deck
-            //GameObject button = Instantiate(Button_Template) as GameObject;
-         
+            GameObject button = cardCollectionScript.GetButton(itemId);
+            if(button != null)
+            {
+                //remove card from collection list
+                cardCollectionScript.RemoveCard(itemId);
+                //Add the card to this deck's list
+                DeckContentsList.Add(cardId);
+                //set it active
+                button.SetActive(true);
+                //store the button's script
+                DraggableCard CB = button.GetComponent<DraggableCard>();
+                //set the cards scrollview variable to be this script
+                CB.SetDeckScrollView(this);
+                //set the instance id variable of the button to the items instance id
+                CB.SetInstanceId(cardId);
+                //set the item id of the button to this item's item id
+                CB.SetId(itemId);
 
-            //set it active
-            button.SetActive(true);
-            //store the button's script
-            DraggableCard CB = button.GetComponent<DraggableCard>();
-            //set the cards scrollview variable to be this script
-            CB.SetDeckScrollView(this);
-            //call the set name function for that button
-            //use the name associated with the id key in the dictionary
-            CB.SetName(PlayFabDataStore.cardList[cardId]);
-            //call the set id function for that button
-            //stores item id for later use
-            CB.SetId(cardId);
-            //indicate that this card is already in deck
-            CB.inDeck = true;
-            //set parent to scroll view
-            //second argument is worldPositionStays
-            //setting to false retain local orientation and scale rather than world orientation and scale
-            button.transform.SetParent(scrollContent.transform, false);
+                //call the set name function for that button
+                //use the name associated with the id key in the dictionary
+                CB.SetName(PlayFabDataStore.cardNameList[itemId]);
 
+                //indicate that this card is already in deck
+                CB.inDeck = true;
+                //set parent to scroll view
+                //second argument is worldPositionStays
+                //setting to false retain local orientation and scale rather than world orientation and scale
+                button.transform.SetParent(scrollContent.transform, false);
+            }
+            else
+            {
+                Debug.Log("Error! Cannot create card in deck because it does not exist in collection");
+            }
         }
+        Debug.Log("Deck Contents Loaded");
         yield return null;
     }
     

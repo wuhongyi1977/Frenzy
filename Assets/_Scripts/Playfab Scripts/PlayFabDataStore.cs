@@ -23,12 +23,12 @@ public class PlayFabDataStore : MonoBehaviour
     //All data for catalog cards on playfab (cardId, string of custom data )
     public static Dictionary<string, string> cardCustomData = new Dictionary<string, string>();
 
-    //all cards owned
+    //all cards owned by instance id (unique to every object)
     public static List<string> cardCollection = new List<string>();
-    //all cards owned by instance id
-    public static Dictionary<string, string> instanceCollection = new Dictionary<string, string>();
-    //all card names stored by id
-    public static Dictionary<string, string> cardList = new Dictionary<string, string>();
+    //all cards item id <itemInstanceId, itemId> (instance id is unique, can be duplicate item id's if it is the same type of card)
+    public static Dictionary<string, string> itemIdCollection = new Dictionary<string, string>();
+    //all card names stored by item id (to reference actual name from item id)
+    public static Dictionary<string, string> cardNameList = new Dictionary<string, string>();
 
     //current selected deck id
     public static string currentDeck;
