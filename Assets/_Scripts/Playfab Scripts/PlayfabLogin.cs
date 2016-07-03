@@ -45,6 +45,9 @@ public class PlayfabLogin : MonoBehaviour
     //check if search has been cancelled
     bool searchCancelled = false;
 
+
+    public GameObject cheatPanel;
+
     void Awake()
     {
         PlayFabSettings.TitleId = "57F4";
@@ -72,7 +75,10 @@ public class PlayfabLogin : MonoBehaviour
     }
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            cheatPanel.SetActive(!cheatPanel.activeSelf);
+        }
     }
   
     //called when player clicks the new account button
@@ -488,6 +494,24 @@ public class PlayfabLogin : MonoBehaviour
         });
 
     }
+
+    ///////////////////////////////////
+    /////////CHEAT PANEL
+
+    public InputField cheatInput;
+    
+
+    public void CheatGrant()
+    {
+        string[] cardToGrant = new string[1];
+        cardToGrant[0] = cheatInput.text;
+        for(int i = 0; i < cardToGrant.Length; i++)
+        {
+            Debug.Log(cardToGrant[i]);
+        }
+        PlayfabApiCalls.GrantCardsToUser(cardToGrant);
+    }
+    
 
 
 
