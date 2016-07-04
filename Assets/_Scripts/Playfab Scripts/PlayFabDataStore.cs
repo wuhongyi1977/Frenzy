@@ -12,6 +12,9 @@ public class PlayFabDataStore : MonoBehaviour
     public static string playFabId;
     public static string userName;
     public static string email;
+
+    //the number of cards in a deck
+    public static int deckSize = 60;
    
     //number of decks a player has stored
     public static int numberOfDecks;

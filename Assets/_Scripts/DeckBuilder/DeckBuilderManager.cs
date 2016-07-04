@@ -9,7 +9,7 @@ public class DeckBuilderManager : MonoBehaviour {
 
     int maxDecks = 4;
     int currentDecks = 0;
-    int deckSize = 60;
+    int deckSize;
 
     //UI Panels
     public GameObject deckSelectPanel;
@@ -32,6 +32,7 @@ public class DeckBuilderManager : MonoBehaviour {
    
     void Awake()
     {
+        deckSize = PlayFabDataStore.deckSize;
         loadingPanel.SetActive(true);
         deckBuildPanel.SetActive(false);
         deckSelectPanel.SetActive(false);

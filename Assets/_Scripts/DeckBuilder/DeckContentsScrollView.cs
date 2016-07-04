@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class DeckContentsScrollView : MonoBehaviour
 {
@@ -18,11 +19,15 @@ public class DeckContentsScrollView : MonoBehaviour
 
     public List<string> deckAtStart;
 
+    public Text deckSizeText;
+
 
 
     // Use this for initialization
     void OnEnable()
     {
+        //set the text for deck size to be 0/decksize
+        deckSizeText.text = "Deck Size: 0/" + PlayFabDataStore.deckSize.ToString();
         //set this list to be the same as the deck was before changes
         deckAtStart = PlayFabDataStore.cardsInDeck;
         //store script for deck builder manager
@@ -51,6 +56,9 @@ public class DeckContentsScrollView : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
         }
+        //update deck size text to reflect number of cards
+        deckSizeText.text = "Deck Size: "+ DeckContentsList.Count.ToString()+"/" + PlayFabDataStore.deckSize.ToString();
+
         //begin loading deck
         Debug.Log("Loading deck contents");
         foreach (string cardId in PlayFabDataStore.cardsInDeck)
@@ -102,8 +110,10 @@ public class DeckContentsScrollView : MonoBehaviour
     {
         //Add the card to this deck's list
         DeckContentsList.Add(newCardId);
+        //update deck size text to reflect number of cards
+        deckSizeText.text = "Deck Size: " + DeckContentsList.Count.ToString() + "/" + PlayFabDataStore.deckSize.ToString();
         //DEBUG CODE
-        foreach(string output in DeckContentsList)
+        foreach (string output in DeckContentsList)
         {
             Debug.Log(output);
         }
