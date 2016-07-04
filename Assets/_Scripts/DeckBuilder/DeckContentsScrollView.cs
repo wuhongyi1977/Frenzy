@@ -138,6 +138,10 @@ public class DeckContentsScrollView : MonoBehaviour
         return (string[])deckAtStart.ToArray();
         
     }
+    public int GetNumberOfCards()
+    {
+        return DeckContentsList.Count;
+    }
 
 
     /*

@@ -120,8 +120,8 @@ public class DraggableCard : MonoBehaviour {
     public void OnMouseUp()
     {
         
-        //if the card is dropped off of the scroll contents
-        if(!isOverScrollView)
+        //if the card is dropped off of the scroll contents or the deck is full
+        if(!isOverScrollView || (deckContents.GetNumberOfCards() >= PlayFabDataStore.deckSize))
         {
             //indicate that this card has now been dropped into deck
             inDeck = false;

@@ -237,7 +237,7 @@ public class DeckBuilderManager : MonoBehaviour {
         //display a popup to show deck saved
         notePanel.SetActive(true);
        //if there are not enough cards to complete a deck
-        if (contentsList.Length != deckSize)
+        if (contentsList.Length < deckSize)
         {
             //store a variable in the deck that it cannot be played until full
             noteText.text = "Deck Saved \n (Unfinished)";
