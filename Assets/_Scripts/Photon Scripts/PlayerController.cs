@@ -251,12 +251,19 @@ public class PlayerController : MonoBehaviour
             if(prefabNames.Length > i)
             {
                 //load each card name from resources folder and add them to card deck
-                cardDeck.Add((GameObject)Resources.Load("Cards/" + prefabNames[i]));
+                GameObject newCard =(GameObject)Resources.Load("Cards/" + prefabNames[i]);
+                cardDeck.Add(newCard);
+                //assign this cards cardId
+                newCard.GetComponent<Card>().cardId = cardIds[i];
             }
             else
             {
                 //fill all remaining spaces with magma bolts
-                cardDeck.Add((GameObject)Resources.Load("Cards/Magma Bolt"));
+                //load each card name from resources folder and add them to card deck
+                GameObject newCard = (GameObject)Resources.Load("Cards/Magma Bolt");
+                cardDeck.Add(newCard);
+                //assign this cards cardId
+                newCard.GetComponent<Card>().cardId = "Classic_MagmaBolt_Standard";
             }
           
         }

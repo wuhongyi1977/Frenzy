@@ -7,6 +7,10 @@ using UnityEngine.UI;
 /// base for all refined cards
 /// </summary>
 public abstract class Card : MonoBehaviour {
+    //The itemId of the Card (not unique, used to reference custom data)
+    public string cardId;
+    //the custom data of the card
+    private string customData;
 	//The name of the card
 	public string cardTitle;
 	//Used to prevent staying step out of a chunk of code in derived Card Update methods
@@ -267,5 +271,46 @@ public abstract class Card : MonoBehaviour {
             //health = (int)stream.ReceiveNext();
         }
 
+    }
+    //takes a string of custom data and stores it
+    public void SetCustomData(string data)
+    {
+        customData = data;
+    }
+    //takes a string key, looks through custom data to find respective value
+    public string GetCustomDataValue(string key)
+    {
+        //create variable for storing value retrieved
+        string value = null;
+        //create string for storing all custom data for this card
+        string customDataString = null;
+        //create separator based on key to locate (separates at key":")
+        string[] stringSeparators = new string[] { key+"\":\"" , "\""};
+        //assign custom data to string variable
+        if (cardId != null)
+        {
+            customDataString = PlayFabDataStore.cardCustomData[cardId];
+        }
+        else
+        {
+            Debug.Log("Failed to Locate Custom Data Key (no card id for this card)");
+            return null;
+        }
+        //locate respective key from list of custom data
+        //splits custom data into 3 (preceding data/key, value, remaining data)
+        string[] result = customDataString.Split(new string[] { "[stop]" }, System.StringSplitOptions.None);
+        value = result[1];
+
+        //return data
+        if (value == null)
+        {
+            Debug.Log("Failed to Locate Custom Data Key (no value found)");
+        }
+        return value;
+    }
+
+    public void AssignCardInfo()
+    {
+       // cardTitle = GetCustomDataValue()
     }
 }
