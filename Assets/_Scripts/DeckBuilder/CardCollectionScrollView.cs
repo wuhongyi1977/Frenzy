@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class CardCollectionScrollView : MonoBehaviour
 {
@@ -126,25 +127,18 @@ public class CardCollectionScrollView : MonoBehaviour
         }
         return tempButton;
     }
-    /*
-    public void ReloadList()
+    //prevent the scrollview from moving
+    public void FreezeScrolling()
     {
-        PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
-        var children = new List<GameObject>();
-        foreach (Transform child in scrollContent.transform) children.Add(child.gameObject);
-        children.ForEach(child => Destroy(child));
-        LoadList();
-
-
+        ScrollRect scrollRect = GetComponent<ScrollRect>();
+        scrollRect.StopMovement();
+        scrollRect.enabled = false;
     }
-    
-
-    public void ButtonClicked(string id, string name)
+    //allow the scrollview to move
+    public void AllowScrolling()
     {
-        //send id and name of deck clicked to deck builder manager
-        builderManagerScript.DeckButtonClicked(id, name);
-
+        ScrollRect scrollRect = GetComponent<ScrollRect>();
+        scrollRect.enabled = true;
     }
-    */
 }
 

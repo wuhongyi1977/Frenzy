@@ -143,27 +143,19 @@ public class DeckContentsScrollView : MonoBehaviour
         return DeckContentsList.Count;
     }
 
-
-    /*
-    public void ReloadList()
+    //prevent the scrollview from moving
+    public void FreezeScrolling()
     {
-        PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
-        var children = new List<GameObject>();
-        foreach (Transform child in scrollContent.transform) children.Add(child.gameObject);
-        children.ForEach(child => Destroy(child));
-        LoadList();
-
-
+        ScrollRect scrollRect = GetComponent<ScrollRect>();
+        scrollRect.StopMovement();
+        scrollRect.enabled = false;
     }
-    
-
-    public void ButtonClicked(string id, string name)
+    //allow the scrollview to move
+    public void AllowScrolling()
     {
-        //send id and name of deck clicked to deck builder manager
-        builderManagerScript.DeckButtonClicked(id, name);
-
+        ScrollRect scrollRect = GetComponent<ScrollRect>();
+        scrollRect.enabled = true;
     }
-    */
 }
 
 

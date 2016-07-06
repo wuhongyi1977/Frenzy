@@ -103,6 +103,10 @@ public class DraggableCard : MonoBehaviour {
     //Registers that the player has clicked on the card
     public void OnMouseDown()
     {
+        //prevent all scrollviews from moving
+        deckContents.FreezeScrolling();
+        collectionContents.FreezeScrolling();
+        //set position to return to if dropped
         origPos = gameObject.transform.position;
         screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
@@ -119,9 +123,11 @@ public class DraggableCard : MonoBehaviour {
     //Registers that the player has let go of the card
     public void OnMouseUp()
     {
-        
+        //allow all scrollviews to move
+        deckContents.AllowScrolling();
+        collectionContents.AllowScrolling();
         //if the card is dropped off of the scroll contents or the deck is full
-        if(!isOverScrollView || (deckContents.GetNumberOfCards() >= PlayFabDataStore.deckSize))
+        if (!isOverScrollView || (deckContents.GetNumberOfCards() >= PlayFabDataStore.deckSize))
         {
             //indicate that this card has now been dropped into deck
             inDeck = false;
