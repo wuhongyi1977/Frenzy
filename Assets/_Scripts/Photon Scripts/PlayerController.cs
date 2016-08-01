@@ -253,8 +253,11 @@ public class PlayerController : MonoBehaviour
                 //load each card name from resources folder and add them to card deck
                 GameObject newCard =(GameObject)Resources.Load("Cards/" + prefabNames[i]);
                 cardDeck.Add(newCard);
-                //assign this cards cardId
-                newCard.GetComponent<Card>().cardId = cardIds[i];
+                //assign this cards cardId 
+                //the initialize function will set the id and custom data associated with it
+                newCard.GetComponent<Card>().InitializeCard(cardIds[i]);
+                //OLD CODE
+                //newCard.GetComponent<Card>().cardId = cardIds[i];
             }
             else
             {
@@ -263,7 +266,9 @@ public class PlayerController : MonoBehaviour
                 GameObject newCard = (GameObject)Resources.Load("Cards/Magma Bolt");
                 cardDeck.Add(newCard);
                 //assign this cards cardId
-                newCard.GetComponent<Card>().cardId = "Classic_MagmaBolt_Standard";
+                newCard.GetComponent<Card>().InitializeCard("Classic_MagmaBolt_Standard");
+                //OLD CODE
+                //newCard.GetComponent<Card>().cardId = "Classic_MagmaBolt_Standard";
             }
           
         }

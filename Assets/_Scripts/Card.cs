@@ -272,10 +272,19 @@ public abstract class Card : MonoBehaviour {
         }
 
     }
+
+    public void InitializeCard(string id)
+    {
+        //set the card's id
+        cardId = id;
+        //set the cards custom data to be the custom data associated with this card id
+        SetCustomData(PlayFabDataStore.cardCustomData[id]);
+    }
     //takes a string of custom data and stores it
     public void SetCustomData(string data)
     {
         customData = data;
+        Debug.Log(cardId+" custom data: "+ data);
     }
     //takes a string key, looks through custom data to find respective value
     public string GetCustomDataValue(string key)

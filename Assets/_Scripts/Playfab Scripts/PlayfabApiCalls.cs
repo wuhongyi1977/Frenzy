@@ -215,8 +215,10 @@ public class PlayfabApiCalls : MonoBehaviour
                     //PlayFabDataStore.cardsInDeck.Add(item.ItemId);
                     PlayFabDataStore.cardsInDeck.Add(item.ItemInstanceId);
                     //allow each cards item id to be referenced from its item instancde id
-                    PlayFabDataStore.itemIdCollection.Add(item.ItemInstanceId, item.ItemId);
-
+                    if (!PlayFabDataStore.itemIdCollection.ContainsKey(item.ItemInstanceId))
+                    {
+                        PlayFabDataStore.itemIdCollection.Add(item.ItemInstanceId, item.ItemId);
+                    }
                     //add a reference to the name associated with that id if it hasnt been added
                     //All cards the player owns should be able to be referenced here
                     if (!PlayFabDataStore.cardNameList.ContainsKey(item.ItemId))

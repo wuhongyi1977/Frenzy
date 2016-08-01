@@ -26,6 +26,7 @@ public class DeckContentsScrollView : MonoBehaviour
     // Use this for initialization
     void OnEnable()
     {
+        DeckContentsList.Clear();
         //set the text for deck size to be 0/decksize
         deckSizeText.text = "Deck Size: 0/" + PlayFabDataStore.deckSize.ToString();
         //set this list to be the same as the deck was before changes
@@ -56,8 +57,7 @@ public class DeckContentsScrollView : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
         }
-        //update deck size text to reflect number of cards
-        deckSizeText.text = "Deck Size: "+ DeckContentsList.Count.ToString()+"/" + PlayFabDataStore.deckSize.ToString();
+       
 
         //begin loading deck
         Debug.Log("Loading deck contents");
@@ -101,7 +101,12 @@ public class DeckContentsScrollView : MonoBehaviour
                 Debug.Log("Error! Cannot create card in deck because it does not exist in collection");
             }
         }
+
         Debug.Log("Deck Contents Loaded");
+
+        //update deck size text to reflect number of cards
+        deckSizeText.text = "Deck Size: " + DeckContentsList.Count.ToString() + "/" + PlayFabDataStore.deckSize.ToString();
+
         yield return null;
     }
     
