@@ -309,8 +309,64 @@ public abstract class Card : MonoBehaviour
     //takes a string of custom data and stores it
     public void SetCustomData(string data)
     {
+        //store custom data for this card
         customData = data;
-        
+        //define where to split the custom data to retrive variables
+        string[] stringSeparators = new string[] { "{\"", "\":\"", "\",\"", "\"}" };
+        //split custom data using seperators
+        string[] splitResultTest = customData.Split(stringSeparators, System.StringSplitOptions.None);
+        //iterate through each string in the split data
+        //goes to 1 less than total length because the last variable doesnt need to be checked and nextString will fail
+        for (int j = 0; j < splitResultTest.Length -1; j++)
+        {
+            //stores the current string being viewed
+            string currentString = splitResultTest[j];
+            //store the next string in the list
+            string nextString = splitResultTest[j+1];
+            Debug.Log(currentString);
+            //Assign variables
+            switch(currentString)
+            {
+                case "PrefabName":
+                    prefabName = nextString;
+                    break;
+                case "ArtName":
+                    artName = nextString;
+                    break;
+                case "BorderArt":
+                    borderArt = nextString;
+                    break;
+                case "Faction":
+                    faction = nextString;
+                    break;
+                case "CardType":
+                    cardType = nextString;
+                    break;
+                case "CastTime":
+                    castTime = float.Parse(nextString);
+                    break;
+                case "RechargeTime":
+                    rechargeTime = float.Parse(nextString);
+                    break;
+                case "AttackPower":
+                    attackPower = float.Parse(nextString);
+                    break;
+                case "DefensePower":
+                    defensePower = float.Parse(nextString);
+                    break;
+                case "OpponentDamage":
+                    opponentHealthChange = float.Parse(nextString);
+                    break;
+                case "OwnerDamage":
+                    ownerHealthChange = float.Parse(nextString);
+                    break;
+                default:
+                    break;
+            }
+                
+
+        }
+
     }
     //takes a string key, looks through custom data to find respective value
     public string GetCustomDataValue(string key)
