@@ -6,7 +6,36 @@ using UnityEngine.UI;
 /// card in the game. This is an abstract object. It will be used as a
 /// base for all refined cards
 /// </summary>
-public abstract class Card : MonoBehaviour {
+public abstract class Card : MonoBehaviour
+{
+
+//STATS 
+    //all card stats are here, are assigned by custom data from Playfab
+
+    //name of prefab that this card will utilize
+    public string prefabName;
+    //name of art asset to use for card art
+    public string artName;
+    //name of art asset to use for border art
+    public string borderArt;
+    //The faction that the card belongs to. Neutral means it is available to all factions
+    public string faction = "Neutral";
+    //the type of card classification this card has (creature, spell, etc.)
+    public string cardType;
+    //The time it takes for the card to be casted
+    public float castTime;
+    //the time it takes for this card to recharge after a use (ex: time it takes a creature before it can attack again)
+    public float rechargeTime;
+    //the attack power of this card (if its a creature)
+    public float attackPower;
+    //the defense power of this card (if its a creature)
+    public float defensePower;
+    //the amount to change the opponents health (can be direct damage or healing)
+    public float opponentHealthChange;
+    //the amount to change the owners health (can be direct damage or healing)
+    public float ownerHealthChange;
+//END STATS
+
     //The itemId of the Card (not unique, used to reference custom data)
     public string cardId;
     //the custom data of the card
@@ -25,8 +54,7 @@ public abstract class Card : MonoBehaviour {
 	public int cardNumber;
 	//Checks to see if the player dropped the card.
 	protected bool dropped;
-	//The time it takes for the card to be casted
-	public float castTime;
+	
 	protected float currentTime;
 	public Text summonZoneTextBox;
 	public Text cardTitleTextBox;
@@ -52,9 +80,6 @@ public abstract class Card : MonoBehaviour {
 
     //PHOTON COMPONENTS
     protected PhotonView photonView;
-
-	//The faction that the card belongs to. Neutral means it is available to all factions
-	public string faction = "Neutral";
 
     //This can be used for initialization code that is identical on ALL cards
     public virtual void Awake()
@@ -278,13 +303,14 @@ public abstract class Card : MonoBehaviour {
         //set the card's id
         cardId = id;
         //set the cards custom data to be the custom data associated with this card id
-        //SetCustomData(PlayFabDataStore.cardCustomData[id]);
+        Debug.Log("id of this card is: "+id);
+        SetCustomData(PlayFabDataStore.cardCustomData[id]);
     }
     //takes a string of custom data and stores it
     public void SetCustomData(string data)
     {
         customData = data;
-        Debug.Log(cardId+" custom data: "+ data);
+        
     }
     //takes a string key, looks through custom data to find respective value
     public string GetCustomDataValue(string key)

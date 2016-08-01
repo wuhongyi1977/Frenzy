@@ -290,6 +290,7 @@ public class PlayfabApiCalls : MonoBehaviour
                 //only store info if this is a card
                 if(item.ItemClass == "Card")
                 {
+                    Debug.Log("Item id of this is :" + item.ItemId);
                     //store custom data
                     string customData = item.CustomData;
                     Debug.Log("Heres custom data: " + customData);
@@ -298,7 +299,7 @@ public class PlayfabApiCalls : MonoBehaviour
                     //assign this to the prefab name from split
                     string prefabName = splitResult[4];
                     Debug.Log("Prefab name is: "+prefabName);
-
+                    
                     //store all custom data to data store
                     if (!PlayFabDataStore.cardCustomData.ContainsKey(item.ItemId))
                     {

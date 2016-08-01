@@ -198,6 +198,7 @@ public class PlayerController : MonoBehaviour
     {
         //FINAL CODE TO REPLACE TEST CODE
         //retrieves all cards in the cardsInDeck array (which should reference the current deck)
+        //card ids holds UNIQUE identifiers for each card instance (item instance id)
         string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
         Debug.Log("Number of cards in deck: "+cardIds.Length);
         //make a new array for prefabNames that is the same size as the cards in deck
@@ -257,7 +258,7 @@ public class PlayerController : MonoBehaviour
                 cardDeck.Add(newCard);
                 //assign this cards cardId 
                 //the initialize function will set the id and custom data associated with it
-                newCard.GetComponent<Card>().InitializeCard(cardIds[i]);
+                newCard.GetComponent<Card>().InitializeCard(PlayFabDataStore.itemIdCollection[cardIds[i]]);
                 //OLD CODE
                 //newCard.GetComponent<Card>().cardId = cardIds[i];
             }
