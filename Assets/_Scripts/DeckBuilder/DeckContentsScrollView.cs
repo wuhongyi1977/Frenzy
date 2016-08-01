@@ -127,6 +127,8 @@ public class DeckContentsScrollView : MonoBehaviour
     {
         //Add the card to this deck's list
         DeckContentsList.Remove(cardId);
+        //update deck size text to reflect number of cards
+        deckSizeText.text = "Deck Size: " + DeckContentsList.Count.ToString() + "/" + PlayFabDataStore.deckSize.ToString();
     }
     //returns the list in array form
     public string[] GetListOfCards()
