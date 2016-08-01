@@ -85,14 +85,14 @@ public class OneShotHealth : Card
             if (photonView.isMine)
             {
                 //handle health changes to self (local player here is card owner)
-                localPlayer.GetComponent<PlayerController>().ChangeHealth(ownerHealth);
+                localPlayer.GetComponent<PlayerController>().ChangeHealth(ownerHealthChange);
                 //send to graveyard
                 localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
             }
             else //if this is the network copy
             {
                 //handle health changes to opponent (local player here is opponent)
-                localPlayer.GetComponent<PlayerController>().ChangeHealth(opponentHealth);
+                localPlayer.GetComponent<PlayerController>().ChangeHealth(opponentHealthChange);
                 //send to opponents graveyard
                 networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
             }

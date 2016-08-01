@@ -266,7 +266,7 @@ public class PlayerController : MonoBehaviour
             {
                 //fill all remaining spaces with magma bolts
                 //load each card name from resources folder and add them to card deck
-                GameObject newCard = (GameObject)Resources.Load("Cards/Magma Bolt");
+                GameObject newCard = (GameObject)Resources.Load("Cards/OneShotHealthCard");
                 cardDeck.Add(newCard);
                 //assign this cards cardId
                 newCard.GetComponent<Card>().InitializeCard("Classic_MagmaBolt_Standard");

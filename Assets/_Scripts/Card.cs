@@ -31,9 +31,9 @@ public abstract class Card : MonoBehaviour
     //the defense power of this card (if its a creature)
     public float defensePower;
     //the amount to change the opponents health (can be direct damage or healing)
-    public float opponentHealthChange;
+    public int opponentHealthChange;
     //the amount to change the owners health (can be direct damage or healing)
-    public float ownerHealthChange;
+    public int ownerHealthChange;
 //END STATS
 
     //The itemId of the Card (not unique, used to reference custom data)
@@ -302,6 +302,8 @@ public abstract class Card : MonoBehaviour
     {
         //set the card's id
         cardId = id;
+        //set cards name 
+        cardTitle = PlayFabDataStore.cardNameList[id];
         //set the cards custom data to be the custom data associated with this card id
         Debug.Log("id of this card is: "+id);
         SetCustomData(PlayFabDataStore.cardCustomData[id]);
@@ -355,10 +357,10 @@ public abstract class Card : MonoBehaviour
                     defensePower = float.Parse(nextString);
                     break;
                 case "OpponentDamage":
-                    opponentHealthChange = float.Parse(nextString);
+                    opponentHealthChange = int.Parse(nextString);
                     break;
                 case "OwnerDamage":
-                    ownerHealthChange = float.Parse(nextString);
+                    ownerHealthChange = int.Parse(nextString);
                     break;
                 default:
                     break;
