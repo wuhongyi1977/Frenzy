@@ -22,6 +22,8 @@ public class CreatureCard : DamageCard {
 	public bool isFrozen;
 	public bool isSelectable;
 	public bool isAttackable;
+	public bool rush;
+	public bool elusive;
 	public override void Start()
 	{
 		localPlayer = GameObject.Find ("LocalPlayer");
@@ -113,7 +115,8 @@ public class CreatureCard : DamageCard {
 				if (!stopCastingTimer) {
 					stopCastingTimer = true;
 					summonZoneTextBox.text = "";
-					creatureCanAttack = true;
+					if(rush)
+						creatureCanAttack = true;
 					inBattlefield = true;
 					//call the event that a creature has entered the battlefield
 					localPlayer.GetComponent<PlayerController> ().creatureEntered ();

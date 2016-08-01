@@ -452,8 +452,12 @@ public class PlayerController : MonoBehaviour
                 {
 					if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().isAttackable) {
 						card.GetComponent<CreatureCard> ().creatureCanAttack = false;
-						card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
-						enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
+						//if your creature doesn't have elusive then deal damage
+						if(!card.GetComponent<CreatureCard>().elusive)
+							card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
+						//if the enemy creature doesn't have elusive then deal damage
+						if(!enemyObjectUnderMouse.GetComponent<CreatureCard>().elusive)
+							enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
 						Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
 						Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
 						photonView.RPC ("ResolveCreatureDamage", PhotonTargets.Others, card, enemyObjectUnderMouse);
