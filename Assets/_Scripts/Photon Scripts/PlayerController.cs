@@ -199,12 +199,13 @@ public class PlayerController : MonoBehaviour
         //FINAL CODE TO REPLACE TEST CODE
         //retrieves all cards in the cardsInDeck array (which should reference the current deck)
         string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
-        
+        Debug.Log("Number of cards in deck: "+cardIds.Length);
         //make a new array for prefabNames that is the same size as the cards in deck
         string[] prefabNames = new string[cardIds.Length];
         //for each card in the cardids array, find its prefab and add it to prefab names array
         for(int i = 0; i < cardIds.Length; i++)
         {
+            Debug.Log("Card "+ (i+1));
             //retrieve item id for this item instance id
             string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
            //CARD ID IS ITS INSTANCE ID< NEED TO BE ITEM ID
@@ -215,6 +216,7 @@ public class PlayerController : MonoBehaviour
             //associated with it
             prefabNames[i] = PlayFabDataStore.cardPrefabs[itemId];
         }
+
         //by the end of this, all prefab names are stored      
 
         /*
@@ -242,7 +244,7 @@ public class PlayerController : MonoBehaviour
         };
         ////////////////END TEST CODE
         */
-
+        Debug.Log("Card data retrieved, begin loading prefabs");
         //Load all cards
         for (int i = 0; i < deckSize; i++)
         {

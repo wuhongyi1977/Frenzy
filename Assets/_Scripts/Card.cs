@@ -278,7 +278,7 @@ public abstract class Card : MonoBehaviour {
         //set the card's id
         cardId = id;
         //set the cards custom data to be the custom data associated with this card id
-        SetCustomData(PlayFabDataStore.cardCustomData[id]);
+        //SetCustomData(PlayFabDataStore.cardCustomData[id]);
     }
     //takes a string of custom data and stores it
     public void SetCustomData(string data)
