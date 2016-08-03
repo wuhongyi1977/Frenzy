@@ -356,10 +356,10 @@ public abstract class Card : MonoBehaviour
                 case "DefensePower":
                     defensePower = float.Parse(nextString);
                     break;
-                case "OpponentDamage":
+                case "OpponentHealthChange":
                     opponentHealthChange = int.Parse(nextString);
                     break;
-                case "OwnerDamage":
+                case "OwnerHealthChange":
                     ownerHealthChange = int.Parse(nextString);
                     break;
                 default:

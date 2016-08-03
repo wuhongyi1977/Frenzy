@@ -273,7 +273,7 @@ public class PlayfabApiCalls : MonoBehaviour
         });
     }
 
-    //store all custom data for all cards
+    //store all custom data for all cards (every card in existance)
     public static void RetrieveCatalogData()
     {
         var request = new GetCatalogItemsRequest()
