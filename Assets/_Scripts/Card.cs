@@ -300,12 +300,12 @@ public abstract class Card : MonoBehaviour
 
     public void InitializeCard(string id)
     {
+        Debug.Log("id of this card is: " + id);
         //set the card's id
         cardId = id;
         //set cards name 
         cardTitle = PlayFabDataStore.cardNameList[id];
         //set the cards custom data to be the custom data associated with this card id
-        Debug.Log("id of this card is: "+id);
         SetCustomData(PlayFabDataStore.cardCustomData[id]);
     }
     //takes a string of custom data and stores it
