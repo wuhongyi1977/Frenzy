@@ -7,6 +7,8 @@ public class OneShotHealth : Card
     public int ownerHealth = 0;
     public int opponentHealth = 0;
 
+    public bool isSelectable = true;
+
     public override void Start()                //Abstract method for start
     {
         //set card data variables
@@ -100,4 +102,30 @@ public class OneShotHealth : Card
            
         }
     }
+    //ADDED TO ATTEMPT TARGETED DAMAGE
+    public override void OnMouseDown()
+    {
+        if (isDraggable == true )//&& isSelectable == true)
+        {
+            cardHandPos = gameObject.transform.position;
+            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+        }
+    }
+    public override void OnMouseUp()
+    {
+        if (isSelectable == true)
+        {
+            localPlayer.GetComponent<PlayerController>().makeLineInvisible();
+            localPlayer.GetComponent<PlayerController>().drawLineOff();
+            //TEST
+            //p1Manager.GetComponent<Player1Manager> ().makeLineInvisible ();
+            //p1Manager.GetComponent<Player1Manager> ().drawLineOff ();
+            dropped = true;
+            //if this is the local card object
+            if (photonView.isMine)
+            {
+
+                if (target == "Creature" || target == "All")//(creatureCanAttack)
+                {
 }

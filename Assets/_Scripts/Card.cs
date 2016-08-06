@@ -22,6 +22,8 @@ public abstract class Card : MonoBehaviour
     public string faction = "Neutral";
     //the type of card classification this card has (creature, spell, etc.)
     public string cardType;
+    //The potential targets for this card (could be creature, player, all)
+    public string target;
     //The time it takes for the card to be casted
     public float castTime;
     //the time it takes for this card to recharge after a use (ex: time it takes a creature before it can attack again)
@@ -34,6 +36,7 @@ public abstract class Card : MonoBehaviour
     public int opponentHealthChange;
     //the amount to change the owners health (can be direct damage or healing)
     public int ownerHealthChange;
+
 //END STATS
 
     //The itemId of the Card (not unique, used to reference custom data)
@@ -343,6 +346,9 @@ public abstract class Card : MonoBehaviour
                     break;
                 case "CardType":
                     cardType = nextString;
+                    break;
+                case "Target":
+                    target = nextString;
                     break;
                 case "CastTime":
                     castTime = float.Parse(nextString);
