@@ -102,6 +102,7 @@ public class OneShotHealth : Card
            
         }
     }
+    /*
     //ADDED TO ATTEMPT TARGETED DAMAGE
     public override void OnMouseDown()
     {
@@ -128,4 +129,81 @@ public class OneShotHealth : Card
 
                 if (target == "Creature" || target == "All")//(creatureCanAttack)
                 {
+                    networkOpponent.GetComponent<PlayerController>().ChangeHealth(opponentHealthChange);
+                    localPlayer.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
+                   
+                }
+                else
+                {
+                    localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+                   
+                }
+            }
+            else
+            {
+                if (target == "Creature" || target == "All")//(creatureCanAttack)
+                {
+
+                    networkOpponent.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
+                   
+                }
+                else
+                {
+                    networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+                }
+
+              
+
+            }
+            //finds the text box that corresponds to the summon zone
+            if (summonZoneTextBox == null)
+            {
+                //if this is the local card object
+                if (photonView.isMine)
+                {
+                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
+                   
+                }
+                else
+                {
+                    summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
+                   
+                }
+
+            }
+        }
+
+    }
+    public override void OnMouseOver()
+    {
+        if (target == "Creature" || target == "All")//(creatureCanAttack)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                localPlayer.GetComponent<PlayerController>().drawLineOn();
+              
+            }
+
+        }
+       
+        if (photonView.isMine)
+        {
+            localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            
+        }
+        else
+        {
+            networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            
+        }
+        if (target == "Creature" || target == "All")//(creatureCanAttack)
+        {
+            if (photonView.isMine)
+            {
+                localPlayer.GetComponent<PlayerController>().drawLineOn();
+              
+            }
+        }
+    }
+    */
 }
