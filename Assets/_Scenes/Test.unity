@@ -1992,7 +1992,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 476072, guid: 20285e99e17b8074689c6ca1cdc59274, type: 2}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 476072, guid: 20285e99e17b8074689c6ca1cdc59274, type: 2}
       propertyPath: m_LocalScale.y
