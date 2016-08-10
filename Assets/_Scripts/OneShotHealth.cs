@@ -56,8 +56,10 @@ public class OneShotHealth : Card
             {
                 waitingForTarget = true;
             }
+
+            //if the target is always the player or 
             //if the target has been selected, begin countdown
-            if (targetSelected == true)
+            if (target == "Player" || targetSelected == true)
             {
 
                 //Increment the current Time
@@ -116,7 +118,7 @@ public class OneShotHealth : Card
            
         }
     }
-    /*
+    
     public override void OnMouseOver()
     {
         
@@ -139,7 +141,7 @@ public class OneShotHealth : Card
         {
             networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
         }
-        
+        /*
         if (waitingForTarget == true && targetSelected == false)//(creatureCanAttack)
         {
             if (photonView.isMine)
@@ -147,8 +149,9 @@ public class OneShotHealth : Card
                 localPlayer.GetComponent<PlayerController>().drawLineOn();
             }
         }
+        */
     }
-
+    /*
     public override void OnMouseUp()
     {
         if (isSelectable == true)
