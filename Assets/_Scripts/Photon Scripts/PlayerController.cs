@@ -42,13 +42,21 @@ public class PlayerController : MonoBehaviour
     //The list that represents the player's graveyard
     public List<GameObject> graveyard = new List<GameObject>(60);
     //The list that represents the player's library
-    public List<GameObject> library = new List<GameObject>(60);
+    //public List<GameObject> library = new List<GameObject>(60);
+
+    public List<string> library = new List<string>(60);//CHANGED
+
+
     //the next card to draw from the deck (index of decksize array)
     int currentCardIndex = 0;
     int currentHandSize = 0;
     float libraryDrawCounterTimer = 0;
     //the player's deck, this gets loaded into the list at start up in a shuffled manner
-    public List<GameObject> cardDeck = new List<GameObject>(60);
+    //public List<GameObject> cardDeck = new List<GameObject>(60);
+
+    public List<string> cardDeck = new List<string>(60); //CHANGED 
+
+
     //The game manager object
     GameManager gameManager;
     //The position of the graveyard. It is off screen so that that player doesn't see it but the player won't 
@@ -200,6 +208,65 @@ public class PlayerController : MonoBehaviour
         //retrieves all cards in the cardsInDeck array (which should reference the current deck)
         //card ids holds UNIQUE identifiers for each card instance (item instance id)
         string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
+        Debug.Log("Number of cards in deck: " + cardIds.Length);
+       
+        //for each card in the cardids array, find its item id and add it to names array
+        for (int i = 0; i < cardIds.Length; i++)
+        {
+            Debug.Log("Card " + (i + 1));
+            //retrieve item id for this item instance id
+            string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
+            //add that card to the deck
+            cardDeck.Add(itemId);
+           
+        }
+
+        //by the end of this, all card names are stored  
+        
+        //for testing, fill any available space with magma bolts    
+        while(cardDeck.Count < deckSize)
+        {
+            cardDeck.Add("Classic_MagmaBolt_Standard");
+        }
+
+        Debug.Log("Card data retrieved, begin loading deck");
+        
+        //Populate deck
+        for (int i = 0; i < deckSize; i++)
+        {
+            library.Add(cardDeck[i]);
+           
+        }
+        //if this is the local player, shuffle the deck and draw
+        //if this isnt, drawing will be handled by received rpc calls
+        if (photonView.isMine)
+        {
+            int numbShuffles = Random.Range(1, maxInitialShuffles);
+            for (int i = 0; i < numbShuffles; i++)
+            {
+                library = shuffleDeck(library);
+            }
+            //draw a hand of (startingHandSize) cards
+            for (int i = 0; i < startingHandSize; i++)
+            {
+                drawFromLibrary();
+            }
+        }
+        //after this resolves, the player's hand should have 5 cards and the current card index 
+        //should be at 5 (since indecies 0-4 have been taken)
+
+    }
+
+    /*
+    //Loads a particular deck into the card deck list
+    //currently is hard coded, later on will be retrieved by playfab
+    [PunRPC]
+    public void LoadDeck()
+    {
+        //FINAL CODE TO REPLACE TEST CODE
+        //retrieves all cards in the cardsInDeck array (which should reference the current deck)
+        //card ids holds UNIQUE identifiers for each card instance (item instance id)
+        string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
         Debug.Log("Number of cards in deck: "+cardIds.Length);
         //make a new array for prefabNames that is the same size as the cards in deck
         string[] prefabNames = new string[cardIds.Length];
@@ -220,31 +287,7 @@ public class PlayerController : MonoBehaviour
 
         //by the end of this, all prefab names are stored      
 
-        /*
-        //TEST CODE
-        //will call playfab and retrieve currently active deck names as array later
-        //put all card names here
-        string[] cardNames =
-        {
-            
-			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
-			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
-			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
-			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
-			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
-			"Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd","Blend With the Crowd",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-			"Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound","Fiend Hound",
-            
-
-
-        };
-        ////////////////END TEST CODE
-        */
+      
         Debug.Log("Card data retrieved, begin loading prefabs");
         //Load all cards
         for (int i = 0; i < deckSize; i++)
@@ -258,9 +301,9 @@ public class PlayerController : MonoBehaviour
                 cardDeck.Add(newCard);
                 //assign this cards cardId 
                 //the initialize function will set the id and custom data associated with it
-                newCard.GetComponent<Card>().InitializeCard(PlayFabDataStore.itemIdCollection[cardIds[i]]);
+               newCard.GetComponent<Card>().InitializeCard(PlayFabDataStore.itemIdCollection[cardIds[i]]);
                 //OLD CODE
-                //newCard.GetComponent<Card>().cardId = cardIds[i];
+               // newCard.GetComponent<Card>().cardId = cardIds[i];
             }
             else
             {
@@ -306,6 +349,7 @@ public class PlayerController : MonoBehaviour
         //should be at 5 (since indecies 0-4 have been taken)
 
     }
+*/
     void Lose()
     {
         Debug.Log("YOU LOST!!!");
@@ -432,10 +476,46 @@ public class PlayerController : MonoBehaviour
 	[PunRPC]
 	public void ResolveCreatureDamage(GameObject creature, GameObject otherCreature)
 	{
-		creature.GetComponent<CreatureCard> ().health -= otherCreature.GetComponent<CreatureCard> ().damageToDeal;
-		otherCreature.GetComponent<CreatureCard> ().health -= creature.GetComponent<CreatureCard> ().damageToDeal;
+        
+        int creatureAttackDamage, otherCreatureAttackDamage;
+
+        //Assign damage based on proper scripts
+        //if this creature is using the basic creature card script
+        if(creature.GetComponent<CreatureCard>() == null)
+        { creatureAttackDamage = creature.GetComponent<BasicCreatureCard>().damageToDeal;}
+        else
+        {creatureAttackDamage = creature.GetComponent<CreatureCard>().damageToDeal;}
+
+        //if the other creature is using the basic creature card script
+        if (otherCreature.GetComponent<CreatureCard>() == null)
+        {otherCreatureAttackDamage = otherCreature.GetComponent<BasicCreatureCard>().damageToDeal;}
+        else
+        {otherCreatureAttackDamage = otherCreature.GetComponent<CreatureCard>().damageToDeal;}
+
+        //Resolve damage
+        if (creature.GetComponent<CreatureCard>() == null)
+        {
+            creature.GetComponent<BasicCreatureCard>().health -= otherCreature.GetComponent<CreatureCard>().damageToDeal;
+        }
+        else
+        {
+            creature.GetComponent<CreatureCard>().health -= otherCreature.GetComponent<CreatureCard>().damageToDeal;
+        }
+
+        if (otherCreature.GetComponent<CreatureCard>() == null)
+        {
+            otherCreature.GetComponent<BasicCreatureCard>().health -= creature.GetComponent<CreatureCard>().damageToDeal;
+        }
+        else
+        {
+            otherCreature.GetComponent<CreatureCard>().health -= creature.GetComponent<CreatureCard>().damageToDeal;
+        }
+
+       
 	}
     
+
+    //Standard creature card dropped function
     public void creatureCardIsDropped(GameObject card, Vector3 cardHandPos)
     {
         //card.transform.position = cardHandPos;
@@ -446,6 +526,7 @@ public class PlayerController : MonoBehaviour
         if (hit)
         {
             enemyObjectUnderMouse = hit.transform.gameObject;
+
             if (enemyObjectUnderMouse.tag == "CreatureCard")
             {
                 if (enemyObjectUnderMouse.GetComponent<CreatureCard>().inBattlefield)
@@ -472,9 +553,6 @@ public class PlayerController : MonoBehaviour
                 gameManager.dealDamage(card.GetComponent<DamageCard>().damageToDeal, playerID);
             }
         }
-
-        //Debug.Log ("HERE - " + objectHit.name);
-
     }
 	public void creatureTargetCardIsDropped(GameObject card, Vector3 cardHandPos)
 	{
@@ -567,6 +645,24 @@ public class PlayerController : MonoBehaviour
         }
         return textBoxToReturn;
     }
+    public static List<string> shuffleDeck(List<string> library)
+    {
+        System.Random _random = new System.Random();
+        string temp;
+
+        int n = library.Count;
+        for (int i = 0; i < n; i++)
+        {
+
+            int r = i + (int)(_random.NextDouble() * (n - i));
+            temp = library[r];
+            library[r] = library[i];
+            library[i] = temp;
+        }
+        return library;
+
+    }
+    /*
     public static List<GameObject> shuffleDeck(List<GameObject> library)
     {
         System.Random _random = new System.Random();
@@ -582,20 +678,29 @@ public class PlayerController : MonoBehaviour
             library[i] = temp;
         }
         return library;
-
     }
-    
+    */
+
     public void drawFromLibrary()
     {
         if (currentHandSize < startingHandSize)
         {
             //set the first card (starting at index 0) of the players hand to
             //the first card (starting at index 0) in the players deck
-            library[currentCardIndex].GetComponent<Card>().playerID = playerID;
+
+            //library[currentCardIndex].GetComponent<Card>().playerID = playerID; REMOVED!!!
+
             //drawCard(library[currentCardIndex]);
 
             //get name of drawn card
-            string cardToDraw = library[currentCardIndex].name;
+
+            //string cardToDraw = library[currentCardIndex].name; REMOVED!!!
+
+            //get the itemid (non-unique) of the card being drawn
+            string itemId = library[currentCardIndex]; //ADDED
+            //get the prefab name associated with this item id
+            string cardToDraw = PlayFabDataStore.cardPrefabs[itemId]; ///ADDED
+
             //send name of drawn card to clones
             //photonView.RPC("drawCard", PhotonTargets.All,cardToDraw);
 
@@ -603,19 +708,24 @@ public class PlayerController : MonoBehaviour
             //Instantiate the passed card over photon network
             GameObject cardToAdd = PhotonNetwork.Instantiate(("Cards/" + cardToDraw), Vector3.zero, Quaternion.identity, 0);
             //get the card's view Id to reference the same card
-            int cardId = cardToAdd.GetComponent<PhotonView>().viewID;
+            int viewId = cardToAdd.GetComponent<PhotonView>().viewID;
+
+            //INITIALIZE CARD
+            cardToAdd.GetComponent<Card>().playerID = playerID;
+            cardToAdd.GetComponent<Card>().InitializeCard(itemId);
+
             //Put the card into proper place
-            photonView.RPC("DrawCard", PhotonTargets.All, cardId);
+            photonView.RPC("DrawCard", PhotonTargets.All, viewId);
 
         }
     }
 //NEW CARD DRAWING FUNCTION
     //Sets up card variables and position of card in hand
     [PunRPC]
-    public void DrawCard(int cardId)
+    public void DrawCard(int viewId)
     {
         //find the spawned card
-        GameObject cardToAdd = PhotonView.Find(cardId).gameObject;
+        GameObject cardToAdd = PhotonView.Find(viewId).gameObject;
         //Set cards position
         cardToAdd.transform.position = new Vector3(handZone.transform.position.x + (currentHandSize * 5f), handZone.transform.position.y, handZone.transform.position.z);
         //set the card's player id

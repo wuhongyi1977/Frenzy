@@ -33,6 +33,7 @@ public class OneShotHealth : Card
         cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
         cardTitleTextBox.text = cardTitle;
 
+
     }
     public override void Update()               //Abstract method for Update
     {

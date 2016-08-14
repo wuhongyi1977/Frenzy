@@ -291,7 +291,7 @@ public class PlayfabApiCalls : MonoBehaviour
                 if(item.ItemClass == "Card")
                 {
                     Debug.Log("Item id of this is :" + item.ItemId);
-                    //store custom data
+                    //store custom data for this card
                     string customData = item.CustomData;
                     Debug.Log("Heres custom data: " + customData);
                     //split the string to get prefab name
@@ -300,10 +300,14 @@ public class PlayfabApiCalls : MonoBehaviour
                     string prefabName = splitResult[4];
                     Debug.Log("Prefab name is: "+prefabName);
                     
+                    //define where to split the custom data to retrive variables
+                    string[] stringSeparators = new string[] { "{\"", "\":\"", "\",\"", "\"}" };
+                    //split custom data using seperators
+                    string[] splitResults = customData.Split(stringSeparators, System.StringSplitOptions.None);
                     //store all custom data to data store
                     if (!PlayFabDataStore.cardCustomData.ContainsKey(item.ItemId))
                     {
-                        PlayFabDataStore.cardCustomData.Add(item.ItemId, item.CustomData);
+                        PlayFabDataStore.cardCustomData.Add(item.ItemId, splitResults);//item.CustomData);
                     }
 
                     //store prefab names for all cards (possibly unnecessary with new custom data)

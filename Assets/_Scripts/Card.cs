@@ -29,9 +29,9 @@ public abstract class Card : MonoBehaviour
     //the time it takes for this card to recharge after a use (ex: time it takes a creature before it can attack again)
     public float rechargeTime;
     //the attack power of this card (if its a creature)
-    public float attackPower;
+    public int attackPower;
     //the defense power of this card (if its a creature)
-    public float defensePower;
+    public int defensePower;
     //the amount to change the opponents health (can be direct damage or healing)
     public int opponentHealthChange;
     //the amount to change the owners health (can be direct damage or healing)
@@ -105,9 +105,10 @@ public abstract class Card : MonoBehaviour
 		isDraggable = true;
 		//gameObject.GetComponentInChildren<Text>();
 		cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
-		cardTitleTextBox.text = cardTitle;
+        cardTitleTextBox.text = cardTitle;
 
-	}
+
+    }
 	public virtual void Update ()				//Abstract method for Update
 	{
 		//If the card is Not in the graveyard and is in the summon zone
@@ -168,7 +169,7 @@ public abstract class Card : MonoBehaviour
 	//Registers that the player has clicked on the card
 	public virtual void OnMouseDown()			
 	{
-		if (isDraggable == true) 
+		if (photonView.isMine && isDraggable == true) 
 		{
 			cardHandPos = gameObject.transform.position;
 			screenPoint = Camera.main.WorldToScreenPoint (gameObject.transform.position);
@@ -182,22 +183,22 @@ public abstract class Card : MonoBehaviour
 	{
         
        
-        dropped = true;
+       
 		if (photonView.isMine)
         {
-            
+            dropped = true;
             localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
             //TEST
             //p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject, cardHandPos);
         }
-        
+        /*
 		else
         {
             networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
             //TEST
             //p2Manager.GetComponent<Player2Manager>().cardIsDropped(gameObject, cardHandPos);
         }
-        
+        */
 			
 		//finds the text box that corresponds to the summon zone
 		if (summonZoneTextBox == null) 
@@ -224,7 +225,8 @@ public abstract class Card : MonoBehaviour
 	//Registers that the card is being dragged
 	public  void OnMouseDrag()			
 	{
-		if (isDraggable == true) {
+		if (photonView.isMine && isDraggable == true)
+        {
 			Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
 			Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
 			transform.position = curPosition;
@@ -282,52 +284,49 @@ public abstract class Card : MonoBehaviour
 		return summonZoneTextBox;
 	}
 
-    //Photon Serialize View
-    //Registers that the player has clicked on the card
-    public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.isWriting)
-        {
-            //We own this player: send the others our data
-            //sync health
-            //stream.SendNext(health);
-
-        }
-        else
-        {
-            //Network player, receive data          
-            //health = (int)stream.ReceiveNext();
-        }
-
-    }
-
+   
+    
     public void InitializeCard(string id)
     {
+    
         Debug.Log("id of this card is: " + id);
+        /*
+        //set the card's id
+        cardId = id;
+        //set cards name 
+        cardTitle = PlayFabDataStore.cardNameList[id];   
+        //set the cards custom data to be the custom data associated with this card id
+        SetCustomData(PlayFabDataStore.cardCustomData[id]); 
+        */
+        photonView.RPC("SetCustomData", PhotonTargets.All, id);
+    }
+
+    //takes a string of custom data and stores it
+    [PunRPC]
+    public void SetCustomData(string id)//string[] data)
+    {
         //set the card's id
         cardId = id;
         //set cards name 
         cardTitle = PlayFabDataStore.cardNameList[id];
-        //set the cards custom data to be the custom data associated with this card id
-        SetCustomData(PlayFabDataStore.cardCustomData[id]);
-    }
-    //takes a string of custom data and stores it
-    public void SetCustomData(string data)
-    {
+
+        string[] data = PlayFabDataStore.cardCustomData[id];
+        /*
         //store custom data for this card
         customData = data;
         //define where to split the custom data to retrive variables
         string[] stringSeparators = new string[] { "{\"", "\":\"", "\",\"", "\"}" };
         //split custom data using seperators
         string[] splitResultTest = customData.Split(stringSeparators, System.StringSplitOptions.None);
+        */
         //iterate through each string in the split data
         //goes to 1 less than total length because the last variable doesnt need to be checked and nextString will fail
-        for (int j = 0; j < splitResultTest.Length -1; j++)
+        for (int j = 0; j < data.Length - 1; j++)//splitResultTest.Length -1; j++)
         {
             //stores the current string being viewed
-            string currentString = splitResultTest[j];
+            string currentString = data[j];//splitResultTest[j];
             //store the next string in the list
-            string nextString = splitResultTest[j+1];
+            string nextString = data[j + 1];//splitResultTest[j+1];
             Debug.Log(currentString);
             //Assign variables
             switch(currentString)
@@ -357,10 +356,10 @@ public abstract class Card : MonoBehaviour
                     rechargeTime = float.Parse(nextString);
                     break;
                 case "AttackPower":
-                    attackPower = float.Parse(nextString);
+                    attackPower = int.Parse(nextString);
                     break;
                 case "DefensePower":
-                    defensePower = float.Parse(nextString);
+                    defensePower = int.Parse(nextString);
                     break;
                 case "OpponentHealthChange":
                     opponentHealthChange = int.Parse(nextString);
@@ -371,11 +370,20 @@ public abstract class Card : MonoBehaviour
                 default:
                     break;
             }
-                
-
         }
+        //set all internal variables on a card using this function
+        UpdateInternalVariables();    
 
     }
+    //this function should be overridden in child script to update any
+    //internal variables that should be set on card initialization
+    public virtual void UpdateInternalVariables()
+    {
+        //variables go here
+    }
+
+
+    /*
     //takes a string key, looks through custom data to find respective value
     public string GetCustomDataValue(string key)
     {
@@ -407,9 +415,33 @@ public abstract class Card : MonoBehaviour
         }
         return value;
     }
-
+    
     public void AssignCardInfo()
     {
        // cardTitle = GetCustomDataValue()
+    }
+    */
+
+        //Photon Serialize View
+        //Registers that the player has clicked on the card
+    public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            //We own this player: send the others our data
+            //sync health
+            stream.SendNext(cardId);
+            stream.SendNext(cardTitle);
+            
+
+        }
+        else
+        {
+            //Network player, receive data   
+            cardId = (string)stream.ReceiveNext();
+            cardTitle = (string)stream.ReceiveNext();
+            cardTitleTextBox.text = cardTitle;
+        }
+
     }
 }

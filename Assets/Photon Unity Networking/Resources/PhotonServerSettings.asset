@@ -49,4 +49,6 @@ MonoBehaviour:
   - ResolveCreatureDamage
   - DrawCard
   - OnMouseUp
+  - InitializeCard
+  - SetCustomData
   DisableAutoOpenWizard: 1

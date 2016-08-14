@@ -24,7 +24,7 @@ public class PlayFabDataStore : MonoBehaviour
     public static Dictionary<string, string> deckList = new Dictionary<string, string>();
 
     //All data for catalog cards on playfab (cardId, string of custom data )
-    public static Dictionary<string, string> cardCustomData = new Dictionary<string, string>();
+    public static Dictionary<string, string[]> cardCustomData = new Dictionary<string, string[]>();
     //all prefab names for all cards
     public static Dictionary<string, string> cardPrefabs = new Dictionary<string, string>();
 
