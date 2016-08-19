@@ -53,4 +53,5 @@ MonoBehaviour:
   - SetCustomData
   - ResolveDamage
   - SendToGraveyard
+  - RequestForPickupItems
   DisableAutoOpenWizard: 1

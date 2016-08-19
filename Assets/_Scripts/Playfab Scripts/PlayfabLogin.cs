@@ -206,8 +206,8 @@ public class PlayfabLogin : MonoBehaviour
 
         //set up room options
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.maxPlayers = 1;//set max players to 1
-        roomOptions.isVisible = false;//make the room unjoinable by other players
+        roomOptions.MaxPlayers = 1;//set max players to 1
+        roomOptions.IsVisible = false;//make the room unjoinable by other players
         //create a room with random name, the previous options, and no specification for typed lobby
         PhotonNetwork.CreateRoom(null, roomOptions, null);// this can make room name same as username(PlayFabDataStore.userName);
     }
@@ -223,7 +223,7 @@ public class PlayfabLogin : MonoBehaviour
         Debug.Log("Creating a new room");
         //set up room options
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.maxPlayers = 2;//set max players to 2
+        roomOptions.MaxPlayers = 2;//set max players to 2
         //create a room with random name, the previous options, and no specification for typed lobby
         PhotonNetwork.CreateRoom(null, roomOptions, null);// this can make room name same as username(PlayFabDataStore.userName);
         //Start Waiting for user to join
