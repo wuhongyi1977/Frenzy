@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-
+    PlayerController opponent;
     PhotonView photonView;
     //PLAYER STATS
     int startingHealth = 20;
@@ -163,6 +163,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        //if this controller belongs to the local player
+        if(opponent == null && photonView.isMine && GameObject.Find("NetworkOpponent") != null)
+        {
+            opponent = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();
+        }
         //keep health text updated to current health
         healthTextBox.text = "Life: " + health;
 
@@ -188,14 +193,7 @@ public class PlayerController : MonoBehaviour
                 drawFromLibrary();
             }
         }
-        /*
-		Debug.Log ("HERE");
-		//move cards down the hand
-		for(int j = 0; j < playerHand.Count;j++)
-		{
-			//if(!playerHand[j].GetComponent<Card>().inSummonZone)
-				playerHand[j].transform.position = new Vector3(handZone.transform.position.x+currentHandSize,handZone.transform.position.y, handZone.transform.position.z);
-		}*/
+      
 
     }
 
@@ -257,99 +255,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    /*
-    //Loads a particular deck into the card deck list
-    //currently is hard coded, later on will be retrieved by playfab
-    [PunRPC]
-    public void LoadDeck()
-    {
-        //FINAL CODE TO REPLACE TEST CODE
-        //retrieves all cards in the cardsInDeck array (which should reference the current deck)
-        //card ids holds UNIQUE identifiers for each card instance (item instance id)
-        string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
-        Debug.Log("Number of cards in deck: "+cardIds.Length);
-        //make a new array for prefabNames that is the same size as the cards in deck
-        string[] prefabNames = new string[cardIds.Length];
-        //for each card in the cardids array, find its prefab and add it to prefab names array
-        for(int i = 0; i < cardIds.Length; i++)
-        {
-            Debug.Log("Card "+ (i+1));
-            //retrieve item id for this item instance id
-            string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
-           //CARD ID IS ITS INSTANCE ID< NEED TO BE ITEM ID
-            Debug.Log(itemId);
-            Debug.Log(PlayFabDataStore.cardPrefabs[itemId]);
-            //assigns the prefab name at each index by calling the dictionary
-            //in playfabdatastore and sending the card id to get the prefab name
-            //associated with it
-            prefabNames[i] = PlayFabDataStore.cardPrefabs[itemId];
-        }
-
-        //by the end of this, all prefab names are stored      
-
-      
-        Debug.Log("Card data retrieved, begin loading prefabs");
-        //Load all cards
-        for (int i = 0; i < deckSize; i++)
-        {
-            
-            //as long as there are enough cards in the list to load
-            if(prefabNames.Length > i)
-            {
-                //load each card name from resources folder and add them to card deck
-                GameObject newCard =(GameObject)Resources.Load("Cards/" + prefabNames[i]);
-                cardDeck.Add(newCard);
-                //assign this cards cardId 
-                //the initialize function will set the id and custom data associated with it
-               newCard.GetComponent<Card>().InitializeCard(PlayFabDataStore.itemIdCollection[cardIds[i]]);
-                //OLD CODE
-               // newCard.GetComponent<Card>().cardId = cardIds[i];
-            }
-            else
-            {
-                //fill all remaining spaces with magma bolts
-                //load each card name from resources folder and add them to card deck
-                GameObject newCard = (GameObject)Resources.Load("Cards/OneShotHealthCard");
-                cardDeck.Add(newCard);
-                //assign this cards cardId
-                newCard.GetComponent<Card>().InitializeCard("Classic_MagmaBolt_Standard");
-                //OLD CODE
-                //newCard.GetComponent<Card>().cardId = "Classic_MagmaBolt_Standard";
-            }
-          
-        }
-        //Populate deck
-        for (int i = 0; i < deckSize; i++)
-        {
-            library.Add(cardDeck[i]);
-            library[i].GetComponent<Card>().playerID = playerID;
-            library[i].GetComponent<Card>().cardNumber = i;
-            //Put the card in the card deck
-            //cardDeck [i] = card;
-            //Set the card's ID to whomever it belongs too
-            //cardDeck [i].GetComponent<Card> ().playerID = playerID;
-            //Give the card an ID(currently all the same for all card since there is only one card going into the deck multiple times)
-            //cardDeck [i].GetComponent<Card> ().cardNumber = i;
-        }
-        //if this is the local player, shuffle the deck and draw
-        //if this isnt, drawing will be handled by received rpc calls
-        if (photonView.isMine)
-        {
-            int numbShuffles = Random.Range(1, maxInitialShuffles);
-            for (int i = 0; i < numbShuffles; i++)
-            { library = shuffleDeck(library); }
-               
-            //draw a hand of (startingHandSize) cards
-            for (int i = 0; i < startingHandSize; i++)
-            {
-                drawFromLibrary();
-            }
-        }
-        //after this resolves, the player's hand should have 5 cards and the current card index 
-        //should be at 5 (since indecies 0-4 have been taken)
-
-    }
-*/
+   
     void Lose()
     {
         Debug.Log("YOU LOST!!!");
@@ -441,7 +347,7 @@ public class PlayerController : MonoBehaviour
                         //PlayCard(card, zonePosition, i);
                         //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
 						//If the card is a creature card, add it to the list of creature cards in play
-						if (card.GetComponent<CreatureCard> () != null) {
+						if (card.GetComponent<Card> ().cardType == "Creature") {
 							creatureThatJustEntered = card;
 							creatureCardsInPlay.Add (card);
 						}
@@ -476,45 +382,129 @@ public class PlayerController : MonoBehaviour
 	[PunRPC]
 	public void ResolveCreatureDamage(GameObject creature, GameObject otherCreature)
 	{
-        
-        int creatureAttackDamage, otherCreatureAttackDamage;
 
-        //Assign damage based on proper scripts
-        //if this creature is using the basic creature card script
-        if(creature.GetComponent<CreatureCard>() == null)
-        { creatureAttackDamage = creature.GetComponent<BasicCreatureCard>().damageToDeal;}
-        else
-        {creatureAttackDamage = creature.GetComponent<CreatureCard>().damageToDeal;}
+        creature.GetComponent<CreatureCard>().health -= otherCreature.GetComponent<CreatureCard>().damageToDeal;
+        otherCreature.GetComponent<CreatureCard>().health -= creature.GetComponent<CreatureCard>().damageToDeal;
 
-        //if the other creature is using the basic creature card script
-        if (otherCreature.GetComponent<CreatureCard>() == null)
-        {otherCreatureAttackDamage = otherCreature.GetComponent<BasicCreatureCard>().damageToDeal;}
-        else
-        {otherCreatureAttackDamage = otherCreature.GetComponent<CreatureCard>().damageToDeal;}
 
-        //Resolve damage
-        if (creature.GetComponent<CreatureCard>() == null)
-        {
-            creature.GetComponent<BasicCreatureCard>().health -= otherCreature.GetComponent<CreatureCard>().damageToDeal;
-        }
-        else
-        {
-            creature.GetComponent<CreatureCard>().health -= otherCreature.GetComponent<CreatureCard>().damageToDeal;
-        }
-
-        if (otherCreature.GetComponent<CreatureCard>() == null)
-        {
-            otherCreature.GetComponent<BasicCreatureCard>().health -= creature.GetComponent<CreatureCard>().damageToDeal;
-        }
-        else
-        {
-            otherCreature.GetComponent<CreatureCard>().health -= creature.GetComponent<CreatureCard>().damageToDeal;
-        }
-
-       
-	}
+    }
     
 
+    //function for determining target when a card is dragged to a target
+    public GameObject CardIsTargetted(GameObject card, Vector3 cardHandPos)
+    {
+        Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+        RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
+        //if the raycast hits an object
+        if (hit)
+        {
+            //store the hit object
+            return hit.transform.gameObject;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    //NEW VERSION FOR NEW CARDS
+    //Resolves damage when it involves creatures (creature to creature or spell to creature)
+    [PunRPC]
+    public void ResolveDamage(int targetId, int attackerId)
+    {
+        //target is always a creature, attacker could be creature or spell
+
+        GameObject attacker = PhotonView.Find(attackerId).gameObject;
+        GameObject target = PhotonView.Find(targetId).gameObject;
+        Card attackerScript = attacker.GetComponent<Card>();
+        Card targetScript = target.GetComponent<Card>();
+
+        Debug.Log("Resolving damage from "+attacker.name+" to "+target.name);
+        CreatureCard targetCreature = target.GetComponent<CreatureCard>();
+        //if the creature can be attacked
+        if (targetCreature.inBattlefield && targetCreature.isAttackable)
+        {
+            //if the target of the damage is a creature and the damage dealer is a creature
+            if (attackerScript.cardType == "Creature")
+            {
+
+                //store attacking creature's script
+                CreatureCard attackerCreature = attacker.GetComponent<CreatureCard>();
+
+
+                attackerCreature.creatureCanAttack = false;
+                //if the attacking creature doesnt have elusive, deal it damage
+                //Elusive prevents damage from other creatures
+                if (!attackerCreature.elusive)
+                {
+                    attackerCreature.health -= targetScript.attackPower;
+                }
+                //if the defending creature doesnt have elusive, deal it damage    
+                if (!targetCreature.elusive)
+                {
+                    targetCreature.health -= attackerScript.attackPower;
+                }
+                   
+                
+            }
+
+            if (attackerScript.cardType == "Spell")
+            {
+                //this is += because opponent health change uses negatives for damage
+                targetCreature.health += attackerScript.opponentHealthChange;
+            }
+        }
+    }
+
+    //Function for dragged targeting (creature / spell damage)
+    public void CardTargetDamage(GameObject attackingCard, Vector3 cardHandPos, GameObject currentTarget)
+    {
+        //if the damaging card has a target
+        if (photonView.isMine && currentTarget != null)
+        {
+            Debug.Log(attackingCard + " dealing damage to " + currentTarget);
+
+            //get the card component of the dragged card
+            Card attackCardScript = attackingCard.GetComponent<Card>();
+           
+            //if the target is a card
+            if(currentTarget.GetComponent<Card>() != null)
+            {
+                //if the hit object is a creature card
+                if (currentTarget.tag == "CreatureCard")
+                {
+                    //RESOLVE DAMAGE
+                    photonView.RPC("ResolveDamage", PhotonTargets.All, currentTarget.GetPhotonView().viewID, attackingCard.GetPhotonView().viewID);      
+                }
+                else
+                {
+                    Debug.Log("Cannot damage non-creature card");
+                }
+            }
+           //if the object is the player
+            else if (currentTarget.tag == "Player2")
+            {
+                Debug.Log("Target verified as opposing player");
+                if(attackCardScript.cardType == "Creature")
+                {
+                    Debug.Log("Attacking card verified as creature");
+                    attackingCard.GetComponent<CreatureCard>().creatureCanAttack = false;
+                    //damage/healing to deal to opponent (playerid is 2 for opponent)
+                    opponent.ChangeHealth(-1* attackCardScript.attackPower);
+                    Debug.Log("opponent change health: "+ attackCardScript.attackPower);
+                }
+                else if(attackCardScript.cardType == "Spell")
+                {
+                    Debug.Log(attackingCard+ " is a spell and is dealing" + attackCardScript.opponentHealthChange + " damage to opponent");
+                    //damage/healing to deal to owner (calls change health in this script)
+                    ChangeHealth(attackCardScript.ownerHealthChange);
+                    //damage/healing to deal to opponent (playerid is 2 for opponent)
+                    opponent.ChangeHealth(attackCardScript.opponentHealthChange);
+                }
+               
+            }
+        }
+    }
     //Standard creature card dropped function
     public void creatureCardIsDropped(GameObject card, Vector3 cardHandPos)
     {

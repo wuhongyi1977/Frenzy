@@ -95,15 +95,8 @@ public class BasicCreatureCard : Card
                 currentTime -= Time.deltaTime;
                 if (summonZoneTextBox == null)
                 {
-                    //if this is the local object
-                    if (photonView.isMine)
-                    {
-                        summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
-                    }
-                    else //if this is the network copy
-                    {
-                        summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
-                    }
+                    //Makes sure summon zone textbox is assigned
+                    GetSummonZoneText();
                 }
                 else
                 {
@@ -220,20 +213,8 @@ public class BasicCreatureCard : Card
                     networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
                 }
             }
-            //finds the text box that corresponds to the summon zone
-            if (summonZoneTextBox == null)
-            {
-                //if this is the local card object
-                if (photonView.isMine)
-                {
-                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
-                }
-                else
-                {
-                    summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
-                }
-
-            }
+            //Makes sure summon zone textbox is assigned
+            GetSummonZoneText();
         }
 
     }
@@ -298,6 +279,7 @@ public class BasicCreatureCard : Card
 
     public override void UpdateInternalVariables()
     {
+        cardTitleTextBox.text = cardTitle;
         //get card stats from stat variables in parent script
         startingDamage = attackPower;
         startingHealth = defensePower;

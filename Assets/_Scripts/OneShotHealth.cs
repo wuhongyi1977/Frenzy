@@ -14,6 +14,8 @@ public class OneShotHealth : Card
     //checks to see if the card has been given a target yet
     private bool targetSelected = false;
 
+    private GameObject currentTarget;
+
 
     public override void Start()                //Abstract method for start
     {
@@ -37,45 +39,23 @@ public class OneShotHealth : Card
     }
     public override void Update()               //Abstract method for Update
     {
-        if (networkOpponent == null)
-        {
-            networkOpponent = GameObject.Find("NetworkOpponent");
-        }
-
-        if (localPlayer == null)
-        {
-            localPlayer = GameObject.Find("LocalPlayer");
-        }
+        //get references to player objects if not assigned
+        GetPlayers();
 
         //If the card is Not in the graveyard and is in the summon zone
         if (!inGraveyard && inSummonZone)
         {
             //IF the current time is larger than or equal to the cast time
             isDraggable = false;
-            //if the card is in the summon zone and isnt waiting for a target yet, make it true
-            if (waitingForTarget == false)
-            {
-                waitingForTarget = true;
-            }
 
-            //if the target is always the player or 
             //if the target has been selected, begin countdown
-            if (target == "Player" || targetSelected == true)
+            if (targetSelected == true)
             {
-
                 //Increment the current Time
                 currentTime -= Time.deltaTime;
                 if (summonZoneTextBox == null)
                 {
-                    //if this is the local object
-                    if (photonView.isMine)
-                    {
-                        summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
-                    }
-                    else //if this is the network copy
-                    {
-                        summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
-                    }
+                    GetSummonZoneText();
                 }
                 else
                 {
@@ -84,6 +64,7 @@ public class OneShotHealth : Card
  
                 if (currentTime <= 0)
                 {
+                    summonZoneTextBox.text = "";
                     //reset the timer
                     currentTime = 0;
                     //Set state of card to being in the graveyard
@@ -97,29 +78,59 @@ public class OneShotHealth : Card
         //If the card is in the graveyard and manager code hasn't been executed yet
         if (inGraveyard && doneAddingToGraveyard == false)
         {
-            summonZoneTextBox.text = "";
-            //Set this to false to prevent multiple executions of this block
-            doneAddingToGraveyard = true;
-            //if this is the local object
-            if (photonView.isMine)
+            
+            //run code for sending card to graveyard
+            //photonView.RPC("SendToGraveyard", PhotonTargets.All);
+
+            
+            SendToGraveyard();  
+        }
+    }
+
+    //handles effects of card when sent to graveyard
+    public override void OnGraveyard()
+    {
+        Debug.Log("Executing OnGraveyard for: "+ gameObject);
+        //Graveyard effect goes here
+        //if this is the local object
+        if (photonView.isMine)
+        {
+            Debug.Log("Dealing damage to : " + currentTarget);
+            localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
+            /*
+            if (target == "Player" || currentTarget.tag == "Player2")
             {
                 //handle health changes to self (local player here is card owner)
                 localPlayer.GetComponent<PlayerController>().ChangeHealth(ownerHealthChange);
-                //send to graveyard
-                localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+          
             }
-            else //if this is the network copy
+            else if(target == "Creature" || currentTarget.tag == "CreatureCard")
+            {
+                localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
+            }
+            */
+            //send to graveyard
+            //localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+
+        }
+
+        else //if this is the network copy
+        {
+            if (target == "Player" || currentTarget.tag == "Player2")
             {
                 //handle health changes to opponent (local player here is opponent)
-                localPlayer.GetComponent<PlayerController>().ChangeHealth(opponentHealthChange);
-                //send to opponents graveyard
-                networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                //localPlayer.GetComponent<PlayerController>().ChangeHealth(opponentHealthChange);
+              
+            }
+            else if (target == "Creature" || currentTarget.tag == "CreatureCard")
+            {
+
             }
 
-           
+            //send to opponents graveyard
+            //networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
         }
     }
-    
     public override void OnMouseOver()
     {
         
@@ -142,151 +153,71 @@ public class OneShotHealth : Card
         {
             networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
         }
-        /*
-        if (waitingForTarget == true && targetSelected == false)//(creatureCanAttack)
-        {
-            if (photonView.isMine)
-            {
-                localPlayer.GetComponent<PlayerController>().drawLineOn();
-            }
-        }
-        */
+       
     }
-    /*
+    
     public override void OnMouseUp()
     {
-        if (isSelectable == true)
+        if (photonView.isMine && isSelectable == true)
         {
-            localPlayer.GetComponent<PlayerController>().makeLineInvisible();
-            localPlayer.GetComponent<PlayerController>().drawLineOff();
-
-            dropped = true;
-
-            
-            //if this is the local card object
-            if (photonView.isMine)
+            //if card is being put into play
+            if (dropped == false)
             {
-
-                if (target == "Creature" || target == "All")//(creatureCanAttack)
+                //make drag line invisible
+                localPlayer.GetComponent<PlayerController>().makeLineInvisible();
+                localPlayer.GetComponent<PlayerController>().drawLineOff();
+                //set card as dropped
+                dropped = true;
+                //drop card for local player (network player drops it by rpc call)
+                localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+                //if the target can only be the player, begin countdown
+                if(target == "Player")
                 {
-                    networkOpponent.GetComponent<PlayerController>().ChangeHealth(opponentHealthChange);
-                    localPlayer.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
-
+                    currentTarget = GameObject.FindGameObjectWithTag("Player2");
+                    targetSelected = true;
+                    waitingForTarget = false;
                 }
+                //if the player has options for target, wait to countdown until selected
                 else
                 {
-                    localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
-
+                    targetSelected = false;
+                    waitingForTarget = true;
                 }
+               
             }
-            else
+            else if (waitingForTarget == true)
             {
-                if (target == "Creature" || target == "All")//(creatureCanAttack)
+                Debug.Log("Target is: " + localPlayer.GetComponent<PlayerController>().CardIsTargetted(gameObject, cardHandPos));
+                //if the target is not null, store the target and set targetSelected to true
+                if (localPlayer.GetComponent<PlayerController>().CardIsTargetted(gameObject, cardHandPos) != null)
                 {
-
-                    networkOpponent.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
-
+                    targetSelected = true;
+                    currentTarget = localPlayer.GetComponent<PlayerController>().CardIsTargetted(gameObject, cardHandPos);
                 }
-                else
-                {
-                    networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
-                }        
             }
-            
-            //finds the text box that corresponds to the summon zone
-            if (summonZoneTextBox == null)
-            {
-                //if this is the local card object
-                if (photonView.isMine)
-                {
-                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
-
-                }
-                else
-                {
-                    summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
-
-                }
-
-            }
-            
-        }
-        
-
+            //Makes sure summon zone textbox is assigned
+            GetSummonZoneText();
+        }   
     }
-    */
-    /*
-    //ADDED TO ATTEMPT TARGETED DAMAGE
-    public override void OnMouseDown()
+
+    //Photon Serialize View
+    public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (isDraggable == true )//&& isSelectable == true)
+        if (stream.isWriting)
         {
-            cardHandPos = gameObject.transform.position;
-            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+            //We own this player: send the others our data
+            stream.SendNext(target);
+            stream.SendNext(targetSelected);
+
+
         }
-    }
-    public override void OnMouseUp()
-    {
-        if (isSelectable == true)
+        else
         {
-            localPlayer.GetComponent<PlayerController>().makeLineInvisible();
-            localPlayer.GetComponent<PlayerController>().drawLineOff();
-           
-            dropped = true;
-            //if this is the local card object
-            if (photonView.isMine)
-            {
-
-                if (target == "Creature" || target == "All")//(creatureCanAttack)
-                {
-                    networkOpponent.GetComponent<PlayerController>().ChangeHealth(opponentHealthChange);
-                    localPlayer.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
-                   
-                }
-                else
-                {
-                    localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
-                   
-                }
-            }
-            else
-            {
-                if (target == "Creature" || target == "All")//(creatureCanAttack)
-                {
-
-                    networkOpponent.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
-                   
-                }
-                else
-                {
-                    networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
-                }
-
-              
-
-            }
-            //finds the text box that corresponds to the summon zone
-            if (summonZoneTextBox == null)
-            {
-                //if this is the local card object
-                if (photonView.isMine)
-                {
-                    summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
-                   
-                }
-                else
-                {
-                    summonZoneTextBox = networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
-                   
-                }
-
-            }
+            //Network player, receive data   
+            target = (string)stream.ReceiveNext();
+            targetSelected = (bool)stream.ReceiveNext();
+            //cardTitleTextBox.text = cardTitle;
         }
 
     }
-    */
-
-
-
 }

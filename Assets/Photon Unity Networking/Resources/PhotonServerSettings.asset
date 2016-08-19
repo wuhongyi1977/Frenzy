@@ -51,4 +51,6 @@ MonoBehaviour:
   - OnMouseUp
   - InitializeCard
   - SetCustomData
+  - ResolveDamage
+  - SendToGraveyard
   DisableAutoOpenWizard: 1

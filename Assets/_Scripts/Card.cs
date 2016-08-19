@@ -77,6 +77,8 @@ public abstract class Card : MonoBehaviour
 
 	public GameObject localPlayer;
 	public GameObject networkOpponent;
+    protected PlayerController localPlayerController;
+    protected PlayerController opponentPlayerController;
 
     //ADDED CODE FOR HAND INDEX
     public int handIndex;
@@ -89,15 +91,13 @@ public abstract class Card : MonoBehaviour
     {
         //get photon view component of this card
         photonView = GetComponent<PhotonView>();
+        localPlayer = GameObject.Find("LocalPlayer");
+        networkOpponent = GameObject.Find("NetworkOpponent");
+        p1Manager = GameObject.Find("Player1Manager");
+        p2Manager = GameObject.Find("Player2Manager");
     }
 	public virtual void Start ()				//Abstract method for start
 	{
-       
-
-		localPlayer = GameObject.Find ("LocalPlayer");
-		networkOpponent = GameObject.Find ("NetworkOpponent");
-		p1Manager = GameObject.Find ("Player1Manager");
-		p2Manager = GameObject.Find ("Player2Manager");
 		doneAddingToGraveyard = false;
 		currentTime = castTime;
 		inSummonZone = false;
@@ -111,59 +111,42 @@ public abstract class Card : MonoBehaviour
     }
 	public virtual void Update ()				//Abstract method for Update
 	{
-		//If the card is Not in the graveyard and is in the summon zone
-		if (!inGraveyard && inSummonZone) 
+        //get references to player objects if not assigned
+        GetPlayers();
+
+        //If the card is Not in the graveyard and is in the summon zone
+        if (!inGraveyard && inSummonZone) 
 		{
 			
 			//Increment the current Time
 			currentTime -= Time.deltaTime;
-			if(summonZoneTextBox == null)
-            { summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject); }
-                //TEST
-				//summonZoneTextBox = p1Manager.GetComponent<Player1Manager> ().getSummonZone (gameObject);
-			else
+            //make sure summon zone text is assigned
+            if (summonZoneTextBox == null)
+            { GetSummonZoneText(); }
+            else
             { summonZoneTextBox.text = currentTime.ToString("F1"); }
-				
-			//cardTimerBox.text = currentTime.ToString ("F1");
+	
 			//IF the current time is larger than or equal to the cast time
 			isDraggable = false;
 			if (currentTime <= 0) 
 			{
-					//reset the timer
-					currentTime = 0;
-					//Set state of card to being in the graveyard
-					inGraveyard = true;
-					//Set state of card to not being in the summon zone
-					inSummonZone = false;
-				}
+                //clear summon zone text
+                summonZoneTextBox.text = "";
+                //reset the timer
+                currentTime = 0;
+				//Set state of card to being in the graveyard
+				inGraveyard = true;
+				//Set state of card to not being in the summon zone
+				inSummonZone = false;
+			}
 
 		}
 		//If the card is in the graveyard and manager code hasn't been executed yet
 		if (inGraveyard && doneAddingToGraveyard == false) 
 		{
-			//If the card beings to player 1
-			if (photonView.isMine) 
-			{
-				summonZoneTextBox.text = "";
-				//Set this to false to prevent multiple executions of this block
-				doneAddingToGraveyard = true;
-                //Execute the game manager code
-                localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
-                //TEST
-                //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
-            } 
-			else 
-			{
-				//Logic for player2
-				summonZoneTextBox.text = "";
-				//Set this to false to prevent multiple executions of this block
-				doneAddingToGraveyard = true;
-                //Execute the game manager code
-                networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
-                //TEST
-                //p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
-            }
-		}
+            photonView.RPC("SendToGraveyard", PhotonTargets.All);
+            //SendToGraveyard();
+        }
 	}
 
 	//Registers that the player has clicked on the card
@@ -181,45 +164,17 @@ public abstract class Card : MonoBehaviour
 	//Registers that the player has let go of the card
 	public virtual void OnMouseUp()			
 	{
-        
-       
-       
+        //if this is the local player, drop the card
+        //network player receives drop through RPC call in PlayerController (void PlayCard)
 		if (photonView.isMine)
         {
             dropped = true;
-            localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
-            //TEST
-            //p1Manager.GetComponent<Player1Manager> ().cardIsDropped (gameObject, cardHandPos);
+            localPlayerController.cardIsDropped(gameObject, cardHandPos);
         }
-        /*
-		else
-        {
-            networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
-            //TEST
-            //p2Manager.GetComponent<Player2Manager>().cardIsDropped(gameObject, cardHandPos);
-        }
-        */
-			
-		//finds the text box that corresponds to the summon zone
-		if (summonZoneTextBox == null) 
-		{
-			if (photonView.isMine)
-            {
-                summonZoneTextBox = localPlayer.GetComponent<PlayerController>().getSummonZone(gameObject);
-                //TEST
-                //summonZoneTextBox = p1Manager.GetComponent<Player1Manager>().getSummonZone(gameObject);
-            }
-			else
-            {
-                summonZoneTextBox =networkOpponent.GetComponent<PlayerController>().getSummonZone(gameObject);
-                //TEST
-                //summonZoneTextBox = p2Manager.GetComponent<Player2Manager>().getSummonZone(gameObject);
-            }
-				
-		}
-		//if(playerID == 2)
-			//GameObject.Find ("Player2Manager").GetComponent<Player2Manager> ().cardIsDropped (gameObject);
-		//gameObject.transform.position = new Vector3 (0, -3.79f, 0);
+
+        //Makes sure summon zone textbox is assigned
+        GetSummonZoneText();
+		
 	}
 
 	//Registers that the card is being dragged
@@ -238,21 +193,15 @@ public abstract class Card : MonoBehaviour
 		Debug.Log (gameObject.name);
 		if (photonView.isMine) 
 		{
-            localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            localPlayerController.setMousedOverCard(gameObject);
             //TEST
             //p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
         } 
-		else 
-		{
-            networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
-            //TEST
-            //p2Manager.GetComponent<Player2Manager> ().setMousedOverCard (gameObject);
-        }
 	}
 	//Registers what card is under the mouse
 	public virtual void OnMouseExit()
 	{
-		Debug.Log ("test");
+		//Debug.Log ("test");
 	}
 
 	//method to return the dropped variable
@@ -327,7 +276,9 @@ public abstract class Card : MonoBehaviour
             string currentString = data[j];//splitResultTest[j];
             //store the next string in the list
             string nextString = data[j + 1];//splitResultTest[j+1];
-            Debug.Log(currentString);
+
+            //Debug.Log(currentString);
+
             //Assign variables
             switch(currentString)
             {
@@ -382,65 +333,97 @@ public abstract class Card : MonoBehaviour
         //variables go here
     }
 
-
-    /*
-    //takes a string key, looks through custom data to find respective value
-    public string GetCustomDataValue(string key)
+    //checks if the card has a reference to summon zone text
+    //assigns it if not
+    public void GetSummonZoneText()
     {
-        //create variable for storing value retrieved
-        string value = null;
-        //create string for storing all custom data for this card
-        string customDataString = null;
-        //create separator based on key to locate (separates at key":")
-        string[] stringSeparators = new string[] { key+"\":\"" , "\""};
-        //assign custom data to string variable
-        if (cardId != null)
+        //finds the text box that corresponds to the summon zone
+        if (summonZoneTextBox == null)
         {
-            customDataString = PlayFabDataStore.cardCustomData[cardId];
+            if (photonView.isMine)
+            {
+                summonZoneTextBox = localPlayerController.getSummonZone(gameObject);
+            }
+            else
+            {
+                summonZoneTextBox = opponentPlayerController.getSummonZone(gameObject);         
+            }
+        }
+    }
+
+    //store all data for player objects
+    public void GetPlayers()
+    {
+        //if network opponent object has not been assigned
+        if (networkOpponent == null)
+        {
+            //find and assign network opponent object
+            networkOpponent = GameObject.Find("NetworkOpponent");
         }
         else
         {
-            Debug.Log("Failed to Locate Custom Data Key (no card id for this card)");
-            return null;
+            //if network opponent has been assigned, store reference to PlayerController script
+            opponentPlayerController = networkOpponent.GetComponent<PlayerController>();
         }
-        //locate respective key from list of custom data
-        //splits custom data into 3 (preceding data/key, value, remaining data)
-        string[] result = customDataString.Split(new string[] { "[stop]" }, System.StringSplitOptions.None);
-        value = result[1];
-
-        //return data
-        if (value == null)
+        //if local player has not been assigned
+        if (localPlayer == null)
         {
-            Debug.Log("Failed to Locate Custom Data Key (no value found)");
+            //find and assign local player object
+            localPlayer = GameObject.Find("LocalPlayer");
         }
-        return value;
+        else
+        {
+            //if local player has been assigned, store reference to PlayerController script
+            localPlayerController = localPlayer.GetComponent<PlayerController>();
+        }
     }
-    
-    public void AssignCardInfo()
+    [PunRPC]
+    public void SendToGraveyard()
     {
-       // cardTitle = GetCustomDataValue()
-    }
-    */
+        Debug.Log(gameObject + "sent to graveyard");
+       
+        //Set this to false to prevent multiple executions of this block
+        doneAddingToGraveyard = true;
 
-        //Photon Serialize View
-        //Registers that the player has clicked on the card
+        //If the card beings to player 1
+        if (photonView.isMine)
+        {
+            //Execute the game manager code
+            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+        }
+        else
+        {      
+            //Execute the game manager code
+            networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+        }
+        //handle graveyard effect of this card, if any
+        OnGraveyard();
+    }
+    //used to hold a cards effect upon being sent to graveyard (if it has any)
+    public virtual void OnGraveyard()
+    {
+        //Graveyard effect goes here
+    }
+
+
+    //Photon Serialize View
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.isWriting)
         {
             //We own this player: send the others our data
             //sync health
-            stream.SendNext(cardId);
-            stream.SendNext(cardTitle);
+            //stream.SendNext(cardId);
+            //stream.SendNext(cardTitle);
             
 
         }
         else
         {
             //Network player, receive data   
-            cardId = (string)stream.ReceiveNext();
-            cardTitle = (string)stream.ReceiveNext();
-            cardTitleTextBox.text = cardTitle;
+            //cardId = (string)stream.ReceiveNext();
+            //cardTitle = (string)stream.ReceiveNext();
+            //cardTitleTextBox.text = cardTitle;
         }
 
     }
