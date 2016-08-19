@@ -9,6 +9,7 @@ public class OneShotHealth : Card
 
     public bool isSelectable = true;
 
+    private bool canTarget = false;
     //checks to see if the card is ready for a target to be selected
     private bool waitingForTarget = false;
     //checks to see if the card has been given a target yet
@@ -48,9 +49,12 @@ public class OneShotHealth : Card
             //IF the current time is larger than or equal to the cast time
             isDraggable = false;
 
+           
+
             //if the target has been selected, begin countdown
             if (targetSelected == true)
             {
+               
                 //Increment the current Time
                 currentTime -= Time.deltaTime;
                 if (summonZoneTextBox == null)
@@ -97,39 +101,8 @@ public class OneShotHealth : Card
         {
             Debug.Log("Dealing damage to : " + currentTarget);
             localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
-            /*
-            if (target == "Player" || currentTarget.tag == "Player2")
-            {
-                //handle health changes to self (local player here is card owner)
-                localPlayer.GetComponent<PlayerController>().ChangeHealth(ownerHealthChange);
-          
-            }
-            else if(target == "Creature" || currentTarget.tag == "CreatureCard")
-            {
-                localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
-            }
-            */
-            //send to graveyard
-            //localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
-
         }
 
-        else //if this is the network copy
-        {
-            if (target == "Player" || currentTarget.tag == "Player2")
-            {
-                //handle health changes to opponent (local player here is opponent)
-                //localPlayer.GetComponent<PlayerController>().ChangeHealth(opponentHealthChange);
-              
-            }
-            else if (target == "Creature" || currentTarget.tag == "CreatureCard")
-            {
-
-            }
-
-            //send to opponents graveyard
-            //networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
-        }
     }
     public override void OnMouseOver()
     {
@@ -147,52 +120,60 @@ public class OneShotHealth : Card
 
         if (photonView.isMine)
         {
-            localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            localPlayerController.setMousedOverCard(gameObject);
         }
         else
         {
-            networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            opponentPlayerController.setMousedOverCard(gameObject);
         }
        
     }
     
     public override void OnMouseUp()
     {
+       
         if (photonView.isMine && isSelectable == true)
         {
-            //if card is being put into play
-            if (dropped == false)
-            {
-                //make drag line invisible
-                localPlayer.GetComponent<PlayerController>().makeLineInvisible();
-                localPlayer.GetComponent<PlayerController>().drawLineOff();
-                //set card as dropped
-                dropped = true;
-                //drop card for local player (network player drops it by rpc call)
-                localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
-                //if the target can only be the player, begin countdown
-                if(target == "Player")
+
+            dropped = true;
+            
+                //if card is being put into play
+                if (!canTarget)
                 {
-                    currentTarget = GameObject.FindGameObjectWithTag("Player2");
-                    targetSelected = true;
-                    waitingForTarget = false;
-                }
-                //if the player has options for target, wait to countdown until selected
-                else
-                {
-                    targetSelected = false;
-                    waitingForTarget = true;
-                }
+                    
+                    //make drag line invisible
+                    localPlayerController.makeLineInvisible();
+                    localPlayerController.drawLineOff();
+                    //set card as dropped
+                    
+                    //drop card for local player (network player drops it by rpc call)
+                    localPlayerController.cardIsDropped(gameObject, cardHandPos);
+                    //if the target can only be the player, begin countdown
+                    if (target == "Player")
+                    {
+                        currentTarget = GameObject.FindGameObjectWithTag("Player2");
+                        targetSelected = true;
+                        waitingForTarget = false;
+                    }
+                    //if the player has options for target, wait to countdown until selected
+                    else
+                    {
+                        targetSelected = false;
+                        waitingForTarget = true;
+                    }
+                canTarget = true;
+                
                
             }
             else if (waitingForTarget == true)
             {
-                Debug.Log("Target is: " + localPlayer.GetComponent<PlayerController>().CardIsTargetted(gameObject, cardHandPos));
+                Debug.Log("Attempt targeting");
+                Debug.Log("Target is: " + localPlayerController.CardIsTargetted(gameObject, cardHandPos));
                 //if the target is not null, store the target and set targetSelected to true
-                if (localPlayer.GetComponent<PlayerController>().CardIsTargetted(gameObject, cardHandPos) != null)
+                if (localPlayerController.CardIsTargetted(gameObject, cardHandPos) != null)
                 {
                     targetSelected = true;
-                    currentTarget = localPlayer.GetComponent<PlayerController>().CardIsTargetted(gameObject, cardHandPos);
+                    currentTarget = localPlayerController.CardIsTargetted(gameObject, cardHandPos);
                 }
             }
             //Makes sure summon zone textbox is assigned
@@ -200,6 +181,15 @@ public class OneShotHealth : Card
         }   
     }
 
+    public override void OnMouseDown()
+    {
+        if (photonView.isMine && isDraggable == true && isSelectable == true)
+        {
+            cardHandPos = gameObject.transform.position;
+            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+        }
+    }
     //Photon Serialize View
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

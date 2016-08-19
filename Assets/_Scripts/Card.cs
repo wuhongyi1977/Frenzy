@@ -80,6 +80,8 @@ public abstract class Card : MonoBehaviour
     protected PlayerController localPlayerController;
     protected PlayerController opponentPlayerController;
 
+    protected SpriteRenderer spriteRender;
+
     //ADDED CODE FOR HAND INDEX
     public int handIndex;
 
@@ -404,7 +406,7 @@ public abstract class Card : MonoBehaviour
     {
         //Graveyard effect goes here
     }
-
+    
 
     //Photon Serialize View
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
