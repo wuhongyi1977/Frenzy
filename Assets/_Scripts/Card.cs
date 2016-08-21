@@ -81,7 +81,10 @@ public abstract class Card : MonoBehaviour
     protected PlayerController opponentPlayerController;
 
     protected SpriteRenderer spriteRender;
+	//The variable for the script attached to the AudioManager object
+	protected AudioManager audioManager;
 
+	protected bool playedCardSelectedSound;
     //ADDED CODE FOR HAND INDEX
     public int handIndex;
 
@@ -203,7 +206,7 @@ public abstract class Card : MonoBehaviour
 	//Registers what card is under the mouse
 	public virtual void OnMouseExit()
 	{
-		//Debug.Log ("test");
+		playedCardSelectedSound = false;
 	}
 
 	//method to return the dropped variable

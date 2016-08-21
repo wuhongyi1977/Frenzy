@@ -47,6 +47,8 @@ public class BasicCreatureCard : Card
             if (textBoxes[i].name == "Stats")
                 creatureStatsTextBox = textBoxes[i];
         }
+		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
+		playedCardSelectedSound = false;
         /*
         //get card stats from stat variables in parent script
         startingDamage = attackPower;
@@ -220,6 +222,11 @@ public class BasicCreatureCard : Card
     }
     public override void OnMouseOver()
     {
+		if (!playedCardSelectedSound) 
+		{
+			audioManager.playCardSelect ();
+			playedCardSelectedSound = true;
+		}
         if (creatureCanAttack)
         {
             if (Input.GetMouseButtonDown(0))
@@ -247,7 +254,6 @@ public class BasicCreatureCard : Card
             }
         }
     }
-
     public void increaseStats(int dmg, int h, int attkSpd)
     {
         //if (photonView.isMine) {

@@ -18,6 +18,7 @@ public class OneShotHealth : Card
     private GameObject currentTarget;
 
 
+
     public override void Start()                //Abstract method for start
     {
         //set card data variables
@@ -35,7 +36,7 @@ public class OneShotHealth : Card
         //gameObject.GetComponentInChildren<Text>();
         cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
         cardTitleTextBox.text = cardTitle;
-
+		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
 
     }
     public override void Update()               //Abstract method for Update
@@ -106,7 +107,11 @@ public class OneShotHealth : Card
     }
     public override void OnMouseOver()
     {
-        
+		if (!playedCardSelectedSound) 
+		{
+			audioManager.playCardSelect ();
+			playedCardSelectedSound = true;
+		}
         if (waitingForTarget == true && targetSelected == false)//(creatureCanAttack)
         {
             if (Input.GetMouseButtonDown(0))
