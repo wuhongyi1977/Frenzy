@@ -83,8 +83,12 @@ public abstract class Card : MonoBehaviour
     protected SpriteRenderer spriteRender;
 	//The variable for the script attached to the AudioManager object
 	protected AudioManager audioManager;
-
+	//variables to prevent spamming of sounds
 	protected bool playedCardSelectedSound;
+	protected bool playedCardPickupSound;
+	protected bool playedCardBuildupSound;
+	protected bool playedCardReleaseSound;
+	protected bool playedCardInSpellSlotSound;
     //ADDED CODE FOR HAND INDEX
     public int handIndex;
 

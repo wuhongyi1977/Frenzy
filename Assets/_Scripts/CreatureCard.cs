@@ -28,6 +28,9 @@ public class CreatureCard : Card
     public bool isAttackable;
     public bool rush;
     public bool elusive;
+	//After the first time the sound CardBuildup was used(when currentTime < 0) it was only played once. 
+	//After this the sound needed to play again so this variable is used instead of playedCardBuildup to make sure everything works correctly
+	private bool playedCardBuildUpOnce;
     public override void Start()
     {
         localPlayer = GameObject.Find("LocalPlayer");
@@ -47,6 +50,8 @@ public class CreatureCard : Card
             if (textBoxes[i].name == "Stats")
                 creatureStatsTextBox = textBoxes[i];
         }
+		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
+		playedCardSelectedSound = false;
         /*
         //get card stats from stat variables in parent script
         startingDamage = attackPower;
@@ -92,7 +97,11 @@ public class CreatureCard : Card
         //If the card is Not in the graveyard and is in the summon zone
         else if (!inGraveyard && inSummonZone)
         {
-
+			if (!playedCardInSpellSlotSound) 
+			{
+				playedCardInSpellSlotSound = true;
+				audioManager.playCardInSpellSlot ();
+			}
             if (!stopCastingTimer)
             {
                 //Increment the current Time
@@ -119,7 +128,11 @@ public class CreatureCard : Card
                     summonZoneTextBox.text = "";
                 }
             }
-
+			if (currentTime <= 3.25f && !playedCardBuildUpOnce) 
+			{
+				playedCardBuildUpOnce = true;
+				audioManager.playCardBuildUp ();
+			}
             if (currentTime <= 0)
             {
                 if (!stopCastingTimer)
@@ -131,16 +144,26 @@ public class CreatureCard : Card
                     inBattlefield = true;
                     //call the event that a creature has entered the battlefield
                     localPlayer.GetComponent<PlayerController>().creatureEntered();
+					//reset the bool to allow the Pickup sound to play again when the player picks up another card
+					playedCardPickupSound = false;
+					audioManager.playCardRelease ();
                 }
 
                 if (creatureCanAttack == false)
                 {
+						
                     creatureAttackSpeedTimer -= Time.deltaTime;
                     summonZoneTextBox.text = creatureAttackSpeedTimer.ToString("F1");
+					if (creatureAttackSpeedTimer <= 3.25f && !playedCardBuildupSound) 
+					{
+						audioManager.playCardBuildUp ();
+						playedCardBuildupSound = true;
+					}
                     if (creatureAttackSpeedTimer < 0)
                     {
                         summonZoneTextBox.text = "";
                         creatureCanAttack = true;
+						playedCardBuildupSound = false;
                         creatureAttackSpeedTimer = attackSpeed;
                     }
                 }
@@ -181,11 +204,18 @@ public class CreatureCard : Card
             cardHandPos = gameObject.transform.position;
             screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
             offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+			if (!playedCardPickupSound) 
+			{
+				audioManager.playCardPickup ();
+				playedCardPickupSound = true;
+			}
         }
     }
     public override void OnMouseUp()
     {
-       
+		//reset the bool to allow the Pickup sound to play again when the player picks up another card
+		playedCardPickupSound = false;
+
         if (isSelectable == true)
         {
             localPlayerController.makeLineInvisible();
@@ -198,10 +228,12 @@ public class CreatureCard : Card
 
                 if (creatureCanAttack)
                 {
+					
                     GameObject currentTarget = localPlayerController.CardIsTargetted(gameObject, cardHandPos);
                     if(currentTarget != null)
                     {
                         localPlayerController.CardTargetDamage(gameObject, cardHandPos, currentTarget);
+						audioManager.playCardRelease ();
                     }
                     
                     //networkOpponent.GetComponent<PlayerController>().ChangeHealth(damageToDeal * -1);
@@ -236,7 +268,11 @@ public class CreatureCard : Card
         {
 
             localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
-
+			if (!playedCardSelectedSound) 
+			{
+				audioManager.playCardSelect ();
+				playedCardSelectedSound = true;
+			}
             if (creatureCanAttack)
             {
                 if (Input.GetMouseButtonDown(0))

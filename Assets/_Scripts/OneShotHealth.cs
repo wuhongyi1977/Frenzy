@@ -49,7 +49,11 @@ public class OneShotHealth : Card
         {
             //IF the current time is larger than or equal to the cast time
             isDraggable = false;
-
+			if (!playedCardInSpellSlotSound) 
+			{
+				playedCardInSpellSlotSound = true;
+				audioManager.playCardInSpellSlot ();
+			}
            
 
             //if the target has been selected, begin countdown
@@ -66,7 +70,11 @@ public class OneShotHealth : Card
                 {
                     summonZoneTextBox.text = currentTime.ToString("F1");
                 }
- 
+				if (currentTime <= 3.25f && !playedCardBuildupSound) 
+				{
+					playedCardBuildupSound = true;
+					audioManager.playCardBuildUp ();
+				}
                 if (currentTime <= 0)
                 {
                     summonZoneTextBox.text = "";
@@ -76,6 +84,11 @@ public class OneShotHealth : Card
                     inGraveyard = true;
                     //Set state of card to not being in the summon zone
                     inSummonZone = false;
+					if (!playedCardReleaseSound) 
+					{
+						playedCardReleaseSound = true;
+						audioManager.playCardRelease ();
+					}
                 }
             }
 
@@ -136,7 +149,9 @@ public class OneShotHealth : Card
     
     public override void OnMouseUp()
     {
-       
+		//reset the bool to allow the Pickup sound to play again when the player picks up another card
+		playedCardPickupSound = false;
+
         if (photonView.isMine && isSelectable == true)
         {
 
@@ -193,6 +208,7 @@ public class OneShotHealth : Card
             cardHandPos = gameObject.transform.position;
             screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
             offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+			audioManager.playCardPickup ();
         }
     }
     //Photon Serialize View

@@ -89,7 +89,11 @@ public class BasicCreatureCard : Card
         //If the card is Not in the graveyard and is in the summon zone
         else if (!inGraveyard && inSummonZone)
         {
-
+			if (!playedCardInSpellSlotSound) 
+			{
+				playedCardInSpellSlotSound = true;
+				audioManager.playCardInSpellSlot ();
+			}
             if (!stopCastingTimer)
             {
                 //Increment the current Time
@@ -116,7 +120,11 @@ public class BasicCreatureCard : Card
                     summonZoneTextBox.text = "";
                 }
             }
-
+			if (currentTime <= 3.25f && !playedCardBuildupSound) 
+			{
+				playedCardBuildupSound = true;
+				audioManager.playCardBuildUp ();
+			}
             if (currentTime <= 0)
             {
                 if (!stopCastingTimer)
@@ -128,6 +136,9 @@ public class BasicCreatureCard : Card
                     inBattlefield = true;
                     //call the event that a creature has entered the battlefield
                     localPlayer.GetComponent<PlayerController>().creatureEntered();
+					//reset the bool to allow the Pickup sound to play again when the player picks up another card
+					playedCardPickupSound = false;
+					audioManager.playCardRelease ();
                 }
 
                 if (creatureCanAttack == false)
@@ -178,10 +189,18 @@ public class BasicCreatureCard : Card
             cardHandPos = gameObject.transform.position;
             screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
             offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+			if (!playedCardPickupSound) 
+			{
+				audioManager.playCardPickup ();
+				playedCardPickupSound = true;
+			}
         }
     }
     public override void OnMouseUp()
     {
+		//reset the bool to allow the Pickup sound to play again when the player picks up another card
+		playedCardPickupSound = false;
+
         if (isSelectable == true)
         {
             localPlayer.GetComponent<PlayerController>().makeLineInvisible();
