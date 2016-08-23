@@ -59,8 +59,11 @@ public abstract class Card : MonoBehaviour
 	protected bool dropped;
 	
 	protected float currentTime;
+    //Text Boxes
 	public Text summonZoneTextBox;
 	public Text cardTitleTextBox;
+    public Text castTimeTextBox;
+
 	//Something for the dragging of cards
 	protected Vector3 screenPoint;
 	//Something fo the dragging of cards

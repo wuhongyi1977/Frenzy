@@ -17,6 +17,8 @@ public class OneShotHealth : Card
 
     private GameObject currentTarget;
 
+    public Text[] textBoxes;
+
 
 
     public override void Start()                //Abstract method for start
@@ -34,13 +36,31 @@ public class OneShotHealth : Card
         summonZoneTextBox = null;
         isDraggable = true;
         //gameObject.GetComponentInChildren<Text>();
-        cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
+        textBoxes = gameObject.GetComponentsInChildren<Text>();
+        for (int i = 0; i < textBoxes.Length; i++)
+        {
+            if (textBoxes[i].name == "CardTitle")
+                cardTitleTextBox = textBoxes[i];
+            if (textBoxes[i].name == "CastTime")
+                castTimeTextBox = textBoxes[i];
+        }
+        //cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
         cardTitleTextBox.text = cardTitle;
 		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
 
     }
     public override void Update()               //Abstract method for Update
     {
+        /*
+        if (cardTitleTextBox != null)
+        {
+            cardTitleTextBox.text = cardTitle;
+        }
+        */
+        if (castTimeTextBox != null)
+        {
+            castTimeTextBox.text = castTime.ToString();
+        }
         //get references to player objects if not assigned
         GetPlayers();
 

@@ -49,6 +49,8 @@ public class CreatureCard : Card
                 cardTitleTextBox = textBoxes[i];
             if (textBoxes[i].name == "Stats")
                 creatureStatsTextBox = textBoxes[i];
+            if (textBoxes[i].name == "CastTime")
+                castTimeTextBox = textBoxes[i];
         }
 		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
 		playedCardSelectedSound = false;
@@ -74,6 +76,10 @@ public class CreatureCard : Card
         if (cardTitleTextBox != null)
         {
             cardTitleTextBox.text = cardTitle;
+        }
+        if (castTimeTextBox != null)
+        {
+            castTimeTextBox.text = castTime.ToString();
         }
         //get references to player objects if not assigned
         GetPlayers();
@@ -341,7 +347,11 @@ public class CreatureCard : Card
         {
             cardTitleTextBox.text = cardTitle;
         }
-        
-       
+        if (castTimeTextBox != null)
+        {
+            castTimeTextBox.text = castTime.ToString();
+        }
+
+
     }
 }
