@@ -147,19 +147,23 @@ public class OneShotHealth : Card
     }
     public override void OnMouseOver()
     {
-		if (!playedCardSelectedSound) 
-		{
-			audioManager.playCardSelect ();
-			playedCardSelectedSound = true;
-		}
-
+       
+       
         if (photonView.isMine && localPlayerController != null)
         {
+            if (!playedCardSelectedSound)
+            {
+                audioManager.playCardSelect();
+                playedCardSelectedSound = true;
+            }
+
             localPlayerController.setMousedOverCard(gameObject);
+            Debug.Log("waitingForTarget: " + waitingForTarget + "/" + "targetSelected: " + targetSelected);
             if (waitingForTarget == true && targetSelected == false)//(creatureCanAttack)
             {
                 if (Input.GetMouseButtonDown(0))
                 {
+                    Debug.Log("Mouse Drag On: " + cardTitle);
                     localPlayerController.drawLineOn();
 
                 }
@@ -195,12 +199,12 @@ public class OneShotHealth : Card
             else if (waitingForTarget == true)
             {
                 Debug.Log("Attempt targeting");
-                Debug.Log("Target is: " + localPlayerController.CardIsTargetted(gameObject, cardHandPos));
+                Debug.Log("Target is: " + localPlayerController.CardIsTargetted());//(gameObject, cardHandPos));
                 //if the target is not null, store the target and set targetSelected to true
-                if (localPlayerController.CardIsTargetted(gameObject, cardHandPos) != null)
+                if (localPlayerController.CardIsTargetted() != null)
                 {
                     targetSelected = true;
-                    currentTarget = localPlayerController.CardIsTargetted(gameObject, cardHandPos);
+                    currentTarget = localPlayerController.CardIsTargetted();
                 }
             }
             //Makes sure summon zone textbox is assigned
@@ -210,6 +214,7 @@ public class OneShotHealth : Card
 
     public override void OnMouseDown()
     {
+        Debug.Log("Mouse Down on: "+cardTitle);
         if (photonView.isMine && isDraggable == true && isSelectable == true)
         {
             cardHandPos = gameObject.transform.position;

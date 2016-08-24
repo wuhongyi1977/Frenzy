@@ -391,7 +391,7 @@ public class PlayerController : MonoBehaviour
     
 
     //function for determining target when a card is dragged to a target
-    public GameObject CardIsTargetted(GameObject card, Vector3 cardHandPos)
+    public GameObject CardIsTargetted()//(GameObject card, Vector3 cardHandPos)
     {
         Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
         RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);

@@ -234,8 +234,8 @@ public class CreatureCard : Card
 
                 if (creatureCanAttack)
                 {
-					
-                    GameObject currentTarget = localPlayerController.CardIsTargetted(gameObject, cardHandPos);
+
+                    GameObject currentTarget = localPlayerController.CardIsTargetted();//gameObject, cardHandPos);
                     if(currentTarget != null)
                     {
                         localPlayerController.CardTargetDamage(gameObject, cardHandPos, currentTarget);
