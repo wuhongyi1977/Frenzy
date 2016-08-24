@@ -221,11 +221,14 @@ public class PlayfabLogin : MonoBehaviour
     {
         Debug.Log("No Room Found");
         Debug.Log("Creating a new room");
+        
         //set up room options
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 2;//set max players to 2
         //create a room with random name, the previous options, and no specification for typed lobby
         PhotonNetwork.CreateRoom(null, roomOptions, null);// this can make room name same as username(PlayFabDataStore.userName);
+       
+
         //Start Waiting for user to join
         StartCoroutine(WaitForOpponent());
 

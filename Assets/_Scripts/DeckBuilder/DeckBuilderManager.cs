@@ -100,17 +100,18 @@ public class DeckBuilderManager : MonoBehaviour {
     //Deck is a "character" on playfab granted to user
     public void CreateDeck(string name)
     {
-        var request = new RunCloudScriptRequest()
+        var request = new ExecuteCloudScriptRequest()
         {
-            ActionId = "newDeck",
-            Params = new { characterName = name, characterType = "Deck" }
+            FunctionName = "newDeck",
+            //ActionId = "newDeck",
+            FunctionParameter = new { characterName = name, characterType = "Deck" }
         };
-        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
         {
             Debug.Log("Deck Created");
             PlayFabDataStore.numberOfDecks += 1;
             //Debug.Log(result.ResultsEncoded.Split);
-            string[] splitResult = result.ResultsEncoded.Split(':','"','"', '}');
+            string[] splitResult = result.ToString().Split(':','"','"', '}');
             //grab the data at position 2 (which is the character id)
             string deckId = splitResult[4];
             Debug.Log(deckId);
@@ -135,12 +136,12 @@ public class DeckBuilderManager : MonoBehaviour {
 
     public static void ConstructDeck(string deckIdNum, string[] itemsToAdd)
     {
-        var request = new RunCloudScriptRequest()
+        var request = new ExecuteCloudScriptRequest()
         {
-            ActionId = "fillDeck",
-            Params = new { deckId = deckIdNum, items = itemsToAdd }
+            FunctionName = "fillDeck",
+            FunctionParameter = new { deckId = deckIdNum, items = itemsToAdd }
         };
-        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
         {
             Debug.Log("Cards Added To Deck");
             //string[] splitResult = result.ResultsEncoded.Split('"'); //19th element is the itemInstanceId
@@ -158,12 +159,12 @@ public class DeckBuilderManager : MonoBehaviour {
     }
     public static void UpdateDeckName(string deckIdNum, string newName)
     {
-        var request = new RunCloudScriptRequest()
+        var request = new ExecuteCloudScriptRequest()
         {
-            ActionId = "changeDeckName",
-            Params = new { deckId = deckIdNum, name = newName }
+            FunctionName = "changeDeckName",
+            FunctionParameter = new { deckId = deckIdNum, name = newName }
         };
-        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
         {
             Debug.Log("Name Changed");
             Debug.Log(result);
