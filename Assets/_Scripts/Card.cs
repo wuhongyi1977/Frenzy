@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// </summary>
 public abstract class Card : MonoBehaviour
 {
-
+    public Image cardArtImage;
 //STATS 
     //all card stats are here, are assigned by custom data from Playfab
 
@@ -107,6 +107,10 @@ public abstract class Card : MonoBehaviour
         networkOpponent = GameObject.Find("NetworkOpponent");
         p1Manager = GameObject.Find("Player1Manager");
         p2Manager = GameObject.Find("Player2Manager");
+        if(cardArtImage == null)
+        {
+            cardArtImage = GetComponentInChildren<Image>();
+        }
     }
 	public virtual void Start ()				//Abstract method for start
 	{
@@ -251,6 +255,7 @@ public abstract class Card : MonoBehaviour
     {
     
         Debug.Log("id of this card is: " + id);
+
         /*
         //set the card's id
         cardId = id;
@@ -334,9 +339,21 @@ public abstract class Card : MonoBehaviour
                     break;
             }
         }
+        //Set the proper art for the card
+        SetArt();
         //set all internal variables on a card using this function
         UpdateInternalVariables();    
 
+    }
+
+    public void SetArt()
+    {
+        if(artName != null && artName != "temp")
+        {
+            cardArtImage.overrideSprite = Resources.Load<Sprite>("CardArt/" + artName);
+            Debug.Log(Resources.Load("CardArt/" + artName));
+        }
+        
     }
     //this function should be overridden in child script to update any
     //internal variables that should be set on card initialization

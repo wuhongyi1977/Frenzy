@@ -86,7 +86,7 @@ public class OneShotHealth : Card
             //if the target has been selected, begin countdown
             if (targetSelected == true)
             {
-                Debug.Log("target selected, counting down!");
+                
                 //Increment the current Time
                 currentTime -= Time.deltaTime;
                 if (summonZoneTextBox == null)
@@ -152,22 +152,21 @@ public class OneShotHealth : Card
 			audioManager.playCardSelect ();
 			playedCardSelectedSound = true;
 		}
-        if (waitingForTarget == true && targetSelected == false)//(creatureCanAttack)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                localPlayer.GetComponent<PlayerController>().drawLineOn();
 
-            }
-
-        }
-        
-
-        if (photonView.isMine)
+        if (photonView.isMine && localPlayerController != null)
         {
             localPlayerController.setMousedOverCard(gameObject);
+            if (waitingForTarget == true && targetSelected == false)//(creatureCanAttack)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    localPlayerController.drawLineOn();
+
+                }
+
+            }
         }
-        else
+        else if(opponentPlayerController != null)
         {
             opponentPlayerController.setMousedOverCard(gameObject);
         }
@@ -176,13 +175,8 @@ public class OneShotHealth : Card
     
     public override void OnMouseUp()
     {
-
-        Debug.Log("Can Target = " + canTarget);
-        Debug.Log("Waiting for Target = " + waitingForTarget);
         //reset the bool to allow the Pickup sound to play again when the player picks up another card
         playedCardPickupSound = false;
-
-       
 
         if (photonView.isMine && isSelectable == true)
         {

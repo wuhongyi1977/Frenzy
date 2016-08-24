@@ -222,7 +222,7 @@ public class CreatureCard : Card
 		//reset the bool to allow the Pickup sound to play again when the player picks up another card
 		playedCardPickupSound = false;
 
-        if (isSelectable == true)
+        if (photonView.isMine && isSelectable == true)
         {
             localPlayerController.makeLineInvisible();
             localPlayerController.drawLineOff();
@@ -270,10 +270,10 @@ public class CreatureCard : Card
     }
     public override void OnMouseOver()
     {
-        if(photonView.isMine)
+        if(photonView.isMine && localPlayerController != null)
         {
 
-            localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            localPlayerController.setMousedOverCard(gameObject);
 			if (!playedCardSelectedSound) 
 			{
 				audioManager.playCardSelect ();
@@ -283,14 +283,14 @@ public class CreatureCard : Card
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    localPlayer.GetComponent<PlayerController>().drawLineOn();
+                    localPlayerController.drawLineOn();
                 }
 
             }
         }
-        else
+        else if(opponentPlayerController != null)
         {
-            networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            opponentPlayerController.setMousedOverCard(gameObject);
 
         }
 
