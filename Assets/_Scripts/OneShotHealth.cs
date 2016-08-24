@@ -14,6 +14,8 @@ public class OneShotHealth : Card
     private bool waitingForTarget = false;
     //checks to see if the card has been given a target yet
     private bool targetSelected = false;
+    //checks if the cards target type has been assigned
+    private bool targetAssignment = false;
 
     private GameObject currentTarget;
 
@@ -69,7 +71,12 @@ public class OneShotHealth : Card
         {
             //IF the current time is larger than or equal to the cast time
             isDraggable = false;
-			if (!playedCardInSpellSlotSound) 
+            //allow player to choose target
+            canTarget = true;
+            //assign this cards target based on CustomData
+            SetTarget();
+            
+            if (!playedCardInSpellSlotSound) 
 			{
 				playedCardInSpellSlotSound = true;
 				audioManager.playCardInSpellSlot ();
@@ -79,7 +86,7 @@ public class OneShotHealth : Card
             //if the target has been selected, begin countdown
             if (targetSelected == true)
             {
-               
+                Debug.Log("target selected, counting down!");
                 //Increment the current Time
                 currentTime -= Time.deltaTime;
                 if (summonZoneTextBox == null)
@@ -169,41 +176,27 @@ public class OneShotHealth : Card
     
     public override void OnMouseUp()
     {
-		//reset the bool to allow the Pickup sound to play again when the player picks up another card
-		playedCardPickupSound = false;
+
+        Debug.Log("Can Target = " + canTarget);
+        Debug.Log("Waiting for Target = " + waitingForTarget);
+        //reset the bool to allow the Pickup sound to play again when the player picks up another card
+        playedCardPickupSound = false;
+
+       
 
         if (photonView.isMine && isSelectable == true)
         {
-
+            //make drag line invisible
+            localPlayerController.makeLineInvisible();
+            localPlayerController.drawLineOff();
+            //set card as dropped
             dropped = true;
             
-                //if card is being put into play
-                if (!canTarget)
-                {
-                    
-                    //make drag line invisible
-                    localPlayerController.makeLineInvisible();
-                    localPlayerController.drawLineOff();
-                    //set card as dropped
-                    
-                    //drop card for local player (network player drops it by rpc call)
-                    localPlayerController.cardIsDropped(gameObject, cardHandPos);
-                    //if the target can only be the player, begin countdown
-                    if (target == "Player")
-                    {
-                        currentTarget = GameObject.FindGameObjectWithTag("Player2");
-                        targetSelected = true;
-                        waitingForTarget = false;
-                    }
-                    //if the player has options for target, wait to countdown until selected
-                    else
-                    {
-                        targetSelected = false;
-                        waitingForTarget = true;
-                    }
-                canTarget = true;
-                
-               
+            //if card is being put into play
+            if (!canTarget)
+            {     
+                //drop card for local player (network player drops it by rpc call)
+                localPlayerController.cardIsDropped(gameObject, cardHandPos);  
             }
             else if (waitingForTarget == true)
             {
@@ -230,6 +223,29 @@ public class OneShotHealth : Card
             offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
 			audioManager.playCardPickup ();
         }
+    }
+
+    public void SetTarget()
+    {
+        if (targetAssignment == false)
+        {
+            //if the target can only be the player, begin countdown
+            if (target == "Player")
+            {
+                currentTarget = GameObject.FindGameObjectWithTag("Player2");
+                targetSelected = true;
+                waitingForTarget = false;
+            }
+            //if the player has options for target, wait to countdown until selected
+            else
+            {
+                targetSelected = false;
+                waitingForTarget = true;
+            }
+            targetAssignment = true;
+        }
+       
+
     }
     //Photon Serialize View
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
