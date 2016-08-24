@@ -508,13 +508,65 @@ public class PlayfabLogin : MonoBehaviour
     {
         string[] cardToGrant = new string[1];
         cardToGrant[0] = cheatInput.text;
-        for(int i = 0; i < cardToGrant.Length; i++)
+        if(cardToGrant[0] == "TestDeck")
         {
-            Debug.Log(cardToGrant[i]);
+            CreateTestDeck();
         }
-        PlayfabApiCalls.GrantCardsToUser(cardToGrant);
+        else
+        {
+            for (int i = 0; i < cardToGrant.Length; i++)
+            {
+                Debug.Log(cardToGrant[i]);
+            }
+            PlayfabApiCalls.GrantCardsToUser(cardToGrant);
+        }
+      
     }
-    
+
+    //Creates a new deck for the player
+    //Deck is a "character" on playfab granted to user
+    public void CreateTestDeck()
+    {
+        var request = new ExecuteCloudScriptRequest()
+        {
+            FunctionName = "newDeck",
+            //ActionId = "newDeck",
+            FunctionParameter = new { characterName = "TestDeck", characterType = "Deck" }
+        };
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
+        {
+            Debug.Log("Test Deck Granted");
+            PlayFabDataStore.numberOfDecks += 1;
+            //Debug.Log(result.ResultsEncoded.Split);
+            string[] splitResult = result.FunctionResult.ToString().Split(':', '"', '"', '}');
+            //grab the data at position 2 (which is the character id)
+            string deckId = splitResult[4];
+
+            Debug.Log("Character Id of new deck is: " + deckId);
+            //store this deck in the decklist
+            PlayFabDataStore.deckIds.Add(deckId);
+            PlayFabDataStore.deckList.Add(deckId, name);
+            string[] cardIdsToAdd = {"Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard",
+                                     "Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard",
+                                     "Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard",
+                                     "Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard",
+                                     "Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard",
+                                     "Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard",
+                                     "Classic_LightningStrike_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard",
+                                     "Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard",
+                                     "Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard",
+                                     "Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard"};
+            PlayfabApiCalls.FillDeck(deckId, cardIdsToAdd);
+
+        },
+        (error) =>
+        {
+            Debug.Log("Deck Not Created!");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
 
 
 

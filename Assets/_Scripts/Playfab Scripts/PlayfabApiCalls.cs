@@ -9,7 +9,7 @@ public class PlayfabApiCalls : MonoBehaviour
     public static bool cardRetrievalDone = false;
     public static bool deckRetrievalDone = false;
 
-
+    
     //Access the newest version of cloud script
     public static void PlayFabInitialize()
     {
@@ -75,13 +75,13 @@ public class PlayfabApiCalls : MonoBehaviour
     }
     public static void GrantCardsToUser(string[] cardIdsToAdd)
     {
-        var request = new RunCloudScriptRequest()
+        var request = new ExecuteCloudScriptRequest()
         {
-            ActionId = "grantItemsToUser",
-            Params = new { itemsToAdd = cardIdsToAdd }
+           FunctionName = "grantItemsToUser",
+           FunctionParameter = new { itemsToAdd = cardIdsToAdd }
         };
 
-        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
         {
             Debug.Log("Cards Granted To User");
 
@@ -97,13 +97,13 @@ public class PlayfabApiCalls : MonoBehaviour
     //Fill a deck with cards
     public static void FillDeck(string deck, string[] cardIdsToAdd)
     {
-        var request = new RunCloudScriptRequest()
+        var request = new ExecuteCloudScriptRequest()
         {
-            ActionId = "fillDeck",
-            Params = new { deckId = deck,items = cardIdsToAdd }
+            FunctionName = "fillDeck",
+            FunctionParameter = new { deckId = deck,items = cardIdsToAdd }
         };
 
-        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
         {
             Debug.Log("Cards Granted To Deck");
 
@@ -119,13 +119,13 @@ public class PlayfabApiCalls : MonoBehaviour
     public static void RemoveCardFromDeck(string deck, string cardIdToRemove)
     {
         Debug.Log("Trying to remove: "+ cardIdToRemove+ " from: "+deck);
-        var request = new RunCloudScriptRequest()
+        var request = new ExecuteCloudScriptRequest()
         {
-            ActionId = "removeCardFromDeck",
-            Params = new { deckId = deck, item = cardIdToRemove }
+            FunctionName = "removeCardFromDeck",
+            FunctionParameter = new { deckId = deck, item = cardIdToRemove }
         };
 
-        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
         {
             Debug.Log("Card Removed From Deck");
 
@@ -244,13 +244,13 @@ public class PlayfabApiCalls : MonoBehaviour
     //Delete a deck
     public static void DeleteDeck(string deck)
     {
-        var request = new RunCloudScriptRequest()
+        var request = new ExecuteCloudScriptRequest()
         {
-            ActionId = "deleteDeck",
-            Params = new { deckId = deck }
+            FunctionName = "deleteDeck",
+            FunctionParameter = new { deckId = deck }
         };
 
-        PlayFabClientAPI.RunCloudScript(request, (result) =>
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
         {
             Debug.Log("Deck Deleted");
             //store the number of saved decks
