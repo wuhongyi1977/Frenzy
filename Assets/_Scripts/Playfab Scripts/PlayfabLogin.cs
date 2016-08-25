@@ -370,7 +370,7 @@ public class PlayfabLogin : MonoBehaviour
             //save user data for rapid login
             ChangeSavedLogin(email, password);
             //Initialize cloud script
-            PlayfabApiCalls.PlayFabInitialize();
+            //PlayfabApiCalls.PlayFabInitialize();
             //get photon token
             GetPhotonToken();
             //set main menu active on successful login
@@ -413,7 +413,7 @@ public class PlayfabLogin : MonoBehaviour
             //save user data for rapid login
             ChangeSavedLogin(email, password);
             //Initialize cloud script
-            PlayfabApiCalls.PlayFabInitialize();
+            //PlayfabApiCalls.PlayFabInitialize();
             //get photon token
             GetPhotonToken();
 

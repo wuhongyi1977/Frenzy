@@ -9,7 +9,7 @@ public class PlayfabApiCalls : MonoBehaviour
     public static bool cardRetrievalDone = false;
     public static bool deckRetrievalDone = false;
 
-    
+    /*
     //Access the newest version of cloud script
     public static void PlayFabInitialize()
     {
@@ -28,6 +28,7 @@ public class PlayfabApiCalls : MonoBehaviour
             Debug.Log("Failed to retrieve Cloud Script URL");
         });
     }
+    */
 
 
     public static void RetrieveDecks(string playfabId)
