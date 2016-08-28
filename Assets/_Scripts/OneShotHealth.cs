@@ -201,10 +201,16 @@ public class OneShotHealth : Card
                 Debug.Log("Attempt targeting");
                 Debug.Log("Target is: " + localPlayerController.CardIsTargetted());//(gameObject, cardHandPos));
                 //if the target is not null, store the target and set targetSelected to true
-                if (localPlayerController.CardIsTargetted() != null)
+                GameObject targetObject = localPlayerController.CardIsTargetted();
+                if (targetObject != null && targetObject != this.gameObject)
                 {
-                    targetSelected = true;
-                    currentTarget = localPlayerController.CardIsTargetted();
+                    //only allow targeting creature cards and players
+                    if ((targetObject.tag == "CreatureCard" && targetObject.GetComponent<CreatureCard>().inBattlefield == true )
+                        || targetObject.tag == "Player2" || targetObject.tag == "Player1")
+                    {
+                        targetSelected = true;
+                        currentTarget = targetObject;//localPlayerController.CardIsTargetted();
+                    }
                 }
             }
             //Makes sure summon zone textbox is assigned
