@@ -236,10 +236,15 @@ public class CreatureCard : Card
                 {
 
                     GameObject currentTarget = localPlayerController.CardIsTargetted();//gameObject, cardHandPos);
-                    if(currentTarget != null)
+                    if(currentTarget != null && currentTarget != this.gameObject)
                     {
-                        localPlayerController.CardTargetDamage(gameObject, cardHandPos, currentTarget);
-						audioManager.playCardRelease ();
+                        if((currentTarget.tag == "CreatureCard"&&currentTarget.GetComponent<CreatureCard>().inBattlefield == true)
+                            || currentTarget.tag == "Player2")
+                        {
+                            localPlayerController.CardTargetDamage(gameObject, cardHandPos, currentTarget);
+                            audioManager.playCardRelease();
+                        }
+                        
                     }
                     
                     //networkOpponent.GetComponent<PlayerController>().ChangeHealth(damageToDeal * -1);
