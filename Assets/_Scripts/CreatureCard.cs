@@ -236,15 +236,11 @@ public class CreatureCard : Card
                 {
 
                     GameObject currentTarget = localPlayerController.CardIsTargetted();//gameObject, cardHandPos);
-                    if(currentTarget != null && currentTarget != this.gameObject)
-                    {
-                        if((currentTarget.tag == "CreatureCard"&&currentTarget.GetComponent<CreatureCard>().inBattlefield == true)
-                            || currentTarget.tag == "Player2")
-                        {
-                            localPlayerController.CardTargetDamage(gameObject, cardHandPos, currentTarget);
-                            audioManager.playCardRelease();
-                        }
-                        
+                    //check if target is a possible target for this card
+                    if (VerifyTarget())
+                    {     
+                        localPlayerController.CardTargetDamage(gameObject, cardHandPos, currentTarget);
+                        audioManager.playCardRelease();   
                     }
                     
                     //networkOpponent.GetComponent<PlayerController>().ChangeHealth(damageToDeal * -1);
@@ -302,6 +298,28 @@ public class CreatureCard : Card
        
     }
 
+    //verify that the proper type of target is being selected
+    public override bool VerifyTarget()
+    {
+        //copy this block into all cards, cards cannot target nothing or themselves
+        if (targetObject == null || targetObject == this.gameObject)
+        { return false; }
+
+        else if (targetObject.tag == "Player2")
+        {
+            return true;
+        }
+        //test if target is proper
+        else if (targetObject.tag == "CreatureCard" && targetObject.GetComponent<CreatureCard>().inBattlefield == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
     public void increaseStats(int dmg, int h, int attkSpd)
     {
         //if (photonView.isMine) {

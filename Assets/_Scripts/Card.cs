@@ -84,19 +84,27 @@ public abstract class Card : MonoBehaviour
     protected PlayerController opponentPlayerController;
 
     protected SpriteRenderer spriteRender;
-	//The variable for the script attached to the AudioManager object
-	protected AudioManager audioManager;
+
+    protected GameObject targetObject = null;
+
+    //ADDED CODE FOR HAND INDEX
+    public int handIndex;
+
+    //PHOTON COMPONENTS
+    protected PhotonView photonView;
+
+//SOUND VARIABLES
+    //The variable for the script attached to the AudioManager object
+    protected AudioManager audioManager;
 	//variables to prevent spamming of sounds
 	protected bool playedCardSelectedSound;
 	protected bool playedCardPickupSound;
 	protected bool playedCardBuildupSound;
 	protected bool playedCardReleaseSound;
 	protected bool playedCardInSpellSlotSound;
-    //ADDED CODE FOR HAND INDEX
-    public int handIndex;
+//END SOUND VARIABLES 
 
-    //PHOTON COMPONENTS
-    protected PhotonView photonView;
+  
 
     //This can be used for initialization code that is identical on ALL cards
     public virtual void Awake()
@@ -360,6 +368,20 @@ public abstract class Card : MonoBehaviour
     public virtual void UpdateInternalVariables()
     {
         //variables go here
+    }
+
+    //this function should be overridden in child script to verify that
+    //the proper type of target is being selected
+    public virtual bool VerifyTarget()
+    {
+        //copy this block into all cards, cards cannot target nothing or themselves
+        if (targetObject == null || targetObject == this.gameObject)
+        { return false; }
+
+        //test if target is proper
+
+        //else
+        return true;
     }
 
     //checks if the card has a reference to summon zone text

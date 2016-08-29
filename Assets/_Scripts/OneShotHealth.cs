@@ -21,7 +21,7 @@ public class OneShotHealth : Card
 
     public Text[] textBoxes;
 
-
+    LineRenderer targetLine;
 
     public override void Start()                //Abstract method for start
     {
@@ -49,6 +49,11 @@ public class OneShotHealth : Card
         //cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
         cardTitleTextBox.text = cardTitle;
 		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
+        targetLine = GetComponent<LineRenderer>();
+        targetLine.enabled = false;
+
+
+
 
     }
     public override void Update()               //Abstract method for Update
@@ -130,11 +135,13 @@ public class OneShotHealth : Card
             
             SendToGraveyard();  
         }
+
     }
 
     //handles effects of card when sent to graveyard
     public override void OnGraveyard()
     {
+        targetLine.enabled = false;
         Debug.Log("Executing OnGraveyard for: "+ gameObject);
         //Graveyard effect goes here
         //if this is the local object
@@ -143,6 +150,7 @@ public class OneShotHealth : Card
             Debug.Log("Dealing damage to : " + currentTarget);
             localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
         }
+       
 
     }
     public override void OnMouseOver()
@@ -165,7 +173,6 @@ public class OneShotHealth : Card
                 {
                     Debug.Log("Mouse Drag On: " + cardTitle);
                     localPlayerController.drawLineOn();
-
                 }
 
             }
@@ -201,17 +208,26 @@ public class OneShotHealth : Card
                 Debug.Log("Attempt targeting");
                 Debug.Log("Target is: " + localPlayerController.CardIsTargetted());//(gameObject, cardHandPos));
                 //if the target is not null, store the target and set targetSelected to true
-                GameObject targetObject = localPlayerController.CardIsTargetted();
-                if (targetObject != null && targetObject != this.gameObject)
+                targetObject = localPlayerController.CardIsTargetted();
+                //if the target is a possible target for this card
+                if (VerifyTarget())
                 {
-                    //only allow targeting creature cards and players
-                    if ((targetObject.tag == "CreatureCard" && targetObject.GetComponent<CreatureCard>().inBattlefield == true )
-                        || targetObject.tag == "Player2" || targetObject.tag == "Player1")
+                   
+                    targetSelected = true;
+                    currentTarget = targetObject;//localPlayerController.CardIsTargetted();
+                    //draw the target line to the position of the current target
+                    int targetViewId = -1;
+                    if (currentTarget.GetPhotonView() != null)
                     {
-                        targetSelected = true;
-                        currentTarget = targetObject;//localPlayerController.CardIsTargetted();
+                        targetViewId = currentTarget.GetPhotonView().viewID;
                     }
+                   
+                    string targetTag = currentTarget.tag;
+                    photonView.RPC("DrawTargetLine",PhotonTargets.All, targetViewId, targetTag);
+                    
+                    
                 }
+              
             }
             //Makes sure summon zone textbox is assigned
             GetSummonZoneText();
@@ -249,7 +265,68 @@ public class OneShotHealth : Card
             }
             targetAssignment = true;
         }
-       
+    }
+
+    //verify that the proper type of target is being selected
+    public override bool VerifyTarget()
+    {
+        //copy this block into all cards, cards cannot target nothing or themselves
+        if (targetObject == null || targetObject == this.gameObject)
+        { return false; }
+
+        else if(targetObject.tag == "Player2" || targetObject.tag == "Player1")
+        {
+            return true;
+        }
+        //test if target is proper
+        else if(targetObject.tag == "CreatureCard" && targetObject.GetComponent<CreatureCard>().inBattlefield == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    
+    }
+    [PunRPC]
+    public void DrawTargetLine(int viewId, string targetTag)
+    {  
+        GameObject objectToTarget;
+        targetLine.enabled = true;
+        //set line color based on if this is your card or opponents
+        if(photonView.isMine)
+        {
+            objectToTarget = currentTarget;
+            targetLine.SetColors(Color.blue, Color.green);
+        }
+        else
+        {
+            //if the casting player targeted their opponent
+            if(targetTag == "Player2")
+            {
+                //show the line drawn to self on opponents screen
+                objectToTarget = GameObject.FindGameObjectWithTag("Player1");
+            }
+            //if the casting player targeted themself
+            else if (targetTag == "Player1")
+            {
+                //show the line drawn to opponents opponent 
+                objectToTarget = GameObject.FindGameObjectWithTag("Player2");
+            }
+            else
+            {
+                objectToTarget = PhotonView.Find(viewId).gameObject;
+            }
+           
+            targetLine.SetColors(Color.yellow, Color.red);
+        }
+        
+        //set the first component of the line renderer to the position of the card
+        targetLine.SetPosition(0, transform.position);
+
+        //set the second component of the line renderer to the position of the target
+        targetLine.SetPosition(1, objectToTarget.transform.position);
 
     }
     //Photon Serialize View
