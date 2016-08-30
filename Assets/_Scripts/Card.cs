@@ -8,7 +8,11 @@ using UnityEngine.UI;
 /// </summary>
 public abstract class Card : MonoBehaviour
 {
+    //the image to display for the card art
     public Image cardArtImage;
+    //the text displayed to the player listing the card's abilities
+    public Text descriptionText;
+
 //STATS 
     //all card stats are here, are assigned by custom data from Playfab
 
@@ -283,6 +287,8 @@ public abstract class Card : MonoBehaviour
         cardId = id;
         //set cards name 
         cardTitle = PlayFabDataStore.cardNameList[id];
+        //set cards description
+        descriptionText.text = PlayFabDataStore.cardDescriptions[id];
 
         string[] data = PlayFabDataStore.cardCustomData[id];
         /*

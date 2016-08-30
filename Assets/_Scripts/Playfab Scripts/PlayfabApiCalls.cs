@@ -305,6 +305,14 @@ public class PlayfabApiCalls : MonoBehaviour
                     string[] stringSeparators = new string[] { "{\"", "\":\"", "\",\"", "\"}" };
                     //split custom data using seperators
                     string[] splitResults = customData.Split(stringSeparators, System.StringSplitOptions.None);
+
+                    //store all custom data to data store
+                    if (!PlayFabDataStore.cardDescriptions.ContainsKey(item.ItemId))
+                    {
+                        PlayFabDataStore.cardDescriptions.Add(item.ItemId, item.Description);//item.CustomData);
+                    }
+
+
                     //store all custom data to data store
                     if (!PlayFabDataStore.cardCustomData.ContainsKey(item.ItemId))
                     {
