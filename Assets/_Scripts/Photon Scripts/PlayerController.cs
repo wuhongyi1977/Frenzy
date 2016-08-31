@@ -380,13 +380,22 @@ public class PlayerController : MonoBehaviour
     }
    
 	[PunRPC]
-	public void ResolveCreatureDamage(GameObject creature, GameObject otherCreature)
+	public void ResolveCreatureDamage(GameObject attacker, GameObject defender)
 	{
+        //get CreatureCard component of both attacker and defender
+        CreatureCard attackerScript = attacker.GetComponent<CreatureCard>();
+        CreatureCard defenderScript = defender.GetComponent<CreatureCard>();
 
-        creature.GetComponent<CreatureCard>().health -= otherCreature.GetComponent<CreatureCard>().damageToDeal;
-        otherCreature.GetComponent<CreatureCard>().health -= creature.GetComponent<CreatureCard>().damageToDeal;
-
-
+        //if the attacker is not elusive, handle damage to attacker
+        if(!attackerScript.creatureAbilities.Contains("Elusive"))
+        {
+           attackerScript.health -= defenderScript.damageToDeal;
+        }
+        //if the defender is not elusive, handle damage to defender
+        if (!defenderScript.creatureAbilities.Contains("Elusive"))
+        {
+            defenderScript.health -= attackerScript.damageToDeal;
+        }
     }
     
 
@@ -398,11 +407,13 @@ public class PlayerController : MonoBehaviour
         //if the raycast hits an object
         if (hit)
         {
+            Debug.Log("Card is targetted returned: "+hit.transform.gameObject.name);
             //store the hit object
             return hit.transform.gameObject;
         }
         else
         {
+            Debug.Log("Card is targetted returned null");
             return null;
         }
     }
@@ -435,12 +446,12 @@ public class PlayerController : MonoBehaviour
                 attackerCreature.creatureCanAttack = false;
                 //if the attacking creature doesnt have elusive, deal it damage
                 //Elusive prevents damage from other creatures
-                if (!attackerCreature.elusive)
+                if (!attackerCreature.creatureAbilities.Contains("Elusive"))
                 {
                     attackerCreature.health -= targetScript.attackPower;
                 }
                 //if the defending creature doesnt have elusive, deal it damage    
-                if (!targetCreature.elusive)
+                if (!targetCreature.creatureAbilities.Contains("Elusive"))
                 {
                     targetCreature.health -= attackerScript.attackPower;
                 }
@@ -838,4 +849,6 @@ public class PlayerController : MonoBehaviour
 	{
 		return creatureThatJustEntered;
 	}
+
+    
 }

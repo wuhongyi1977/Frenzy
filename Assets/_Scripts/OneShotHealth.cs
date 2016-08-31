@@ -166,7 +166,7 @@ public class OneShotHealth : Card
             }
 
             localPlayerController.setMousedOverCard(gameObject);
-            Debug.Log("waitingForTarget: " + waitingForTarget + "/" + "targetSelected: " + targetSelected);
+            //Debug.Log("waitingForTarget: " + waitingForTarget + "/" + "targetSelected: " + targetSelected);
             if (waitingForTarget == true && targetSelected == false)//(creatureCanAttack)
             {
                 if (Input.GetMouseButtonDown(0))

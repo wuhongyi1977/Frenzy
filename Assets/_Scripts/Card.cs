@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 /// <summary>
 /// A script to handle the functions that should be available to every
@@ -40,6 +41,9 @@ public abstract class Card : MonoBehaviour
     public int opponentHealthChange;
     //the amount to change the owners health (can be direct damage or healing)
     public int ownerHealthChange;
+    //the list of standard abilities a creature has (Rush, Elusive, etc.)
+    //to handle abilities, have each possible occurence check if hashset contains ability
+    public HashSet<string> creatureAbilities = new HashSet<string>(); 
 
 //END STATS
 
@@ -348,11 +352,16 @@ public abstract class Card : MonoBehaviour
                     break;
                 case "OwnerHealthChange":
                     ownerHealthChange = int.Parse(nextString);
-                    break;
+                    break;         
+                case "CreatureAbility":
+                    string ability = nextString;
+                    creatureAbilities.Add(ability); //= int.Parse(nextString);
+                    break;   
                 default:
                     break;
             }
         }
+        Debug.Log("Finished setting variables");
         //Set the proper art for the card
         SetArt();
         //set all internal variables on a card using this function

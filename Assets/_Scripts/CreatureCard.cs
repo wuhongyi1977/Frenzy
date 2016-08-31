@@ -145,8 +145,10 @@ public class CreatureCard : Card
                 {
                     stopCastingTimer = true;
                     summonZoneTextBox.text = "";
-                    if (rush)
+                    if (creatureAbilities.Contains("Rush"))
+                    {
                         creatureCanAttack = true;
+                    }                      
                     inBattlefield = true;
                     //call the event that a creature has entered the battlefield
                     localPlayer.GetComponent<PlayerController>().creatureEntered();
@@ -235,11 +237,12 @@ public class CreatureCard : Card
                 if (creatureCanAttack)
                 {
 
-                    GameObject currentTarget = localPlayerController.CardIsTargetted();//gameObject, cardHandPos);
+                    //GameObject currentTarget = localPlayerController.CardIsTargetted();//gameObject, cardHandPos);
+                    targetObject = localPlayerController.CardIsTargetted();
                     //check if target is a possible target for this card
                     if (VerifyTarget())
-                    {     
-                        localPlayerController.CardTargetDamage(gameObject, cardHandPos, currentTarget);
+                    {
+                        localPlayerController.CardTargetDamage(gameObject, cardHandPos, targetObject);//currentTarget);
                         audioManager.playCardRelease();   
                     }
                     
@@ -301,21 +304,36 @@ public class CreatureCard : Card
     //verify that the proper type of target is being selected
     public override bool VerifyTarget()
     {
+        Debug.Log("Verifying target");
         //copy this block into all cards, cards cannot target nothing or themselves
         if (targetObject == null || targetObject == this.gameObject)
-        { return false; }
+        {
+            if (targetObject == null)
+            {
+                Debug.Log("Target is null");
+            }
+            else
+            {
+                Debug.Log("Target is self");
+            }
+           
+            return false;
+        }
 
         else if (targetObject.tag == "Player2")
         {
+            Debug.Log("Target is opponent");
             return true;
         }
         //test if target is proper
         else if (targetObject.tag == "CreatureCard" && targetObject.GetComponent<CreatureCard>().inBattlefield == true)
         {
+            Debug.Log("Target is "+targetObject.GetComponent<CreatureCard>().cardTitle);
             return true;
         }
         else
         {
+            Debug.Log("No target found");
             return false;
         }
 
