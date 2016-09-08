@@ -107,24 +107,20 @@ public class OneShotHealth : Card
 					playedCardBuildupSound = true;
 					audioManager.playCardBuildUp ();
 				}
+                //if the cast time completes
                 if (currentTime <= 0)
                 {
-                    summonZoneTextBox.text = "";
-                    //reset the timer
-                    currentTime = 0;
-                    //Set state of card to being in the graveyard
-                    inGraveyard = true;
-                    //Set state of card to not being in the summon zone
-                    inSummonZone = false;
-					if (!playedCardReleaseSound) 
-					{
-						playedCardReleaseSound = true;
-						audioManager.playCardRelease ();
-					}
+                    //run this card's OnCast function
+                    OnCast();
+
+                    //send to graveyard
+                    SendToGraveyard();
+                   
                 }
             }
 
         }
+        /*
         //If the card is in the graveyard and manager code hasn't been executed yet
         if (inGraveyard && doneAddingToGraveyard == false)
         {
@@ -135,12 +131,14 @@ public class OneShotHealth : Card
             
             SendToGraveyard();  
         }
+        */
 
     }
 
     //handles effects of card when sent to graveyard
     public override void OnGraveyard()
     {
+        /*
         targetLine.enabled = false;
         Debug.Log("Executing OnGraveyard for: "+ gameObject);
         //Graveyard effect goes here
@@ -150,9 +148,49 @@ public class OneShotHealth : Card
             Debug.Log("Dealing damage to : " + currentTarget);
             localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
         }
-       
+        */
 
     }
+    //handles card's function upon casting
+    public override void OnCast()
+    {
+        Debug.Log(photonView.owner + " cast "+ cardTitle + " on " + currentTarget.name +" successfully!");
+
+        //disable targetting line
+        targetLine.enabled = false;
+        //if this card belongs to the local player, run casting code
+        if(photonView.isMine && currentTarget != null)
+        {
+
+            //CREATURE TARGET FUNCTIONS
+            if(currentTarget.tag == "CreatureCard")
+            {
+
+            }
+
+            //SELF TARGET FUNCTIONS
+            if (currentTarget.tag == "Player1")
+            {
+
+            }
+            //OPPONENT TARGET FUNCTIONS
+            if(currentTarget.tag == "Player2")
+            {
+
+            }
+
+
+            //DAMAGE
+            //if this card changes either player's health, run damage code
+            if (ownerHealthChange != 0 || opponentHealthChange != 0)
+            {
+                Debug.Log("Dealing damage to : " + currentTarget);
+                localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
+            }
+
+        }    
+    }
+
     public override void OnMouseOver()
     {
        

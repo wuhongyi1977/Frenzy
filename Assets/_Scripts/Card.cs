@@ -451,6 +451,19 @@ public abstract class Card : MonoBehaviour
         //Set this to false to prevent multiple executions of this block
         doneAddingToGraveyard = true;
 
+        summonZoneTextBox.text = "";
+        //reset the timer
+        currentTime = 0;
+        //Set state of card to being in the graveyard
+        inGraveyard = true;
+        //Set state of card to not being in the summon zone
+        inSummonZone = false;
+        if (!playedCardReleaseSound)
+        {
+            playedCardReleaseSound = true;
+            audioManager.playCardRelease();
+        }
+
         //If the card beings to player 1
         if (photonView.isMine)
         {
@@ -465,11 +478,19 @@ public abstract class Card : MonoBehaviour
         //handle graveyard effect of this card, if any
         OnGraveyard();
     }
-    //used to hold a cards effect upon being sent to graveyard (if it has any)
+
+    //used to hold a card's effect upon being put into play (if it has any)
+    public virtual void OnCast()
+    {
+        //cast effect goes here
+    }
+
+    //used to hold a card's effect upon being sent to graveyard (if it has any)
     public virtual void OnGraveyard()
     {
         //Graveyard effect goes here
     }
+    
     
 
     //Photon Serialize View
