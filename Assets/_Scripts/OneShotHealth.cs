@@ -64,6 +64,10 @@ public class OneShotHealth : Card
             cardTitleTextBox.text = cardTitle;
         }
         */
+        if (summonZoneTextBox == null)
+        {
+            GetSummonZoneText();
+        }
         if (castTimeTextBox != null)
         {
             castTimeTextBox.text = castTime.ToString();
@@ -92,16 +96,12 @@ public class OneShotHealth : Card
             if (targetSelected == true)
             {
                 
-                //Increment the current Time
+                //Decrement the current Time
                 currentTime -= Time.deltaTime;
-                if (summonZoneTextBox == null)
-                {
-                    GetSummonZoneText();
-                }
-                else
-                {
-                    summonZoneTextBox.text = currentTime.ToString("F1");
-                }
+               
+                //set summon zone text to current time
+                summonZoneTextBox.text = currentTime.ToString("F1");
+                //play card builduup sound when current time is near 0
 				if (currentTime <= 3.25f && !playedCardBuildupSound) 
 				{
 					playedCardBuildupSound = true;
@@ -120,37 +120,10 @@ public class OneShotHealth : Card
             }
 
         }
-        /*
-        //If the card is in the graveyard and manager code hasn't been executed yet
-        if (inGraveyard && doneAddingToGraveyard == false)
-        {
-            
-            //run code for sending card to graveyard
-            //photonView.RPC("SendToGraveyard", PhotonTargets.All);
-
-            
-            SendToGraveyard();  
-        }
-        */
 
     }
 
-    //handles effects of card when sent to graveyard
-    public override void OnGraveyard()
-    {
-        /*
-        targetLine.enabled = false;
-        Debug.Log("Executing OnGraveyard for: "+ gameObject);
-        //Graveyard effect goes here
-        //if this is the local object
-        if (photonView.isMine)
-        {
-            Debug.Log("Dealing damage to : " + currentTarget);
-            localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
-        }
-        */
-
-    }
+    
     //handles card's function upon casting
     public override void OnCast()
     {
