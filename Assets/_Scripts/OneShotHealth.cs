@@ -138,6 +138,12 @@ public class OneShotHealth : Card
             //CREATURE TARGET FUNCTIONS
             if(currentTarget.tag == "CreatureCard")
             {
+                CreatureCard targetCreatureScript = currentTarget.GetComponent<CreatureCard>();
+
+                if(cardEffects.Contains("ReturnCreature"))
+                {
+                    targetCreatureScript.ReturnToHand();
+                }
 
             }
 

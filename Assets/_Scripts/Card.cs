@@ -43,9 +43,13 @@ public abstract class Card : MonoBehaviour
     public int ownerHealthChange;
     //the list of standard abilities a creature has (Rush, Elusive, etc.)
     //to handle abilities, have each possible occurence check if hashset contains ability
-    public HashSet<string> creatureAbilities = new HashSet<string>(); 
+    public HashSet<string> creatureAbilities = new HashSet<string>();
+    //the list of effects a card has
+    //have each possible occurence check if hashset contains effect
+    public HashSet<string> cardEffects = new HashSet<string>();
 
-//END STATS
+
+    //END STATS
 
     //The itemId of the Card (not unique, used to reference custom data)
     public string cardId;
@@ -446,7 +450,7 @@ public abstract class Card : MonoBehaviour
     [PunRPC]
     public void SendToGraveyard()
     {
-        Debug.Log(gameObject + "sent to graveyard");
+        Debug.Log(cardTitle + "sent to graveyard");
        
         //Set this to false to prevent multiple executions of this block
         doneAddingToGraveyard = true;
@@ -468,15 +472,68 @@ public abstract class Card : MonoBehaviour
         if (photonView.isMine)
         {
             //Execute the game manager code
-            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+            localPlayerController.sendToGraveyard(gameObject);
         }
         else
         {      
             //Execute the game manager code
-            networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+            opponentPlayerController.sendToGraveyard(gameObject);
         }
         //handle graveyard effect of this card, if any
         OnGraveyard();
+    }
+    //handles the functions for returning a card to a player's hand
+    public void ReturnToHand()
+    {
+        if(photonView.isMine)
+        {
+            Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");
+
+
+
+            //RESET VARIABLES
+            if (cardType == "Creature")
+            {
+                //get creature script
+                CreatureCard creatureScript = GetComponent<CreatureCard>();
+                //reset creature variables
+                creatureScript.isSelectable = true;
+                creatureScript.isFrozen = false;
+                creatureScript.isAttackable = true;
+                //remove this card from the list of creatures in play
+                localPlayerController.creatureCardsInPlay.Remove(gameObject);
+            }
+
+            //reset the timer
+            currentTime = 0;
+            //Set state of card to being in the graveyard
+            inGraveyard = false;
+            //Set state of card to not being in the summon zone
+            inSummonZone = false;
+            //set graveyard variable to false
+            doneAddingToGraveyard = false;
+            //clear summon zone text box
+            summonZoneTextBox = null;
+            //allow dragging
+            isDraggable = true;
+
+
+            //play card return sound
+            /*
+            if (!playedCardReleaseSound)
+            {
+                playedCardReleaseSound = true;
+                audioManager.playCardRelease();
+            }
+            */
+
+            //RETURN TO HAND
+
+            //Put the card into proper place
+            photonView.RPC("DrawCard", PhotonTargets.All, photonView.viewID);
+        }
+
+
     }
 
     //used to hold a card's effect upon being put into play (if it has any)

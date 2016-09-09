@@ -686,24 +686,11 @@ public class PlayerController : MonoBehaviour
     {
         if (currentHandSize < startingHandSize)
         {
-            //set the first card (starting at index 0) of the players hand to
-            //the first card (starting at index 0) in the players deck
-
-            //library[currentCardIndex].GetComponent<Card>().playerID = playerID; REMOVED!!!
-
-            //drawCard(library[currentCardIndex]);
-
-            //get name of drawn card
-
-            //string cardToDraw = library[currentCardIndex].name; REMOVED!!!
-
+            
             //get the itemid (non-unique) of the card being drawn
-            string itemId = library[currentCardIndex]; //ADDED
+            string itemId = library[currentCardIndex]; 
             //get the prefab name associated with this item id
-            string cardToDraw = PlayFabDataStore.cardPrefabs[itemId]; ///ADDED
-
-            //send name of drawn card to clones
-            //photonView.RPC("drawCard", PhotonTargets.All,cardToDraw);
+            string cardToDraw = PlayFabDataStore.cardPrefabs[itemId]; 
 
             //MODIFIED TO INSTANTIATE ON NETWORK
             //Instantiate the passed card over photon network
