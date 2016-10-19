@@ -567,6 +567,12 @@ public class PlayfabLogin : MonoBehaviour
         });
     }
 
+    //TEMPORARY WAY OF GRANTING TEST DECK EASILY
+    public void OnPressTesterButton()
+    {
+        CreateTestDeck();
+    }
+
 
 
 
