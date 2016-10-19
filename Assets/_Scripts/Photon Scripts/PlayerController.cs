@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     //The speed in seconds in which the player draws a card from the deck
     int libraryDrawSpeed = 7;
     //the number of cards in a player's deck
-    int deckSize = 60;
+    int deckSize = 40;
     //The empty game object for the position of the handzone
     public GameObject handZone;
     //The list of summoning zones
