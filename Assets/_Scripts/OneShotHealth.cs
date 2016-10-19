@@ -128,7 +128,7 @@ public class OneShotHealth : Card
     //handles card's function upon casting
     public override void OnCast()
     {
-        Debug.Log(photonView.owner + " cast "+ cardTitle + " on " + currentTarget.name +" successfully!");
+        //Debug.Log(photonView.owner + " cast "+ cardTitle + " on " + currentTarget.name +" successfully!");
 
         //disable targetting line
         targetLine.enabled = false;
