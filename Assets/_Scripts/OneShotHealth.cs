@@ -64,20 +64,21 @@ public class OneShotHealth : Card
             cardTitleTextBox.text = cardTitle;
         }
         */
-        if (summonZoneTextBox == null)
-        {
-            GetSummonZoneText();
-        }
-        if (castTimeTextBox != null)
-        {
-            castTimeTextBox.text = castTime.ToString();
-        }
+        
         //get references to player objects if not assigned
         GetPlayers();
 
         //If the card is Not in the graveyard and is in the summon zone
         if (!inGraveyard && inSummonZone)
         {
+			if (summonZoneTextBox == null)
+			{
+				GetSummonZoneText();
+			}
+			if (castTimeTextBox != null)
+			{
+				castTimeTextBox.text = castTime.ToString();
+			}
             //IF the current time is larger than or equal to the cast time
             isDraggable = false;
             //allow player to choose target
