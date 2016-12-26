@@ -269,8 +269,9 @@ public class PlayfabLogin : MonoBehaviour
     {
         //wait so user can read success indication
         yield return new WaitForSeconds(2);
-        PhotonNetwork.LoadLevel("Test");
-      
+        //PhotonNetwork.LoadLevel("Test");
+        PhotonNetwork.LoadLevel("RefactorTest");
+
         yield return null;
     }
     //Wait for a set number of seconds in a room for an opponent before leaving

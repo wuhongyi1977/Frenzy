@@ -2,7 +2,16 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
+    //NEW STUFF
+    //child of GameManager, assigned in inspector
+    public Canvas FieldUICanvas; 
+
+
+
+
+
     //bool tracks if player is a network opponent or AI opponent
     public bool versusAi;
     //stored name for AI player
@@ -20,10 +29,15 @@ public class GameManager : MonoBehaviour {
     //The panel and text box for when a player wins or loses
     public GameObject gameEndPanel;
     public Text gameEndText;
-    //NETWORK COMPONENTS
-    //PhotonView photonView;
 
 
+    private void Awake()
+    {
+        
+
+   
+
+}
     // Use this for initialization
     void Start ()
     {
@@ -35,21 +49,7 @@ public class GameManager : MonoBehaviour {
         //get this manager's photon view
         //photonView = GetComponent<PhotonView>();
         StartCoroutine("TimedCall");
-        //if this is the 2nd player joining
-        /*
-        if (!PhotonNetwork.isMasterClient)
-        {
-            photonView.RPC("SpawnPlayers", PhotonTargets.All);
-        }
-        */
-        //PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
-        ///COMMENTED OUT TEMPORARILY SINCE PLAYERCONTROLLERS WILL HANDLE THIS
-        /*
-        player1HealthTextBox = GameObject.Find("Player1HealthBox").GetComponent<Text>();
-        player1HealthTextBox.text = "Life: " + 20;
-        player2HealthTextBox = GameObject.Find("Player2HealthBox").GetComponent<Text>();
-        player2HealthTextBox.text = "Enemy Life: " + 20;
-        */
+       
 
         //set your username to the stored username on playfabdatastore
         player1Username.text = PlayFabDataStore.userName;
@@ -70,11 +70,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 	
-	// Update is called once per frame
-	void Update ()
-    {
-        
-    }
+	
     //TEMP CALL TO SPAWN PLAYERS
     IEnumerator TimedCall()
     {
@@ -182,10 +178,5 @@ public class GameManager : MonoBehaviour {
             PhotonNetwork.Disconnect();
         }
     }
-    /*
-	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-	{
-
-	}
-    */
+   
 }

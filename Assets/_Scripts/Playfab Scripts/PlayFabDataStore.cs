@@ -34,6 +34,7 @@ public class PlayFabDataStore : MonoBehaviour
     public static List<string> cardCollection = new List<string>();
     //all cards item id <itemInstanceId, itemId> (instance id is unique, can be duplicate item id's if it is the same type of card)
     public static Dictionary<string, string> itemIdCollection = new Dictionary<string, string>();
+
     //all card names stored by item id (to reference actual name from item id)
     public static Dictionary<string, string> cardNameList = new Dictionary<string, string>();
 

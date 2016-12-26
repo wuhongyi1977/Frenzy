@@ -9,28 +9,6 @@ public class PlayfabApiCalls : MonoBehaviour
     public static bool cardRetrievalDone = false;
     public static bool deckRetrievalDone = false;
 
-    /*
-    //Access the newest version of cloud script
-    public static void PlayFabInitialize()
-    {
-        var cloudRequest = new GetCloudScriptUrlRequest()
-        {
-            Testing = false
-        };
-
-        PlayFabClientAPI.GetCloudScriptUrl(cloudRequest, (result) =>
-        {
-            Debug.Log("URL is set");
-
-        },
-        (error) =>
-        {
-            Debug.Log("Failed to retrieve Cloud Script URL");
-        });
-    }
-    */
-
-
     public static void RetrieveDecks(string playfabId)
     {
         deckRetrievalDone = false;
@@ -284,7 +262,6 @@ public class PlayfabApiCalls : MonoBehaviour
         PlayFabClientAPI.GetCatalogItems(request, (result) =>
         {
             Debug.Log("Card data retrieved");
-            //Debug.Log(result.Catalog);
             
             foreach (var item in result.Catalog)
             {
