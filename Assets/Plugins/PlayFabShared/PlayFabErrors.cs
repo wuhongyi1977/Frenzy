@@ -247,7 +247,22 @@ namespace PlayFab
         SessionLogNotFound = 1244,
         InvalidSearchTerm = 1245,
         TwoFactorAuthenticationTokenRequired = 1246,
-        GameServerHostCountLimitExceeded = 1247
+        GameServerHostCountLimitExceeded = 1247,
+        PlayerTagCountLimitExceeded = 1248,
+        RequestAlreadyRunning = 1249,
+        ActionGroupNotFound = 1250,
+        MaximumSegmentBulkActionJobsRunning = 1251,
+        NoActionsOnPlayersInSegmentJob = 1252,
+        DuplicateStatisticName = 1253,
+        ScheduledTaskNameConflict = 1254,
+        ScheduledTaskCreateConflict = 1255,
+        InvalidScheduledTaskName = 1256,
+        InvalidTaskSchedule = 1257,
+        SteamNotEnabledForTitle = 1258,
+        LimitNotAnUpgradeOption = 1259,
+        NoSecretKeyEnabledForCloudScript = 1260,
+        TaskNotFound = 1261,
+        TaskInstanceNotFound = 1262
     }
 
     public delegate void ErrorCallback(PlayFabError error);

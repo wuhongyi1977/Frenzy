@@ -13,8 +13,6 @@ namespace PlayFab.Internal
     /// </summary>
     public class PlayFabHttp : SingletonMonoBehaviour<PlayFabHttp>
     {
-        private static readonly StringBuilder Sb = new StringBuilder();
-
         private static IPlayFabHttp _internalHttp; //This is the default;
         private static List<CallRequestContainer> _apiCallQueue = new List<CallRequestContainer>(); // Starts initialized, and is nulled when it's flushed
 
@@ -84,23 +82,20 @@ namespace PlayFab.Internal
             if (_internalHttp == null)
                 _internalHttp = new PlayFabWww();
 
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-            _internalHttp.DevKey = PlayFabSettings.DeveloperSecretKey;
-#endif
             _internalHttp.InitializeHttp();
             CreateInstance(); // Invoke the SingletonMonoBehaviour
         }
 
         /// <summary>
         /// This initializes the GameObject and ensures it is in the scene.
-        /// TODO: Allow redirecting to a custom logger.
         /// </summary>
-        public static void InitializeLogger()
+        public static void InitializeLogger(IPlayFabLogger setLogger = null)
         {
             if (_logger != null)
-                return;
-
-            _logger = new PlayFabLogger();
+                throw new Exception("Once initialized, the logger cannot be reset.");
+            if (setLogger == null)
+                setLogger = new PlayFabLogger();
+            _logger = setLogger;
         }
 
 #if ENABLE_PLAYFABPLAYSTREAM_API && ENABLE_PLAYFABSERVER_API
@@ -149,7 +144,7 @@ namespace PlayFab.Internal
             where TResult : PlayFabResultCommon
         {
             InitializeHttp();
-            SendEvent(request, null, ApiProcessingEventType.Pre);
+            SendEvent(apiEndpoint, request, null, ApiProcessingEventType.Pre);
 
             var reqContainer = new CallRequestContainer();
 #if PLAYFAB_REQUEST_TIMING
@@ -261,50 +256,31 @@ namespace PlayFab.Internal
             return _internalHttp != null && !string.IsNullOrEmpty(_internalHttp.AuthKey);
         }
 
-        protected internal static PlayFabError GeneratePlayFabErrorGeneric(string message, string stacktrace, object customData = null)
+        protected internal static PlayFabError GeneratePlayFabError(string json, object customData)
         {
-            var errorDetails = new Dictionary<string, List<string>>();
-            Sb.Length = 0;
-            Sb.Append(message);
-            if (!string.IsNullOrEmpty(stacktrace))
-            {
-                Sb.Append(" | See stack trace in errorDetails");
-                errorDetails.Add("stacktrace", new List<string>() { stacktrace });
-            }
-            return new PlayFabError()
-            {
-                Error = PlayFabErrorCode.InternalServerError,
-                ErrorMessage = Sb.ToString(),
-                ErrorDetails = errorDetails,
-                CustomData = customData ?? new object()
-            };
-        }
-
-        protected internal static PlayFabError GeneratePlayFabError(string json, object customData = null)
-        {
-            //deserialize the error
-            var errorDict = JsonWrapper.DeserializeObject<JsonObject>(json, PlayFabUtil.ApiSerializerStrategy);
-
+            JsonObject errorDict = null;
             Dictionary<string, List<string>> errorDetails = null;
-            if (errorDict.ContainsKey("errorDetails"))
+            try
             {
-                errorDetails = JsonWrapper.DeserializeObject<Dictionary<string, List<string>>>(errorDict["errorDetails"].ToString());
+                // Deserialize the error
+                errorDict = JsonWrapper.DeserializeObject<JsonObject>(json, PlayFabUtil.ApiSerializerStrategy);
             }
-            //create new error object
+            catch (Exception) { /* Unusual, but shouldn't actually matter */ }
+            try
+            {
+                if (errorDict != null && errorDict.ContainsKey("errorDetails"))
+                    errorDetails = JsonWrapper.DeserializeObject<Dictionary<string, List<string>>>(errorDict["errorDetails"].ToString());
+            }
+            catch (Exception) { /* Unusual, but shouldn't actually matter */ }
+
             return new PlayFabError
             {
-                HttpCode = errorDict.ContainsKey("code") ? Convert.ToInt32(errorDict["code"]) : 400,
-                HttpStatus = errorDict.ContainsKey("status")
-                    ? (string)errorDict["status"]
-                    : "BadRequest",
-                Error = errorDict.ContainsKey("errorCode")
-                    ? (PlayFabErrorCode)Convert.ToInt32(errorDict["errorCode"])
-                    : PlayFabErrorCode.ServiceUnavailable,
-                ErrorMessage = errorDict.ContainsKey("errorMessage")
-                    ? (string)errorDict["errorMessage"]
-                    : string.Empty,
+                HttpCode = errorDict != null && errorDict.ContainsKey("code") ? Convert.ToInt32(errorDict["code"]) : 400,
+                HttpStatus = errorDict != null && errorDict.ContainsKey("status") ? (string)errorDict["status"] : "BadRequest",
+                Error = errorDict != null && errorDict.ContainsKey("errorCode") ? (PlayFabErrorCode)Convert.ToInt32(errorDict["errorCode"]) : PlayFabErrorCode.ServiceUnavailable,
+                ErrorMessage = errorDict != null && errorDict.ContainsKey("errorMessage") ? (string)errorDict["errorMessage"] : json,
                 ErrorDetails = errorDetails,
-                CustomData = customData ?? new object()
+                CustomData = customData
             };
         }
 
@@ -323,7 +299,7 @@ namespace PlayFab.Internal
             }
         }
 
-        protected internal static void SendEvent(PlayFabRequestCommon request, PlayFabResultCommon result, ApiProcessingEventType eventType)
+        protected internal static void SendEvent(string apiEndpoint, PlayFabRequestCommon request, PlayFabResultCommon result, ApiProcessingEventType eventType)
         {
             if (ApiProcessingEventHandler == null)
                 return;
@@ -331,6 +307,7 @@ namespace PlayFab.Internal
             {
                 ApiProcessingEventHandler(new ApiProcessingEventArgs
                 {
+                    ApiEndpoint = apiEndpoint,
                     EventType = eventType,
                     Request = request,
                     Result = result
@@ -365,11 +342,12 @@ namespace PlayFab.Internal
         Post
     }
 
-    public class ApiProcessingEventArgs : EventArgs
+    public class ApiProcessingEventArgs
     {
-        public ApiProcessingEventType EventType { get; set; }
-        public PlayFabRequestCommon Request { get; set; }
-        public PlayFabResultCommon Result { get; set; }
+        public string ApiEndpoint;
+        public ApiProcessingEventType EventType;
+        public PlayFabRequestCommon Request;
+        public PlayFabResultCommon Result;
 
         public TRequest GetRequest<TRequest>() where TRequest : PlayFabRequestCommon
         {

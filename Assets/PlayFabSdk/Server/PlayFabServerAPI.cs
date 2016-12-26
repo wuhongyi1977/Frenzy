@@ -2,6 +2,7 @@
 using System;
 using PlayFab.ServerModels;
 using PlayFab.Internal;
+using PlayFab.Json;
 
 namespace PlayFab
 {
@@ -122,6 +123,16 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Retrieves a list of ranked friends of the given player for the given statistic, starting from the indicated point in the leaderboard
+        /// </summary>
+        public static void GetFriendLeaderboard(GetFriendLeaderboardRequest request, Action<GetLeaderboardResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/GetFriendLeaderboard", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
         /// Retrieves a list of ranked users for the given statistic, starting from the indicated point in the leaderboard
         /// </summary>
         public static void GetLeaderboard(GetLeaderboardRequest request, Action<GetLeaderboardResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -232,17 +243,6 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// Retrieves the details of all title-specific statistics for the user
-        /// </summary>
-        [Obsolete("Use 'GetPlayerStatistics' instead", false)]
-        public static void GetUserStatistics(GetUserStatisticsRequest request, Action<GetUserStatisticsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
-        {
-            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
-
-            PlayFabHttp.MakeApiCall("/Server/GetUserStatistics", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
-        }
-
-        /// <summary>
         /// Updates the values of the specified title-specific statistics for the user
         /// </summary>
         public static void UpdatePlayerStatistics(UpdatePlayerStatisticsRequest request, Action<UpdatePlayerStatisticsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -313,17 +313,6 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// Updates the values of the specified title-specific statistics for the user. By default, clients are not permitted to update statistics. Developers may override this setting in the Game Manager > Settings > API Features.
-        /// </summary>
-        [Obsolete("Use 'UpdatePlayerStatistics' instead", false)]
-        public static void UpdateUserStatistics(UpdateUserStatisticsRequest request, Action<UpdateUserStatisticsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
-        {
-            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
-
-            PlayFabHttp.MakeApiCall("/Server/UpdateUserStatistics", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
-        }
-
-        /// <summary>
         /// Retrieves the specified version of the title's catalog of virtual goods, including all defined properties
         /// </summary>
         public static void GetCatalogItems(GetCatalogItemsRequest request, Action<GetCatalogItemsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -341,6 +330,16 @@ namespace PlayFab
             if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
 
             PlayFabHttp.MakeApiCall("/Server/GetPublisherData", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Retrieves the current server time
+        /// </summary>
+        public static void GetTime(GetTimeRequest request, Action<GetTimeResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/GetTime", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
         }
 
         /// <summary>
@@ -624,6 +623,46 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Adds the Friend user to the friendlist of the user with PlayFabId. At least one of FriendPlayFabId,FriendUsername,FriendEmail, or FriendTitleDisplayName should be initialized.
+        /// </summary>
+        public static void AddFriend(AddFriendRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/AddFriend", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Retrieves the current friends for the user with PlayFabId, constrained to users who have PlayFab accounts. Friends from linked accounts (Facebook, Steam) are also included. You may optionally exclude some linked services' friends.
+        /// </summary>
+        public static void GetFriendsList(GetFriendsListRequest request, Action<GetFriendsListResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/GetFriendsList", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Removes the specified friend from the the user's friend list
+        /// </summary>
+        public static void RemoveFriend(RemoveFriendRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/RemoveFriend", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Inform the matchmaker that a Game Server Instance is removed.
+        /// </summary>
+        public static void DeregisterGame(DeregisterGameRequest request, Action<DeregisterGameResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/DeregisterGame", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
         /// Informs the PlayFab match-making service that the user specified has left the Game Server Instance
         /// </summary>
         public static void NotifyMatchmakerPlayerLeft(NotifyMatchmakerPlayerLeftRequest request, Action<NotifyMatchmakerPlayerLeftResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -641,6 +680,26 @@ namespace PlayFab
             if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
 
             PlayFabHttp.MakeApiCall("/Server/RedeemMatchmakerTicket", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Set the state of the indicated Game Server Instance. Also update the heartbeat for the instance.
+        /// </summary>
+        public static void RefreshGameServerInstanceHeartbeat(RefreshGameServerInstanceHeartbeatRequest request, Action<RefreshGameServerInstanceHeartbeatResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/RefreshGameServerInstanceHeartbeat", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Inform the matchmaker that a new Game Server Instance is added.
+        /// </summary>
+        public static void RegisterGame(RegisterGameRequest request, Action<RegisterGameResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/RegisterGame", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
         }
 
         /// <summary>
@@ -664,6 +723,16 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Set custom tags for the specified Game Server Instance
+        /// </summary>
+        public static void SetGameServerInstanceTags(SetGameServerInstanceTagsRequest request, Action<SetGameServerInstanceTagsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/SetGameServerInstanceTags", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
         /// Awards the specified users the specified Steam achievements
         /// </summary>
         public static void AwardSteamAchievement(AwardSteamAchievementRequest request, Action<AwardSteamAchievementResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -671,17 +740,6 @@ namespace PlayFab
             if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
 
             PlayFabHttp.MakeApiCall("/Server/AwardSteamAchievement", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
-        }
-
-        /// <summary>
-        /// Logs a custom analytics event
-        /// </summary>
-        [Obsolete("Use 'WritePlayerEvent' instead", false)]
-        public static void LogEvent(LogEventRequest request, Action<LogEventResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
-        {
-            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
-
-            PlayFabHttp.MakeApiCall("/Server/LogEvent", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
         }
 
         /// <summary>
@@ -782,6 +840,24 @@ namespace PlayFab
             if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
 
             PlayFabHttp.MakeApiCall("/Server/ExecuteCloudScript", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        public static void ExecuteCloudScript<TOut>(ExecuteCloudScriptServerRequest request, Action<ExecuteCloudScriptResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+        Action<ExecuteCloudScriptResult> wrappedResultCallback = (wrappedResult) =>
+        {
+            var wrappedJson = JsonWrapper.SerializeObject(wrappedResult.FunctionResult, PlayFabUtil.ApiSerializerStrategy);
+            try {
+                wrappedResult.FunctionResult = JsonWrapper.DeserializeObject<TOut>(wrappedJson, PlayFabUtil.ApiSerializerStrategy);
+            }
+            catch (Exception)
+            {
+                wrappedResult.FunctionResult = wrappedJson;
+                wrappedResult.Logs.Add(new LogStatement{ Level = "Warning", Data = wrappedJson, Message = "Sdk Message: Could not deserialize result as: " + typeof (TOut).Name });
+            }
+            resultCallback(wrappedResult);
+        };
+        ExecuteCloudScript(request, wrappedResultCallback, errorCallback, customData);
         }
 
         /// <summary>
@@ -935,6 +1011,26 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Adds a given tag to a player profile. The tag's namespace is automatically generated based on the source of the tag.
+        /// </summary>
+        public static void AddPlayerTag(AddPlayerTagRequest request, Action<AddPlayerTagResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/AddPlayerTag", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Retrieve a list of all PlayStream actions groups.
+        /// </summary>
+        public static void GetAllActionGroups(GetAllActionGroupsRequest request, Action<GetAllActionGroupsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/GetAllActionGroups", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
         /// Retrieves an array of player segment definitions. Results from this can be used in subsequent API calls such as GetPlayersInSegment which requires a Segment ID. While segment names can change the ID for that segment will not change.
         /// </summary>
         public static void GetAllSegments(GetAllSegmentsRequest request, Action<GetAllSegmentsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -962,6 +1058,26 @@ namespace PlayFab
             if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
 
             PlayFabHttp.MakeApiCall("/Server/GetPlayersInSegment", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Get all tags with a given Namespace (optional) from a player profile.
+        /// </summary>
+        public static void GetPlayerTags(GetPlayerTagsRequest request, Action<GetPlayerTagsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/GetPlayerTags", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Remove a given tag from a player profile. The tag's namespace is automatically generated based on the source of the tag.
+        /// </summary>
+        public static void RemovePlayerTag(RemovePlayerTagRequest request, Action<RemovePlayerTagResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Server/RemovePlayerTag", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
         }
 
 

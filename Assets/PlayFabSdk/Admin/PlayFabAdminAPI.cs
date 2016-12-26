@@ -2,6 +2,7 @@
 using System;
 using PlayFab.AdminModels;
 using PlayFab.Internal;
+using PlayFab.Json;
 
 namespace PlayFab
 {
@@ -10,6 +11,26 @@ namespace PlayFab
     /// </summary>
     public static class PlayFabAdminAPI
     {
+
+        /// <summary>
+        /// Gets the requested policy.
+        /// </summary>
+        public static void GetPolicy(GetPolicyRequest request, Action<GetPolicyResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/GetPolicy", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Changes a policy for a title
+        /// </summary>
+        public static void UpdatePolicy(UpdatePolicyRequest request, Action<UpdatePolicyResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/UpdatePolicy", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
 
         /// <summary>
         /// Bans users by PlayFab ID with optional IP address, or MAC address for the provided game.
@@ -112,7 +133,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// Deletes the users for the provided game. Deletes custom data, all account linkages, and statistics.
+        /// Deletes the users for the provided game. Deletes custom data, all account linkages, and statistics. This method does not remove the player's event history, login history, inventory items, nor virtual currencies.
         /// </summary>
         public static void DeleteUsers(DeleteUsersRequest request, Action<DeleteUsersResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
         {
@@ -222,6 +243,16 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Attempts to process an order refund through the original real money payment provider.
+        /// </summary>
+        public static void RefundPurchase(RefundPurchaseRequest request, Action<RefundPurchaseResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/RefundPurchase", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
         /// Completely removes all statistics for the specified user, for the current game
         /// </summary>
         public static void ResetUserStatistics(ResetUserStatisticsRequest request, Action<ResetUserStatisticsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -229,6 +260,16 @@ namespace PlayFab
             if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
 
             PlayFabHttp.MakeApiCall("/Admin/ResetUserStatistics", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Attempts to resolve a dispute with the original order's payment provider.
+        /// </summary>
+        public static void ResolvePurchaseDispute(ResolvePurchaseDisputeRequest request, Action<ResolvePurchaseDisputeResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/ResolvePurchaseDispute", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
         }
 
         /// <summary>
@@ -722,6 +763,26 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Adds a given tag to a player profile. The tag's namespace is automatically generated based on the source of the tag.
+        /// </summary>
+        public static void AddPlayerTag(AddPlayerTagRequest request, Action<AddPlayerTagResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/AddPlayerTag", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Retrieve a list of all PlayStream actions groups.
+        /// </summary>
+        public static void GetAllActionGroups(GetAllActionGroupsRequest request, Action<GetAllActionGroupsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/GetAllActionGroups", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
         /// Retrieves an array of player segment definitions. Results from this can be used in subsequent API calls such as GetPlayersInSegment which requires a Segment ID. While segment names can change the ID for that segment will not change.
         /// </summary>
         public static void GetAllSegments(GetAllSegmentsRequest request, Action<GetAllSegmentsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
@@ -749,6 +810,126 @@ namespace PlayFab
             if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
 
             PlayFabHttp.MakeApiCall("/Admin/GetPlayersInSegment", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Get all tags with a given Namespace (optional) from a player profile.
+        /// </summary>
+        public static void GetPlayerTags(GetPlayerTagsRequest request, Action<GetPlayerTagsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/GetPlayerTags", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Remove a given tag from a player profile. The tag's namespace is automatically generated based on the source of the tag.
+        /// </summary>
+        public static void RemovePlayerTag(RemovePlayerTagRequest request, Action<RemovePlayerTagResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/RemovePlayerTag", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Abort an ongoing task instance.
+        /// </summary>
+        public static void AbortTaskInstance(AbortTaskInstanceRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/AbortTaskInstance", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Create an ActionsOnPlayersInSegment task, which iterates through all players in a segment to execute action.
+        /// </summary>
+        public static void CreateActionsOnPlayersInSegmentTask(CreateActionsOnPlayerSegmentTaskRequest request, Action<CreateTaskResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/CreateActionsOnPlayersInSegmentTask", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Create a CloudScript task, which can run a CloudScript on a schedule.
+        /// </summary>
+        public static void CreateCloudScriptTask(CreateCloudScriptTaskRequest request, Action<CreateTaskResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/CreateCloudScriptTask", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Delete a task.
+        /// </summary>
+        public static void DeleteTask(DeleteTaskRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/DeleteTask", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Get information about a ActionsOnPlayersInSegment task instance.
+        /// </summary>
+        public static void GetActionsOnPlayersInSegmentTaskInstance(GetTaskInstanceRequest request, Action<GetActionsOnPlayersInSegmentTaskInstanceResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/GetActionsOnPlayersInSegmentTaskInstance", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Get detail information about a CloudScript task instance.
+        /// </summary>
+        public static void GetCloudScriptTaskInstance(GetTaskInstanceRequest request, Action<GetCloudScriptTaskInstanceResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/GetCloudScriptTaskInstance", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Query for task instances by task, status, or time range.
+        /// </summary>
+        public static void GetTaskInstances(GetTaskInstancesRequest request, Action<GetTaskInstancesResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/GetTaskInstances", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Get definition information on a specified task or all tasks within a title.
+        /// </summary>
+        public static void GetTasks(GetTasksRequest request, Action<GetTasksResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/GetTasks", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Run a task immediately regardless of its schedule.
+        /// </summary>
+        public static void RunTask(RunTaskRequest request, Action<RunTaskResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/RunTask", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
+        }
+
+        /// <summary>
+        /// Update an existing task.
+        /// </summary>
+        public static void UpdateTask(UpdateTaskRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null)
+        {
+            if (PlayFabSettings.DeveloperSecretKey == null) throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+            PlayFabHttp.MakeApiCall("/Admin/UpdateTask", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData);
         }
 
 

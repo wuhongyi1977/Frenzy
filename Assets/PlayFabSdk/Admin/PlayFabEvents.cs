@@ -5,6 +5,10 @@ namespace PlayFab.Events
 {
     public partial class PlayFabEvents
     {
+        public event PlayFabRequestEvent<GetPolicyRequest> OnAdminGetPolicyRequestEvent;
+        public event PlayFabResultEvent<GetPolicyResponse> OnAdminGetPolicyResultEvent;
+        public event PlayFabRequestEvent<UpdatePolicyRequest> OnAdminUpdatePolicyRequestEvent;
+        public event PlayFabResultEvent<UpdatePolicyResponse> OnAdminUpdatePolicyResultEvent;
         public event PlayFabRequestEvent<BanUsersRequest> OnAdminBanUsersRequestEvent;
         public event PlayFabResultEvent<BanUsersResult> OnAdminBanUsersResultEvent;
         public event PlayFabRequestEvent<LookupUserAccountInfoRequest> OnAdminGetUserAccountInfoRequestEvent;
@@ -47,8 +51,12 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<GetUserDataResult> OnAdminGetUserReadOnlyDataResultEvent;
         public event PlayFabRequestEvent<IncrementPlayerStatisticVersionRequest> OnAdminIncrementPlayerStatisticVersionRequestEvent;
         public event PlayFabResultEvent<IncrementPlayerStatisticVersionResult> OnAdminIncrementPlayerStatisticVersionResultEvent;
+        public event PlayFabRequestEvent<RefundPurchaseRequest> OnAdminRefundPurchaseRequestEvent;
+        public event PlayFabResultEvent<RefundPurchaseResponse> OnAdminRefundPurchaseResultEvent;
         public event PlayFabRequestEvent<ResetUserStatisticsRequest> OnAdminResetUserStatisticsRequestEvent;
         public event PlayFabResultEvent<ResetUserStatisticsResult> OnAdminResetUserStatisticsResultEvent;
+        public event PlayFabRequestEvent<ResolvePurchaseDisputeRequest> OnAdminResolvePurchaseDisputeRequestEvent;
+        public event PlayFabResultEvent<ResolvePurchaseDisputeResponse> OnAdminResolvePurchaseDisputeResultEvent;
         public event PlayFabRequestEvent<UpdatePlayerStatisticDefinitionRequest> OnAdminUpdatePlayerStatisticDefinitionRequestEvent;
         public event PlayFabResultEvent<UpdatePlayerStatisticDefinitionResult> OnAdminUpdatePlayerStatisticDefinitionResultEvent;
         public event PlayFabRequestEvent<UpdateUserDataRequest> OnAdminUpdateUserDataRequestEvent;
@@ -147,12 +155,40 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<GetContentUploadUrlResult> OnAdminGetContentUploadUrlResultEvent;
         public event PlayFabRequestEvent<ResetCharacterStatisticsRequest> OnAdminResetCharacterStatisticsRequestEvent;
         public event PlayFabResultEvent<ResetCharacterStatisticsResult> OnAdminResetCharacterStatisticsResultEvent;
+        public event PlayFabRequestEvent<AddPlayerTagRequest> OnAdminAddPlayerTagRequestEvent;
+        public event PlayFabResultEvent<AddPlayerTagResult> OnAdminAddPlayerTagResultEvent;
+        public event PlayFabRequestEvent<GetAllActionGroupsRequest> OnAdminGetAllActionGroupsRequestEvent;
+        public event PlayFabResultEvent<GetAllActionGroupsResult> OnAdminGetAllActionGroupsResultEvent;
         public event PlayFabRequestEvent<GetAllSegmentsRequest> OnAdminGetAllSegmentsRequestEvent;
         public event PlayFabResultEvent<GetAllSegmentsResult> OnAdminGetAllSegmentsResultEvent;
         public event PlayFabRequestEvent<GetPlayersSegmentsRequest> OnAdminGetPlayerSegmentsRequestEvent;
         public event PlayFabResultEvent<GetPlayerSegmentsResult> OnAdminGetPlayerSegmentsResultEvent;
         public event PlayFabRequestEvent<GetPlayersInSegmentRequest> OnAdminGetPlayersInSegmentRequestEvent;
         public event PlayFabResultEvent<GetPlayersInSegmentResult> OnAdminGetPlayersInSegmentResultEvent;
+        public event PlayFabRequestEvent<GetPlayerTagsRequest> OnAdminGetPlayerTagsRequestEvent;
+        public event PlayFabResultEvent<GetPlayerTagsResult> OnAdminGetPlayerTagsResultEvent;
+        public event PlayFabRequestEvent<RemovePlayerTagRequest> OnAdminRemovePlayerTagRequestEvent;
+        public event PlayFabResultEvent<RemovePlayerTagResult> OnAdminRemovePlayerTagResultEvent;
+        public event PlayFabRequestEvent<AbortTaskInstanceRequest> OnAdminAbortTaskInstanceRequestEvent;
+        public event PlayFabResultEvent<EmptyResult> OnAdminAbortTaskInstanceResultEvent;
+        public event PlayFabRequestEvent<CreateActionsOnPlayerSegmentTaskRequest> OnAdminCreateActionsOnPlayersInSegmentTaskRequestEvent;
+        public event PlayFabResultEvent<CreateTaskResult> OnAdminCreateActionsOnPlayersInSegmentTaskResultEvent;
+        public event PlayFabRequestEvent<CreateCloudScriptTaskRequest> OnAdminCreateCloudScriptTaskRequestEvent;
+        public event PlayFabResultEvent<CreateTaskResult> OnAdminCreateCloudScriptTaskResultEvent;
+        public event PlayFabRequestEvent<DeleteTaskRequest> OnAdminDeleteTaskRequestEvent;
+        public event PlayFabResultEvent<EmptyResult> OnAdminDeleteTaskResultEvent;
+        public event PlayFabRequestEvent<GetTaskInstanceRequest> OnAdminGetActionsOnPlayersInSegmentTaskInstanceRequestEvent;
+        public event PlayFabResultEvent<GetActionsOnPlayersInSegmentTaskInstanceResult> OnAdminGetActionsOnPlayersInSegmentTaskInstanceResultEvent;
+        public event PlayFabRequestEvent<GetTaskInstanceRequest> OnAdminGetCloudScriptTaskInstanceRequestEvent;
+        public event PlayFabResultEvent<GetCloudScriptTaskInstanceResult> OnAdminGetCloudScriptTaskInstanceResultEvent;
+        public event PlayFabRequestEvent<GetTaskInstancesRequest> OnAdminGetTaskInstancesRequestEvent;
+        public event PlayFabResultEvent<GetTaskInstancesResult> OnAdminGetTaskInstancesResultEvent;
+        public event PlayFabRequestEvent<GetTasksRequest> OnAdminGetTasksRequestEvent;
+        public event PlayFabResultEvent<GetTasksResult> OnAdminGetTasksResultEvent;
+        public event PlayFabRequestEvent<RunTaskRequest> OnAdminRunTaskRequestEvent;
+        public event PlayFabResultEvent<RunTaskResult> OnAdminRunTaskResultEvent;
+        public event PlayFabRequestEvent<UpdateTaskRequest> OnAdminUpdateTaskRequestEvent;
+        public event PlayFabResultEvent<EmptyResult> OnAdminUpdateTaskResultEvent;
     }
 }
 #endif

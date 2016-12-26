@@ -17,7 +17,6 @@ namespace PlayFab.Internal
         private int _pendingWwwMessages = 0;
         public bool SessionStarted { get; set; }
         public string AuthKey { get; set; }
-        public string DevKey { get; set; }
 
         public void InitializeHttp() { }
         public void Update() { }
@@ -29,7 +28,9 @@ namespace PlayFab.Internal
             var headers = new Dictionary<string, string> { { "Content-Type", "application/json" } };
             if (reqContainer.AuthKey == AuthType.DevSecretKey)
             {
-                headers.Add("X-SecretKey", DevKey);
+#if ENABLE_PLAYFABSERVER_API || ENABLE_PLAYFABADMIN_API
+                headers.Add("X-SecretKey", PlayFabSettings.DeveloperSecretKey);
+#endif
             }
             else if (reqContainer.AuthKey == AuthType.LoginSession)
             {
@@ -100,16 +101,10 @@ namespace PlayFab.Internal
                         {
                             PlayFabIdfa.OnPlayFabLogin();
                         }
-
-                        var cloudScriptUrl = reqContainer.ApiResult as ClientModels.GetCloudScriptUrlResult;
-                        if (cloudScriptUrl != null)
-                        {
-                            PlayFabSettings.LogicServerUrl = cloudScriptUrl.Url;
-                        }
 #endif
                         try
                         {
-                            PlayFabHttp.SendEvent(reqContainer.ApiRequest, reqContainer.ApiResult, ApiProcessingEventType.Post);
+                            PlayFabHttp.SendEvent(reqContainer.ApiEndpoint, reqContainer.ApiRequest, reqContainer.ApiResult, ApiProcessingEventType.Post);
                         }
                         catch (Exception e)
                         {
@@ -153,9 +148,10 @@ namespace PlayFab.Internal
 
             Action<string> wwwErrorCallback = (errorCb) =>
             {
+                reqContainer.JsonResponse = errorCb;
                 if (reqContainer.ErrorCallback != null)
                 {
-                    reqContainer.Error = PlayFabHttp.GeneratePlayFabErrorGeneric(errorCb, null, reqContainer.CustomData);
+                    reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.JsonResponse, reqContainer.CustomData);
                     PlayFabHttp.SendErrorEvent(reqContainer.ApiRequest, reqContainer.Error);
                     reqContainer.ErrorCallback(reqContainer.Error);
                 }
@@ -173,10 +169,11 @@ namespace PlayFab.Internal
             }
             else
             {
-#if !UNITY_WSA && !UNITY_WP8 && !UNITY_WEBGL
-                if (PlayFabSettings.CompressApiData)
+                try
                 {
-                    try
+#if !UNITY_WSA && !UNITY_WP8 && !UNITY_WEBGL
+                    string encoding;
+                    if (www.responseHeaders.TryGetValue("Content-Encoding", out encoding) && encoding.ToLower() == "gzip")
                     {
                         var stream = new MemoryStream(www.bytes);
                         using (var gZipStream = new GZipStream(stream, CompressionMode.Decompress, false))
@@ -197,19 +194,16 @@ namespace PlayFab.Internal
                             }
                         }
                     }
-                    catch
+                    else
+#endif
                     {
-                        //if this was not a valid GZip response, then send the message back as text to the call back.
                         wwwSuccessCallback(www.text);
                     }
                 }
-                else
+                catch (Exception e)
                 {
-#endif
-                    wwwSuccessCallback(www.text);
-#if !UNITY_WSA && !UNITY_WP8 && !UNITY_WEBGL
+                    wwwErrorCallback("Unhandled error in PlayFabWWW: " + e);
                 }
-#endif
             }
         }
 

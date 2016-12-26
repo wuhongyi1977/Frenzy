@@ -27,6 +27,8 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<UpdateBansResult> OnServerUpdateBansResultEvent;
         public event PlayFabRequestEvent<DeleteUsersRequest> OnServerDeleteUsersRequestEvent;
         public event PlayFabResultEvent<DeleteUsersResult> OnServerDeleteUsersResultEvent;
+        public event PlayFabRequestEvent<GetFriendLeaderboardRequest> OnServerGetFriendLeaderboardRequestEvent;
+        public event PlayFabResultEvent<GetLeaderboardResult> OnServerGetFriendLeaderboardResultEvent;
         public event PlayFabRequestEvent<GetLeaderboardRequest> OnServerGetLeaderboardRequestEvent;
         public event PlayFabResultEvent<GetLeaderboardResult> OnServerGetLeaderboardResultEvent;
         public event PlayFabRequestEvent<GetLeaderboardAroundUserRequest> OnServerGetLeaderboardAroundUserRequestEvent;
@@ -49,8 +51,6 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<GetUserDataResult> OnServerGetUserPublisherReadOnlyDataResultEvent;
         public event PlayFabRequestEvent<GetUserDataRequest> OnServerGetUserReadOnlyDataRequestEvent;
         public event PlayFabResultEvent<GetUserDataResult> OnServerGetUserReadOnlyDataResultEvent;
-        public event PlayFabRequestEvent<GetUserStatisticsRequest> OnServerGetUserStatisticsRequestEvent;
-        public event PlayFabResultEvent<GetUserStatisticsResult> OnServerGetUserStatisticsResultEvent;
         public event PlayFabRequestEvent<UpdatePlayerStatisticsRequest> OnServerUpdatePlayerStatisticsRequestEvent;
         public event PlayFabResultEvent<UpdatePlayerStatisticsResult> OnServerUpdatePlayerStatisticsResultEvent;
         public event PlayFabRequestEvent<UpdateUserDataRequest> OnServerUpdateUserDataRequestEvent;
@@ -65,12 +65,12 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<UpdateUserDataResult> OnServerUpdateUserPublisherReadOnlyDataResultEvent;
         public event PlayFabRequestEvent<UpdateUserDataRequest> OnServerUpdateUserReadOnlyDataRequestEvent;
         public event PlayFabResultEvent<UpdateUserDataResult> OnServerUpdateUserReadOnlyDataResultEvent;
-        public event PlayFabRequestEvent<UpdateUserStatisticsRequest> OnServerUpdateUserStatisticsRequestEvent;
-        public event PlayFabResultEvent<UpdateUserStatisticsResult> OnServerUpdateUserStatisticsResultEvent;
         public event PlayFabRequestEvent<GetCatalogItemsRequest> OnServerGetCatalogItemsRequestEvent;
         public event PlayFabResultEvent<GetCatalogItemsResult> OnServerGetCatalogItemsResultEvent;
         public event PlayFabRequestEvent<GetPublisherDataRequest> OnServerGetPublisherDataRequestEvent;
         public event PlayFabResultEvent<GetPublisherDataResult> OnServerGetPublisherDataResultEvent;
+        public event PlayFabRequestEvent<GetTimeRequest> OnServerGetTimeRequestEvent;
+        public event PlayFabResultEvent<GetTimeResult> OnServerGetTimeResultEvent;
         public event PlayFabRequestEvent<GetTitleDataRequest> OnServerGetTitleDataRequestEvent;
         public event PlayFabResultEvent<GetTitleDataResult> OnServerGetTitleDataResultEvent;
         public event PlayFabRequestEvent<GetTitleDataRequest> OnServerGetTitleInternalDataRequestEvent;
@@ -127,18 +127,30 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<UnlockContainerItemResult> OnServerUnlockContainerItemResultEvent;
         public event PlayFabRequestEvent<UpdateUserInventoryItemDataRequest> OnServerUpdateUserInventoryItemCustomDataRequestEvent;
         public event PlayFabResultEvent<EmptyResult> OnServerUpdateUserInventoryItemCustomDataResultEvent;
+        public event PlayFabRequestEvent<AddFriendRequest> OnServerAddFriendRequestEvent;
+        public event PlayFabResultEvent<EmptyResult> OnServerAddFriendResultEvent;
+        public event PlayFabRequestEvent<GetFriendsListRequest> OnServerGetFriendsListRequestEvent;
+        public event PlayFabResultEvent<GetFriendsListResult> OnServerGetFriendsListResultEvent;
+        public event PlayFabRequestEvent<RemoveFriendRequest> OnServerRemoveFriendRequestEvent;
+        public event PlayFabResultEvent<EmptyResult> OnServerRemoveFriendResultEvent;
+        public event PlayFabRequestEvent<DeregisterGameRequest> OnServerDeregisterGameRequestEvent;
+        public event PlayFabResultEvent<DeregisterGameResponse> OnServerDeregisterGameResultEvent;
         public event PlayFabRequestEvent<NotifyMatchmakerPlayerLeftRequest> OnServerNotifyMatchmakerPlayerLeftRequestEvent;
         public event PlayFabResultEvent<NotifyMatchmakerPlayerLeftResult> OnServerNotifyMatchmakerPlayerLeftResultEvent;
         public event PlayFabRequestEvent<RedeemMatchmakerTicketRequest> OnServerRedeemMatchmakerTicketRequestEvent;
         public event PlayFabResultEvent<RedeemMatchmakerTicketResult> OnServerRedeemMatchmakerTicketResultEvent;
+        public event PlayFabRequestEvent<RefreshGameServerInstanceHeartbeatRequest> OnServerRefreshGameServerInstanceHeartbeatRequestEvent;
+        public event PlayFabResultEvent<RefreshGameServerInstanceHeartbeatResult> OnServerRefreshGameServerInstanceHeartbeatResultEvent;
+        public event PlayFabRequestEvent<RegisterGameRequest> OnServerRegisterGameRequestEvent;
+        public event PlayFabResultEvent<RegisterGameResponse> OnServerRegisterGameResultEvent;
         public event PlayFabRequestEvent<SetGameServerInstanceDataRequest> OnServerSetGameServerInstanceDataRequestEvent;
         public event PlayFabResultEvent<SetGameServerInstanceDataResult> OnServerSetGameServerInstanceDataResultEvent;
         public event PlayFabRequestEvent<SetGameServerInstanceStateRequest> OnServerSetGameServerInstanceStateRequestEvent;
         public event PlayFabResultEvent<SetGameServerInstanceStateResult> OnServerSetGameServerInstanceStateResultEvent;
+        public event PlayFabRequestEvent<SetGameServerInstanceTagsRequest> OnServerSetGameServerInstanceTagsRequestEvent;
+        public event PlayFabResultEvent<SetGameServerInstanceTagsResult> OnServerSetGameServerInstanceTagsResultEvent;
         public event PlayFabRequestEvent<AwardSteamAchievementRequest> OnServerAwardSteamAchievementRequestEvent;
         public event PlayFabResultEvent<AwardSteamAchievementResult> OnServerAwardSteamAchievementResultEvent;
-        public event PlayFabRequestEvent<LogEventRequest> OnServerLogEventRequestEvent;
-        public event PlayFabResultEvent<LogEventResult> OnServerLogEventResultEvent;
         public event PlayFabRequestEvent<WriteServerCharacterEventRequest> OnServerWriteCharacterEventRequestEvent;
         public event PlayFabResultEvent<WriteEventResponse> OnServerWriteCharacterEventResultEvent;
         public event PlayFabRequestEvent<WriteServerPlayerEventRequest> OnServerWritePlayerEventRequestEvent;
@@ -189,12 +201,20 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<UpdateCharacterDataResult> OnServerUpdateCharacterInternalDataResultEvent;
         public event PlayFabRequestEvent<UpdateCharacterDataRequest> OnServerUpdateCharacterReadOnlyDataRequestEvent;
         public event PlayFabResultEvent<UpdateCharacterDataResult> OnServerUpdateCharacterReadOnlyDataResultEvent;
+        public event PlayFabRequestEvent<AddPlayerTagRequest> OnServerAddPlayerTagRequestEvent;
+        public event PlayFabResultEvent<AddPlayerTagResult> OnServerAddPlayerTagResultEvent;
+        public event PlayFabRequestEvent<GetAllActionGroupsRequest> OnServerGetAllActionGroupsRequestEvent;
+        public event PlayFabResultEvent<GetAllActionGroupsResult> OnServerGetAllActionGroupsResultEvent;
         public event PlayFabRequestEvent<GetAllSegmentsRequest> OnServerGetAllSegmentsRequestEvent;
         public event PlayFabResultEvent<GetAllSegmentsResult> OnServerGetAllSegmentsResultEvent;
         public event PlayFabRequestEvent<GetPlayersSegmentsRequest> OnServerGetPlayerSegmentsRequestEvent;
         public event PlayFabResultEvent<GetPlayerSegmentsResult> OnServerGetPlayerSegmentsResultEvent;
         public event PlayFabRequestEvent<GetPlayersInSegmentRequest> OnServerGetPlayersInSegmentRequestEvent;
         public event PlayFabResultEvent<GetPlayersInSegmentResult> OnServerGetPlayersInSegmentResultEvent;
+        public event PlayFabRequestEvent<GetPlayerTagsRequest> OnServerGetPlayerTagsRequestEvent;
+        public event PlayFabResultEvent<GetPlayerTagsResult> OnServerGetPlayerTagsResultEvent;
+        public event PlayFabRequestEvent<RemovePlayerTagRequest> OnServerRemovePlayerTagRequestEvent;
+        public event PlayFabResultEvent<RemovePlayerTagResult> OnServerRemovePlayerTagResultEvent;
     }
 }
 #endif
