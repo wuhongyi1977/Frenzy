@@ -15,7 +15,7 @@ public class BasicCreatureCard : Card
     protected bool stopCastingTimer = false;
     public bool creatureCanAttack = false;
     protected float creatureAttackSpeedTimer;
-    public Text[] textBoxes;
+    //public Text[] textBoxes;
     private Text creatureStatsTextBox;
     public bool inBattlefield = false;
 

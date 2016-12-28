@@ -15,9 +15,9 @@ public class CreatureCard : Card
     protected bool stopCastingTimer = false;
     public bool creatureCanAttack = false;
     protected float creatureAttackSpeedTimer;
-    public Text[] textBoxes;
+    //public Text[] textBoxes;
     private Text creatureStatsTextBox;
-    public bool inBattlefield = false;
+	public bool inBattlefield;
 
     public int increaseDamageAmount, increaseAttackSpeedAmount, increaseHealthAmount;
     private int startingDamage, startingHealth;
@@ -67,6 +67,7 @@ public class CreatureCard : Card
         //startingAttackSpeed = attackSpeed;
         //startingHealth = health;
         */
+		inBattlefield = false;
         isSelectable = true;
         isFrozen = false;
         isAttackable = true;
@@ -139,70 +140,71 @@ public class CreatureCard : Card
 				playedCardBuildUpOnce = true;
 				audioManager.playCardBuildUp ();
 			}
-            if (currentTime <= 0)
-            {
-                if (!stopCastingTimer)
-                {
-                    stopCastingTimer = true;
-                    summonZoneTextBox.text = "";
-                    if (creatureAbilities.Contains("Rush"))
-                    {
-                        creatureCanAttack = true;
-                    }                      
-                    inBattlefield = true;
-                    //call the event that a creature has entered the battlefield
-                    localPlayer.GetComponent<PlayerController>().creatureEntered();
-					//reset the bool to allow the Pickup sound to play again when the player picks up another card
-					playedCardPickupSound = false;
-					audioManager.playCardRelease ();
-                }
-
-                if (creatureCanAttack == false)
-                {
-						
-                    creatureAttackSpeedTimer -= Time.deltaTime;
-                    summonZoneTextBox.text = creatureAttackSpeedTimer.ToString("F1");
-					if (creatureAttackSpeedTimer <= 3.25f && !playedCardBuildupSound) 
-					{
-						audioManager.playCardBuildUp ();
-						playedCardBuildupSound = true;
+			if (currentTime <= 0) {
+				//if the opponent has more than one counter cards
+				if (opponentPlayerController.getNumberOfCounterCards() > 0 && inBattlefield == false) 
+				{
+					//resolve countering card
+					Debug.Log(cardTitle + " got countered");
+					setGraveyardVariables();
+					opponentPlayerController.decreaseNumbCounterCards ();
+				} 
+				else 
+				{
+					if (!stopCastingTimer) {
+						stopCastingTimer = true;
+						summonZoneTextBox.text = "";
+						if (creatureAbilities.Contains ("Rush")) {
+							creatureCanAttack = true;
+						}                      
+						inBattlefield = true;
+						//call the event that a creature has entered the battlefield
+						localPlayer.GetComponent<PlayerController> ().creatureEntered ();
+						//reset the bool to allow the Pickup sound to play again when the player picks up another card
+						playedCardPickupSound = false;
+						audioManager.playCardRelease ();
 					}
-                    if (creatureAttackSpeedTimer < 0)
-                    {
-                        summonZoneTextBox.text = "";
-                        creatureCanAttack = true;
-						playedCardBuildupSound = false;
-                        creatureAttackSpeedTimer = attackSpeed;
-                    }
-                }
 
-                //Add code here to deal damage to creature or player
-                if (health <= 0 && !inGraveyard)
-                {
-                    summonZoneTextBox.text = "";
-                    inGraveyard = true;
-                    inSummonZone = false;
-                    inBattlefield = false;
-                    creatureCanAttack = false;
-                    //reset creature's stats to default
-                    damageToDeal = startingDamage;
-                    attackSpeed = startingAttackSpeed;
-                    health = startingHealth;
-                    //if this is the local card object
-                    if (photonView.isMine)
-                    {
-                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
-                        localPlayer.GetComponent<PlayerController>().creatureDied();
+					if (creatureCanAttack == false) {
+						
+						creatureAttackSpeedTimer -= Time.deltaTime;
+						summonZoneTextBox.text = creatureAttackSpeedTimer.ToString ("F1");
+						if (creatureAttackSpeedTimer <= 3.25f && !playedCardBuildupSound) {
+							audioManager.playCardBuildUp ();
+							playedCardBuildupSound = true;
+						}
+						if (creatureAttackSpeedTimer < 0) {
+							summonZoneTextBox.text = "";
+							creatureCanAttack = true;
+							playedCardBuildupSound = false;
+							creatureAttackSpeedTimer = attackSpeed;
+						}
+					}
 
-                    }
-                    else
-                    {
-                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
-                        networkOpponent.GetComponent<PlayerController>().creatureDied();
+					//Add code here to deal damage to creature or player
+					if (health <= 0 && !inGraveyard) {
+						summonZoneTextBox.text = "";
+						inGraveyard = true;
+						inSummonZone = false;
+						inBattlefield = false;
+						creatureCanAttack = false;
+						//reset creature's stats to default
+						damageToDeal = startingDamage;
+						attackSpeed = startingAttackSpeed;
+						health = startingHealth;
+						//if this is the local card object
+						if (photonView.isMine) {
+							localPlayer.GetComponent<PlayerController> ().sendToGraveyard (gameObject);
+							localPlayer.GetComponent<PlayerController> ().creatureDied ();
 
-                    }
-                }
-            }
+						} else {
+							networkOpponent.GetComponent<PlayerController> ().sendToGraveyard (gameObject);
+							networkOpponent.GetComponent<PlayerController> ().creatureDied ();
+
+						}
+					}
+				}
+			}
         }
     }
     public override void OnMouseDown()
@@ -395,4 +397,25 @@ public class CreatureCard : Card
 
 
     }
+	public override void setGraveyardVariables ()
+	{
+		base.setGraveyardVariables ();
+		summonZoneTextBox.text = "";
+		inBattlefield = false;
+		creatureCanAttack = false;
+		//reset creature's stats to default
+		damageToDeal = startingDamage;
+		attackSpeed = startingAttackSpeed;
+		health = startingHealth;
+		//if this is the local card object
+		if (photonView.isMine) {
+			localPlayer.GetComponent<PlayerController> ().sendToGraveyard (gameObject);
+			//localPlayer.GetComponent<PlayerController> ().creatureDied ();
+
+		} else {
+			networkOpponent.GetComponent<PlayerController> ().sendToGraveyard (gameObject);
+			//networkOpponent.GetComponent<PlayerController> ().creatureDied ();
+
+		}
+	}
 }

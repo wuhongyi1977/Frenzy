@@ -19,7 +19,7 @@ public class OneShotHealth : Card
 
     private GameObject currentTarget;
 
-    public Text[] textBoxes;
+    //public Text[] textBoxes;
 
     LineRenderer targetLine;
 
@@ -38,7 +38,7 @@ public class OneShotHealth : Card
         summonZoneTextBox = null;
         isDraggable = true;
         //gameObject.GetComponentInChildren<Text>();
-        textBoxes = gameObject.GetComponentsInChildren<Text>();
+       	textBoxes = gameObject.GetComponentsInChildren<Text>();
         for (int i = 0; i < textBoxes.Length; i++)
         {
             if (textBoxes[i].name == "CardTitle")

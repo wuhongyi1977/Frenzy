@@ -56,4 +56,7 @@ MonoBehaviour:
   - SendToGraveyard
   - RequestForPickupItems
   - DrawTargetLine
+  - incOpponentNumbCounterCards
+  - incNumbCounterCards
+  - decNumbCounterCards
   DisableAutoOpenWizard: 1

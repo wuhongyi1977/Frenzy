@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    PlayerController opponent;
+    public PlayerController opponent;
     PhotonView photonView;
     //PLAYER STATS
     int startingHealth = 20;
@@ -76,7 +76,11 @@ public class PlayerController : MonoBehaviour
 
 	public int increaseDamageAmount, increaseAttackSpeedAmount, increaseHealthAmount;
 	public List<GameObject> creatureCardsInPlay = new List<GameObject>(3);
+	public List<GameObject> counterCardsInPlay = new List<GameObject>(3);
 	private GameObject creatureThatJustEntered;
+
+	//counter for how many counter cards the card's owner has
+	public int numbCounterCards;
     void Awake()
     {
         //get this object's photon view component
@@ -157,7 +161,8 @@ public class PlayerController : MonoBehaviour
         }
         //set initial text for health text box
         healthTextBox.text = "Life: " + startingHealth;
-
+		//reset number of counter cards
+		numbCounterCards = 0;
     }
 
     // Update is called once per frame
@@ -836,6 +841,53 @@ public class PlayerController : MonoBehaviour
 	{
 		return creatureThatJustEntered;
 	}
-
+	//function to increment counter for the number of counter cards the local player has
+	public void increaseNumbCounterCards()
+	{
+		//if(photonView.isMine)
+			//numbCounterCards++;
+		photonView.RPC ("incNumbCounterCards", PhotonTargets.All);
+	}
+	//function to decrement counter for the number of counter cards the local player has
+	public void decreaseNumbCounterCards()
+	{
+		//if(photonView.isMine)
+			//numbCounterCards--;
+		photonView.RPC ("decNumbCounterCards", PhotonTargets.All);
+	}
+	//function to return the number of counter cards the local player has
+	public int getNumberOfCounterCards()
+	{
+			return numbCounterCards;
+	}
+	//function for when a counter card was used
+	public void counterCardUsed()
+	{
+		if (photonView.isMine) {
+			//remove card at index 0
+			counterCardsInPlay.RemoveAt (0);
+			//sort so that cards are moved down
+			counterCardsInPlay.Sort ();
+		}
+	}
+	[PunRPC]
+	public void incNumbCounterCards()
+	{/*
+		if (opponent != null)
+			opponent.numbCounterCards++;
+		else
+			Debug.Log ("OPPONENT IS NULL");*/
+		numbCounterCards++;
+	}
+	[PunRPC]
+	public void decNumbCounterCards()
+	{
+		numbCounterCards--;
+	}
+	[PunRPC]
+	public void usedCounterCard()
+	{
+		
+	}
     
 }

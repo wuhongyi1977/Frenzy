@@ -72,6 +72,8 @@ public abstract class Card : MonoBehaviour
 	
 	protected float currentTime;
     //Text Boxes
+
+	public Text[] textBoxes;
 	public Text summonZoneTextBox;
 	public Text cardTitleTextBox;
     public Text castTimeTextBox;
@@ -254,7 +256,7 @@ public abstract class Card : MonoBehaviour
 	{
 		return currentTime;
 	}
-	public void setGraveyardVariables()
+	public virtual void setGraveyardVariables()
 	{
 		inSummonZone = false;
 		inGraveyard = true;
@@ -291,12 +293,27 @@ public abstract class Card : MonoBehaviour
     [PunRPC]
     public void SetCustomData(string id)//string[] data)
     {
+		textBoxes = gameObject.GetComponentsInChildren<Text>();
+		for (int i = 0; i < textBoxes.Length; i++) {
+			if (textBoxes [i].name == "DescriptionText")
+				descriptionText = textBoxes [i];
+		}
         //set the card's id
         cardId = id;
+		Debug.Log ("cardID: " + cardId);
         //set cards name 
         cardTitle = PlayFabDataStore.cardNameList[id];
+		Debug.Log ("cardTitle: " + cardTitle);
         //set cards description
-        descriptionText.text = PlayFabDataStore.cardDescriptions[id];
+		//if (descriptionText != null)
+
+			descriptionText.text = PlayFabDataStore.cardDescriptions [id];
+		Debug.Log ("descriptionText: " + descriptionText);
+		Debug.Log ("PlayFabDataStore: " + PlayFabDataStore.userName);
+		//else 
+		//{
+		//	Debug.Log ("Descriptiontext is null.");
+		//}
 
         string[] data = PlayFabDataStore.cardCustomData[id];
         /*

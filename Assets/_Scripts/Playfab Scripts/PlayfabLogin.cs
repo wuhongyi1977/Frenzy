@@ -556,6 +556,7 @@ public class PlayfabLogin : MonoBehaviour
                                      "Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard",
                                      "Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard",
                                      "Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard"};
+			
             PlayfabApiCalls.FillDeck(deckId, cardIdsToAdd);
 
         },
@@ -567,11 +568,71 @@ public class PlayfabLogin : MonoBehaviour
         });
     }
 
+	public void CreateCounterTestDeck()
+	{
+		var request = new ExecuteCloudScriptRequest()
+		{
+			FunctionName = "newDeck",
+			//ActionId = "newDeck",
+			//FunctionParameter = new { characterName = "TestDeck", characterType = "Deck" }
+			FunctionParameter = new { characterName = "CounterTestDeck", characterType = "Deck" }
+		};
+		PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
+			{
+				Debug.Log("Test Deck Granted");
+				PlayFabDataStore.numberOfDecks += 1;
+				//Debug.Log(result.ResultsEncoded.Split);
+				string[] splitResult = result.FunctionResult.ToString().Split(':', '"', '"', '}');
+				//grab the data at position 2 (which is the character id)
+				string deckId = splitResult[4];
+
+				Debug.Log("Character Id of new deck is: " + deckId);
+				//store this deck in the decklist
+				PlayFabDataStore.deckIds.Add(deckId);
+				PlayFabDataStore.deckList.Add(deckId, name);
+				/*
+            string[] cardIdsToAdd = {"Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard",
+                                     "Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard",
+                                     "Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard",
+                                     "Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard",
+                                     "Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard",
+                                     "Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard",
+                                     "Classic_LightningStrike_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard",
+                                     "Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard",
+                                     "Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard",
+                                     "Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard"};
+			*/string[] cardIdsToAdd = {"Classic_Distraction_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard",
+					"Classic_Distraction_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard",
+					"Classic_Distraction_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard",
+					"Classic_Distraction_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard",
+					"Classic_Distraction_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard",
+					"Classic_Distraction_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard",
+					"Classic_Distraction_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard",
+					"Classic_Distraction_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard",
+					"Classic_Distraction_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard",
+					"Classic_Distraction_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard"};	
+				PlayfabApiCalls.FillDeck(deckId, cardIdsToAdd);
+
+			},
+			(error) =>
+			{
+				Debug.Log("Deck Not Created!");
+				Debug.Log(error.ErrorMessage);
+				Debug.Log(error.ErrorDetails);
+			});
+	}
+
+
     //TEMPORARY WAY OF GRANTING TEST DECK EASILY
     public void OnPressTesterButton()
     {
         CreateTestDeck();
     }
+	//TEMPORARY WAY OF GRANTING TEST DECK EASILY
+	public void OnPressCounterTesterButton()
+	{
+		CreateCounterTestDeck();
+	}
 
 
 
