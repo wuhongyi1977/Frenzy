@@ -149,6 +149,7 @@ public abstract class Card : MonoBehaviour
     }
 	public virtual void Update ()				//Abstract method for Update
 	{
+		/*
         //get references to player objects if not assigned
         GetPlayers();
 
@@ -184,7 +185,7 @@ public abstract class Card : MonoBehaviour
 		{
             photonView.RPC("SendToGraveyard", PhotonTargets.All);
             //SendToGraveyard();
-        }
+        }*/
 	}
 
 	//Registers that the player has clicked on the card
@@ -228,7 +229,7 @@ public abstract class Card : MonoBehaviour
 	//Registers what card is under the mouse
 	public virtual void OnMouseOver()
 	{
-		Debug.Log (gameObject.name);
+		//Debug.Log (gameObject.name);
 		if (photonView.isMine) 
 		{
             localPlayerController.setMousedOverCard(gameObject);
@@ -467,7 +468,7 @@ public abstract class Card : MonoBehaviour
     [PunRPC]
     public void SendToGraveyard()
     {
-        Debug.Log(cardTitle + "sent to graveyard");
+        Debug.Log(cardTitle + " sent to graveyard");
        
         //Set this to false to prevent multiple executions of this block
         doneAddingToGraveyard = true;
@@ -479,11 +480,16 @@ public abstract class Card : MonoBehaviour
         inGraveyard = true;
         //Set state of card to not being in the summon zone
         inSummonZone = false;
-        if (!playedCardReleaseSound)
-        {
-            playedCardReleaseSound = true;
-            audioManager.playCardRelease();
-        }
+		if (audioManager != null) {
+			if (!playedCardReleaseSound) {
+				playedCardReleaseSound = true;
+				audioManager.playCardRelease ();
+			}
+		} 
+		else 
+		{
+			Debug.Log ("AudioManager field is null in " + gameObject.name);
+		}
 
         //If the card beings to player 1
         if (photonView.isMine)

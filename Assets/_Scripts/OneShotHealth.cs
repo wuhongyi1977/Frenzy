@@ -111,11 +111,24 @@ public class OneShotHealth : Card
                 //if the cast time completes
                 if (currentTime <= 0)
                 {
-                    //run this card's OnCast function
-                    OnCast();
+					//If the opponent has a counter card and it is my view
+					if (opponentPlayerController.getNumberOfCounterCards() > 0 && photonView.isMine) 
+					{
+						//resolve countering card
+						Debug.Log(cardTitle + " COUNTERED");
+						//call the RPC function to send this card to the graveyard over the network
+						photonView.RPC("SendToGraveyard", PhotonTargets.All);
+						//register to the opponent that a counter card has been used
+						opponentPlayerController.decreaseNumbCounterCards ();
+					}
+					else
+					{
+	                    //run this card's OnCast function
+	                    OnCast();
 
-                    //send to graveyard
-                    SendToGraveyard();
+	                    //send to graveyard
+						SendToGraveyard();
+					}
                    
                 }
             }

@@ -841,53 +841,38 @@ public class PlayerController : MonoBehaviour
 	{
 		return creatureThatJustEntered;
 	}
-	//function to increment counter for the number of counter cards the local player has
-	public void increaseNumbCounterCards()
+	//function to call the RPC function
+	public void increaseNumbCounterCards(GameObject c)
 	{
-		//if(photonView.isMine)
-			//numbCounterCards++;
-		photonView.RPC ("incNumbCounterCards", PhotonTargets.All);
+		photonView.RPC ("incNumbCounterCards", PhotonTargets.All,c.GetComponent<PhotonView>().viewID);
 	}
-	//function to decrement counter for the number of counter cards the local player has
+	//function to call the RPC function
 	public void decreaseNumbCounterCards()
 	{
 		//if(photonView.isMine)
 			//numbCounterCards--;
 		photonView.RPC ("decNumbCounterCards", PhotonTargets.All);
 	}
-	//function to return the number of counter cards the local player has
+	//function that returns the number of counter cards on this playerController
 	public int getNumberOfCounterCards()
 	{
 			return numbCounterCards;
 	}
-	//function for when a counter card was used
-	public void counterCardUsed()
-	{
-		if (photonView.isMine) {
-			//remove card at index 0
-			counterCardsInPlay.RemoveAt (0);
-			//sort so that cards are moved down
-			counterCardsInPlay.Sort ();
-		}
-	}
+	//function to increment and add the counter card over the network
 	[PunRPC]
-	public void incNumbCounterCards()
-	{/*
-		if (opponent != null)
-			opponent.numbCounterCards++;
-		else
-			Debug.Log ("OPPONENT IS NULL");*/
+	public void incNumbCounterCards(int cardId)
+	{
+		GameObject card = PhotonView.Find(cardId).gameObject;
+		counterCardsInPlay.Add (card);
 		numbCounterCards++;
 	}
 	[PunRPC]
 	public void decNumbCounterCards()
 	{
+		GameObject card = counterCardsInPlay [0];
+		card.GetComponent<Card> ().SendToGraveyard ();
+		counterCardsInPlay.Remove (card);
 		numbCounterCards--;
-	}
-	[PunRPC]
-	public void usedCounterCard()
-	{
-		
 	}
     
 }

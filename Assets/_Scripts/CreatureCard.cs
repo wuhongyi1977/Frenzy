@@ -140,13 +140,16 @@ public class CreatureCard : Card
 				playedCardBuildUpOnce = true;
 				audioManager.playCardBuildUp ();
 			}
-			if (currentTime <= 0) {
-				//if the opponent has more than one counter cards
-				if (opponentPlayerController.getNumberOfCounterCards() > 0 && inBattlefield == false) 
+			if (currentTime <= 0) 
+			{
+				//if the opponent has more than one counter cards, the creature is not on the battlefield, and it is my view
+				if (opponentPlayerController.getNumberOfCounterCards() > 0 && inBattlefield == false && photonView.isMine) 
 				{
 					//resolve countering card
-					Debug.Log(cardTitle + " got countered");
-					setGraveyardVariables();
+					Debug.Log(cardTitle + " COUNTERED");
+					//call the RPC function to send this card to the graveyard over the network
+					photonView.RPC("SendToGraveyard", PhotonTargets.All);
+					//register to the opponent that a counter card has been used
 					opponentPlayerController.decreaseNumbCounterCards ();
 				} 
 				else 
