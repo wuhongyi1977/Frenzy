@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
     //The number of times the deck is shuffled before game starts
     private int numbShuffles;
     //The player ID (1 is local player, 2 is opponent)
-    private int playerID = 1;
+    private int playerID = 1; // TODO change to Enum (Unassigned, Local, Opponent)
     
     //the maximum number of cards a player can hold
     int maxHandSize = 7;
@@ -48,6 +48,9 @@ public class PlayerController : MonoBehaviour
     public Dictionary<int, GameObject> playerHand = new Dictionary<int, GameObject>();//< stores a card at an index
     //public List<GameObject> playerHand = new List<GameObject>(7);
 
+    public List<string> cardDeck = new List<string>(60); //CHANGED 
+
+
     //The list that represents the player's graveyard
     public List<GameObject> graveyard = new List<GameObject>(60);
     //The list that represents the player's library
@@ -63,7 +66,7 @@ public class PlayerController : MonoBehaviour
     //the player's deck, this gets loaded into the list at start up in a shuffled manner
     //public List<GameObject> cardDeck = new List<GameObject>(60);
 
-    public List<string> cardDeck = new List<string>(60); //CHANGED 
+   
 
 
     //The game manager object
@@ -96,7 +99,6 @@ public class PlayerController : MonoBehaviour
         CheckOwnerAndGetComponents();
         //set your current health to the starting health value
         health = startingHealth;
-
     }
 
     // Update is called once per frame
@@ -115,35 +117,168 @@ public class PlayerController : MonoBehaviour
         DrawTimer();
     }
 
-    void CheckForLoss()
-    {
-        
-      //if health is 0 or less
-      if(health <= 0)
-      {
-          if (photonView.isMine)
-          {Lose();}
-          else if (!photonView.isMine) // if this is the opponent
-          {Win();}
-      }
-      
-    }
+    //Checks if enough time has passed to draw a card
     void DrawTimer()
-    {
-        //if this is the local player, handle draw
-        //if this isnt, drawing will be handled by received rpc calls
+    {     
         if (photonView.isMine)
         {
             //increase counter for draw timer
-            libraryDrawCounterTimer += Time.deltaTime;
-           
+            libraryDrawCounterTimer += Time.deltaTime;  
             if (libraryDrawCounterTimer > libraryDrawSpeed)
             {
                 libraryDrawCounterTimer = 0;
-                //draw a card
-                drawFromLibrary();
+                DrawFromLibrary();
             }
         }
+    }
+
+    //Instantiates a new card from the library 
+    // TODO Instantiate all cards at the start and link them to remote copies
+    public void DrawFromLibrary()
+    {
+        if (currentHandSize < maxHandSize)
+        {
+            //get the itemid (non-unique) of the card being drawn
+            string itemId = library[currentCardIndex];
+            //get the prefab name associated with this item id
+            string cardToDraw = PlayFabDataStore.cardPrefabs[itemId];
+
+            //Instantiate the passed card over photon network 
+            GameObject cardToAdd = PhotonNetwork.Instantiate(("Cards/" + cardToDraw), Vector3.zero, Quaternion.identity, 0);
+            //get the card's view Id to reference the same card
+            int viewId = cardToAdd.GetComponent<PhotonView>().viewID;
+
+            //INITIALIZE CARD
+            cardToAdd.GetComponent<Card>().playerID = playerID;
+            cardToAdd.GetComponent<Card>().InitializeCard(itemId);
+
+            //Put the card into proper place
+            photonView.RPC("DrawCard", PhotonTargets.All, viewId);
+        }
+    }
+    //NEW CARD DRAWING FUNCTION
+    //Sets up card variables and position of card in hand
+    [PunRPC]
+    public void DrawCard(int viewId)
+    {
+        //find the spawned card
+        GameObject cardToAdd = PhotonView.Find(viewId).gameObject;
+        //Set cards position
+        if (cardToAdd != null)
+        {
+            cardToAdd.transform.position = new Vector3(handZone.transform.position.x + (currentHandSize * 5f), handZone.transform.position.y, handZone.transform.position.z);
+        }
+        //set the card's player id
+        cardToAdd.GetComponent<Card>().playerID = playerID;
+        //add it to the player's hand
+        //playerHand.Add(cardToAdd);
+        cardToAdd.GetComponent<Card>().handIndex = AddToHand(cardToAdd); //< returns index of card
+        //increment the index of the deck (since a card has now been taken)
+        currentCardIndex++;
+    }
+
+    // TODO Do this only on local player, remote copy doesnt need to know all cards in deck (i think)
+    //However, all cards should be instantiated at start and held in a pool so they can be accessed quickly
+    //Instantiated cards can be held in an off screen area (card pool), moved on screen by local version when put into deck zone
+    //Loads a particular deck into the card deck list
+    [PunRPC]
+    public void LoadDeck()
+    {
+        //FINAL CODE TO REPLACE TEST CODE
+        //retrieves all cards in the cardsInDeck array (which should reference the current deck)
+        //card ids holds UNIQUE identifiers for each card instance (item instance id)
+        string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
+        Debug.Log("Number of cards in deck: " + cardIds.Length);
+
+        //for each card in the cardids array, find its item id and add it to deck
+        for (int i = 0; i < cardIds.Length; i++)
+        {
+            //retrieve item id for this item instance id
+            string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
+            //add that card to the deck
+            cardDeck.Add(itemId);
+        }
+
+        // TODO Remove this section
+        //for testing, fill any available space with magma bolts    
+        while (cardDeck.Count < deckSize)
+        {
+            cardDeck.Add("Classic_MagmaBolt_Standard");
+        }
+        //////////////////////////////////////////////////////////
+
+        Debug.Log("Card data retrieved, begin loading deck");
+        //Populate deck
+        for (int i = 0; i < deckSize; i++)
+        {
+            library.Add(cardDeck[i]);
+
+        }
+        //if this is the local player, shuffle the deck and draw
+        //if this isnt, drawing will be handled by received rpc calls
+        if (photonView.isMine)
+        {
+            int numbShuffles = Random.Range(1, maxInitialShuffles);
+            for (int i = 0; i < numbShuffles; i++)
+            {
+                library = shuffleDeck(library);
+            }
+            //draw a hand of (startingHandSize) cards
+            for (int i = 0; i < startingHandSize; i++)
+            {
+                DrawFromLibrary();
+            }
+        }
+        //after this resolves, the player's hand should have 5 cards and the current card index 
+        //should be at 5 (since indecies 0-4 have been taken)
+
+    }
+
+    //places card into proper slot in hand
+    int AddToHand(GameObject cardToAdd)
+    {
+        for (int i = 0; i < maxHandSize; i++)
+        {
+            //if no card is stored at this index
+            if (playerHand[i] == null)
+            {
+                playerHand[i] = cardToAdd;
+                //increment hand size
+                currentHandSize++;
+                return i;
+            }
+        }
+        Debug.Log("Failed to add card to hand");
+        return -1;
+    }
+
+    void RemoveFromHand(int index)
+    {
+        if (playerHand[index] != null)
+        {
+            playerHand[index] = null;
+            //increment hand size
+            currentHandSize--;
+        }
+        else
+        {
+            Debug.Log("Unable to remove card from hand, no card at index");
+        }
+    }
+
+
+    void CheckForLoss()
+    {
+
+        //if health is 0 or less
+        if (health <= 0)
+        {
+            if (photonView.isMine)
+            { Lose(); }
+            else if (!photonView.isMine) // if this is the opponent
+            { Win(); }
+        }
+
     }
     /**
    * Checks whether this controller is owned by the local player or the opponent.
@@ -203,60 +338,13 @@ public class PlayerController : MonoBehaviour
         healthTextBox.text = "Life: " + startingHealth;
     }
 
-    //Loads a particular deck into the card deck list
-    [PunRPC]
-    public void LoadDeck()
+    /*
+     * Shuffles the deck order on local version only
+     **/
+    void ShuffleDeck() //TODO move deck shuffle code here
     {
-        //FINAL CODE TO REPLACE TEST CODE
-        //retrieves all cards in the cardsInDeck array (which should reference the current deck)
-        //card ids holds UNIQUE identifiers for each card instance (item instance id)
-        string[] cardIds = (string[])PlayFabDataStore.cardsInDeck.ToArray();
-        Debug.Log("Number of cards in deck: " + cardIds.Length);
-       
-        //for each card in the cardids array, find its item id and add it to deck
-        for (int i = 0; i < cardIds.Length; i++)
-        {
-            //retrieve item id for this item instance id
-            string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
-            //add that card to the deck
-            cardDeck.Add(itemId);     
-        }
-
-        // TODO Remove this section
-        //for testing, fill any available space with magma bolts    
-        while(cardDeck.Count < deckSize)
-        {
-            cardDeck.Add("Classic_MagmaBolt_Standard");
-        }
-        //////////////////////////////////////////////////////////
-
-        Debug.Log("Card data retrieved, begin loading deck");   
-        //Populate deck
-        for (int i = 0; i < deckSize; i++)
-        {
-            library.Add(cardDeck[i]);
-           
-        }
-        //if this is the local player, shuffle the deck and draw
-        //if this isnt, drawing will be handled by received rpc calls
-        if (photonView.isMine)
-        {
-            int numbShuffles = Random.Range(1, maxInitialShuffles);
-            for (int i = 0; i < numbShuffles; i++)
-            {
-                library = shuffleDeck(library);
-            }
-            //draw a hand of (startingHandSize) cards
-            for (int i = 0; i < startingHandSize; i++)
-            {
-                drawFromLibrary();
-            }
-        }
-        //after this resolves, the player's hand should have 5 cards and the current card index 
-        //should be at 5 (since indecies 0-4 have been taken)
 
     }
-
    
     void Lose()
     {
@@ -669,82 +757,7 @@ public class PlayerController : MonoBehaviour
    
     
 
-    public void drawFromLibrary()
-    {
-        if (currentHandSize < maxHandSize)
-        {
-            //get the itemid (non-unique) of the card being drawn
-            string itemId = library[currentCardIndex]; 
-            //get the prefab name associated with this item id
-            string cardToDraw = PlayFabDataStore.cardPrefabs[itemId]; 
-
-            //Instantiate the passed card over photon network
-            GameObject cardToAdd = PhotonNetwork.Instantiate(("Cards/" + cardToDraw), Vector3.zero, Quaternion.identity, 0);
-            //get the card's view Id to reference the same card
-            int viewId = cardToAdd.GetComponent<PhotonView>().viewID;
-
-            //INITIALIZE CARD
-            cardToAdd.GetComponent<Card>().playerID = playerID;
-            cardToAdd.GetComponent<Card>().InitializeCard(itemId);
-
-            //Put the card into proper place
-            photonView.RPC("DrawCard", PhotonTargets.All, viewId);
-        }
-    }
-//NEW CARD DRAWING FUNCTION
-    //Sets up card variables and position of card in hand
-    [PunRPC]
-    public void DrawCard(int viewId)
-    {
-        //find the spawned card
-        GameObject cardToAdd = PhotonView.Find(viewId).gameObject;
-        //Set cards position
-        if (cardToAdd != null)
-        {
-            cardToAdd.transform.position = new Vector3(handZone.transform.position.x + (currentHandSize * 5f), handZone.transform.position.y, handZone.transform.position.z);
-        }
-        //set the card's player id
-        cardToAdd.GetComponent<Card>().playerID = playerID;
-        //add it to the player's hand
-        //playerHand.Add(cardToAdd);
-        cardToAdd.GetComponent<Card>().handIndex = AddToHand(cardToAdd); //< returns index of card
-        //increment the index of the deck (since a card has now been taken)
-        currentCardIndex++;
-        
-
-    }
-
-    //places card into proper slot in hand
-    int AddToHand(GameObject cardToAdd)
-    {
-        for(int i = 0; i < maxHandSize; i++)
-        {
-            //if no card is stored at this index
-            if(playerHand[i] == null)
-            {
-                playerHand[i] = cardToAdd;
-                //increment hand size
-                currentHandSize++;
-                return i;
-            }
-        }
-        Debug.Log("Failed to add card to hand");
-        return -1;
-    }
-
-    void RemoveFromHand(int index)
-    {
-        if (playerHand[index] != null)
-        {
-            playerHand[index] = null;
-            //increment hand size
-            currentHandSize--;
-        }
-        else
-        {
-            Debug.Log("Unable to remove card from hand, no card at index");
-        }
-    }
+    
 
     public void setMousedOverCard(GameObject card)
     {
