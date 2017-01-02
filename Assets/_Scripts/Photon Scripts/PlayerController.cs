@@ -13,8 +13,9 @@ public class PlayerController : MonoBehaviour
     PlayerController opponent;
     PhotonView photonView;
     private Text healthTextBox;   
-    private Transform handZone; //< The empty game object for the position of the handzone
+    Vector3 handZone; //< The empty game object for the position of the handzone
     Vector3 graveyardPos; //< The position of the graveyard. (off screen) 
+    Vector3 cardPool; //< The position of the card pool (off screen)
     private GameObject line; 
 
 
@@ -45,10 +46,11 @@ public class PlayerController : MonoBehaviour
     //The list of summoning zones
     public GameObject[] SummonZones = new GameObject[3];
     //The list that represents the player's hand
-    public Dictionary<int, GameObject> playerHand = new Dictionary<int, GameObject>();//< stores a card at an index
+    //public Dictionary<int, GameObject> playerHand = new Dictionary<int, GameObject>();//< stores a card at an index
+    public GameObject[] playerHand = new GameObject[7];
     //public List<GameObject> playerHand = new List<GameObject>(7);
 
-    public List<string> cardDeck = new List<string>(60); //CHANGED 
+    public List<int> cardDeck = new List<int>(60); //CHANGED 
 
 
     //The list that represents the player's graveyard
@@ -127,19 +129,47 @@ public class PlayerController : MonoBehaviour
             if (libraryDrawCounterTimer > libraryDrawSpeed)
             {
                 libraryDrawCounterTimer = 0;
-                DrawFromLibrary();
+                if (currentHandSize < maxHandSize)
+                {
+                    //DrawFromLibrary();
+                    //get the viewid of the card being drawn
+                    int viewId = cardDeck[currentCardIndex];
+                    photonView.RPC("DrawCard", PhotonTargets.All, viewId);
+                }
             }
         }
     }
 
+    //NEW CARD DRAWING FUNCTION
+    //Sets up card variables and position of card in hand
+    [PunRPC]
+    public void DrawCard(int viewId)
+    {
+        GameObject cardToAdd = null;
+        //find the spawned card, Set cards position
+        if (cardToAdd = PhotonView.Find(viewId).gameObject)
+        {
+            cardToAdd.transform.position = new Vector3(handZone.x + (currentHandSize * 5f), handZone.y, handZone.z);
+            //set the card's player id
+            cardToAdd.GetComponent<Card>().playerID = playerID;
+            //add it to the player's hand
+            //playerHand.Add(cardToAdd);
+            cardToAdd.GetComponent<Card>().handIndex = AddToHand(cardToAdd); //< returns index of card                                                                             //increment the index of the deck (since a card has now been taken)
+            currentCardIndex++;
+        }
+    }
+
+    /*
     //Instantiates a new card from the library 
     // TODO Instantiate all cards at the start and link them to remote copies
     public void DrawFromLibrary()
     {
         if (currentHandSize < maxHandSize)
         {
-            //get the itemid (non-unique) of the card being drawn
-            string itemId = library[currentCardIndex];
+            //get the viewid of the card being drawn
+            int viewId = cardDeck[currentCardIndex];
+
+            
             //get the prefab name associated with this item id
             string cardToDraw = PlayFabDataStore.cardPrefabs[itemId];
 
@@ -151,31 +181,16 @@ public class PlayerController : MonoBehaviour
             //INITIALIZE CARD
             cardToAdd.GetComponent<Card>().playerID = playerID;
             cardToAdd.GetComponent<Card>().InitializeCard(itemId);
+            
 
             //Put the card into proper place
             photonView.RPC("DrawCard", PhotonTargets.All, viewId);
+            
+
         }
     }
-    //NEW CARD DRAWING FUNCTION
-    //Sets up card variables and position of card in hand
-    [PunRPC]
-    public void DrawCard(int viewId)
-    {
-        //find the spawned card
-        GameObject cardToAdd = PhotonView.Find(viewId).gameObject;
-        //Set cards position
-        if (cardToAdd != null)
-        {
-            cardToAdd.transform.position = new Vector3(handZone.transform.position.x + (currentHandSize * 5f), handZone.transform.position.y, handZone.transform.position.z);
-        }
-        //set the card's player id
-        cardToAdd.GetComponent<Card>().playerID = playerID;
-        //add it to the player's hand
-        //playerHand.Add(cardToAdd);
-        cardToAdd.GetComponent<Card>().handIndex = AddToHand(cardToAdd); //< returns index of card
-        //increment the index of the deck (since a card has now been taken)
-        currentCardIndex++;
-    }
+    */
+
 
     // TODO Do this only on local player, remote copy doesnt need to know all cards in deck (i think)
     //However, all cards should be instantiated at start and held in a pool so they can be accessed quickly
@@ -195,25 +210,31 @@ public class PlayerController : MonoBehaviour
         {
             //retrieve item id for this item instance id
             string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
+            //get the prefab name associated with this item id
+            string cardToDraw = PlayFabDataStore.cardPrefabs[itemId];
+            //Instantiate the passed card over photon network 
+            GameObject cardToAdd = PhotonNetwork.Instantiate(("Cards/" + cardToDraw), Vector3.zero, Quaternion.identity, 0);
+            //get the card's view Id to reference the same card
+            int viewId = cardToAdd.GetComponent<PhotonView>().viewID;
+
+            //INITIALIZE CARD
+            cardToAdd.GetComponent<Card>().playerID = playerID;
+            cardToAdd.GetComponent<Card>().InitializeCard(itemId);
+
             //add that card to the deck
-            cardDeck.Add(itemId);
+            cardDeck.Add(viewId);
         }
 
-        // TODO Remove this section
-        //for testing, fill any available space with magma bolts    
-        while (cardDeck.Count < deckSize)
-        {
-            cardDeck.Add("Classic_MagmaBolt_Standard");
-        }
-        //////////////////////////////////////////////////////////
 
         Debug.Log("Card data retrieved, begin loading deck");
+        /*
         //Populate deck
         for (int i = 0; i < deckSize; i++)
         {
             library.Add(cardDeck[i]);
 
         }
+        */
         //if this is the local player, shuffle the deck and draw
         //if this isnt, drawing will be handled by received rpc calls
         if (photonView.isMine)
@@ -226,7 +247,10 @@ public class PlayerController : MonoBehaviour
             //draw a hand of (startingHandSize) cards
             for (int i = 0; i < startingHandSize; i++)
             {
-                DrawFromLibrary();
+                //DrawFromLibrary();
+                //get the viewid of the card being drawn
+                int viewId = cardDeck[currentCardIndex];
+                photonView.RPC("DrawCard", PhotonTargets.All, viewId);
             }
         }
         //after this resolves, the player's hand should have 5 cards and the current card index 
@@ -259,6 +283,7 @@ public class PlayerController : MonoBehaviour
             playerHand[index] = null;
             //increment hand size
             currentHandSize--;
+            //TODO shift cards down
         }
         else
         {
@@ -312,19 +337,23 @@ public class PlayerController : MonoBehaviour
     void GetPlayerComponents()
     {
         //get player's handzone
-        handZone = PlayerManager.transform.FindChild("HandZone");
+        handZone = PlayerManager.transform.FindChild("HandZone").position;
+    
         //initialize hand indicies
+        /*
         for(int i = 0; i < maxHandSize; i++)
         {
             playerHand.Add(i, null);
         }
-        
+        */
         //set the health text box of this controller to the playerhealthbox
         healthTextBox = PlayerManager.transform.FindChild("PlayerUI").GetComponentInChildren<Text>();
         //get the player's attack line
         line = PlayerManager.transform.FindChild("PlayerLine").gameObject;
         //get the position of the graveyard
         graveyardPos = PlayerManager.transform.FindChild("Graveyard").position;
+        //get the position of the card pool
+        cardPool = PlayerManager.transform.FindChild("CardPool").position;
         // get summon zones
         int index = 0;
         foreach (Transform t in PlayerManager.transform)
@@ -338,13 +367,6 @@ public class PlayerController : MonoBehaviour
         healthTextBox.text = "Life: " + startingHealth;
     }
 
-    /*
-     * Shuffles the deck order on local version only
-     **/
-    void ShuffleDeck() //TODO move deck shuffle code here
-    {
-
-    }
    
     void Lose()
     {
@@ -778,9 +800,9 @@ public class PlayerController : MonoBehaviour
     }
     public void shiftCardsDown()
     {
-        for (int i = 0; i < playerHand.Count; i++)
+        for (int i = 0; i < playerHand.Length; i++)
         {
-            playerHand[i].transform.position = new Vector3(handZone.transform.position.x + (i * 5f), handZone.transform.position.y, 0);
+            playerHand[i].transform.position = new Vector3(handZone.x + (i * 5f), handZone.y, 0);
             //set card's hand index
             playerHand[i].GetComponent<Card>().handIndex = i;
         }
