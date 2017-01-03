@@ -601,16 +601,16 @@ public class PlayfabLogin : MonoBehaviour
                                      "Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard",
                                      "Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard",
                                      "Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard"};
-			*/string[] cardIdsToAdd = {"Classic_Distraction_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard",
-					"Classic_Distraction_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard",
-					"Classic_Distraction_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard",
-					"Classic_Distraction_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard",
-					"Classic_Distraction_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard",
-					"Classic_Distraction_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard",
-					"Classic_Distraction_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard",
-					"Classic_Distraction_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard",
-					"Classic_Distraction_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard",
-					"Classic_Distraction_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard"};	
+			*/string[] cardIdsToAdd = {"Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard", "Classic_AssassinDrone_Standard",
+					"Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard","Classic_BeastOfGevaudan_Standard",
+					"Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard","Classic_EssenceDrain_Standard",
+					"Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard","Classic_FiendHound_Standard",
+					"Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard","Classic_GuardianOfTheOldGods_Standard",
+					"Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard","Classic_LifeTax_Standard",
+					"Classic_Distraction_Standard","Classic_Distraction_Standard","Classic_LightningStrike_Standard","Classic_LightningStrike_Standard",
+					"Classic_Distraction_Standard","Classic_Distraction_Standard","Classic_MagmaBolt_Standard","Classic_MagmaBolt_Standard",
+					"Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard","Classic_PoulticeFoam_Standard",
+					"Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard","Classic_TouchOfJudgement_Standard"};	
 				PlayfabApiCalls.FillDeck(deckId, cardIdsToAdd);
 
 			},
