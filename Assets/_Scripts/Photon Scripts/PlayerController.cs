@@ -207,13 +207,9 @@ public class PlayerController : MonoBehaviour
     {
         //if this controller belongs to the local player
         if(opponent == null && photonView.isMine && GameObject.Find("NetworkOpponent") != null)
-        {
-            opponent = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();
-        }
+        {opponent = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();}
         //keep health text updated to current health
         healthTextBox.text = "Life: " + health;
-
-        //COMMENTED OUT TEMPORARILY
         CheckForLoss();
         DrawTimer();
     }
@@ -258,9 +254,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-    
-
     //places card into proper slot in hand
     int AddToHand(GameObject cardToAdd)
     {
@@ -279,6 +272,8 @@ public class PlayerController : MonoBehaviour
         return -1;
     }
 
+    //removes card from specific index in hand
+    //shifts cards down to fill empty slot
     void RemoveFromHand(int index)
     {
         if (playerHand[index] != null)
@@ -302,49 +297,27 @@ public class PlayerController : MonoBehaviour
         else { Debug.Log("Unable to remove card from hand, no card at index");}
     }
 
-
+    // checks if a player's health has reached 0
     void CheckForLoss()
     {
-
         //if health is 0 or less
         if (health <= 0)
         {
             if (photonView.isMine)
-            { Lose(); }
+            {
+                //call lose function on gamemanager
+                //displays ending panel and message
+                gameManager.Lose();
+            }
             else if (!photonView.isMine) // if this is the opponent
-            { Win(); }
+            {
+                //call win function on gamemanager
+                //displays ending panel and message
+                gameManager.Win();
+            }
         }
-
     }
    
-
-   
-    void Lose()
-    {
-        Debug.Log("YOU LOST!!!");
-        //call lose function on gamemanager
-        //displays ending panel and message
-        gameManager.Lose();
-        //wait for a set number of seconds before returning to menu
-        StartCoroutine("FinishingGame");
-    }
-    void Win()
-    {
-        Debug.Log("YOU WIN!!!");
-        //call lose function on gamemanager
-        //displays ending panel and message
-        gameManager.Win();
-        //wait for a set number of seconds before returning to menu
-        StartCoroutine("FinishingGame");
-    }
-
-    IEnumerator FinishingGame()
-    {
-        yield return new WaitForSeconds(3);
-        //leave the current room
-        PhotonNetwork.LeaveRoom();
-
-    }
     //HANDLE DAMAGE OVER NETWORK
     [PunRPC]
     public void ChangeHealth(int amount)
