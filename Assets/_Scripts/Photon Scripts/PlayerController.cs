@@ -159,10 +159,10 @@ public class PlayerController : MonoBehaviour
         healthTextBox.text = "Life: " + startingHealth;
     }
 
-    // TODO Do this only on local player, remote copy doesnt need to know all cards in deck (i think)
-    //However, all cards should be instantiated at start and held in a pool so they can be accessed quickly
-    //Instantiated cards can be held in an off screen area (card pool), moved on screen by local version when put into deck zone
-    //Loads a particular deck into the card deck list
+    
+  
+    //Instantiates cards in deck in an offscreen area (card pool)
+    //Loads the deck into the card deck list, shuffles list
     public void LoadDeck()
     {
         //retrieves all cards in the cardsInDeck array (which should reference the current deck)
@@ -214,7 +214,7 @@ public class PlayerController : MonoBehaviour
         healthTextBox.text = "Life: " + health;
 
         //COMMENTED OUT TEMPORARILY
-        //CheckForLoss();
+        CheckForLoss();
         DrawTimer();
     }
 
