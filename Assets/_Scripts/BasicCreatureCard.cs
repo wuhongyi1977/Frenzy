@@ -257,12 +257,12 @@ public class BasicCreatureCard : Card
 
         if (photonView.isMine)
         {
-            localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            //localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
 
         }
         else
         {
-            networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+            //networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
 
         }
         if (creatureCanAttack)

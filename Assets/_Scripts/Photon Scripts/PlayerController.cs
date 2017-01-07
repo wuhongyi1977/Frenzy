@@ -23,12 +23,6 @@ public class PlayerController : MonoBehaviour
     int startingHealth = 20; //< Players initial health
     int health;  //< Player's current health
 
-
-    /// <summary>
-    /// All code from playercontroller
-    /// </summary>
-    //The total number of shuffles when the game starts
-    private int maxInitialShuffles = 10;
     //The number of times the deck is shuffled before game starts
     private int numbShuffles;
     //The player ID (1 is local player, 2 is opponent)
@@ -68,14 +62,8 @@ public class PlayerController : MonoBehaviour
     //the player's deck, this gets loaded into the list at start up in a shuffled manner
     //public List<GameObject> cardDeck = new List<GameObject>(60);
 
-   
-
-
     //The game manager object
     GameManager gameManager;
-    
-    //The card that the player is moused over
-    private GameObject mousedOverCard;
    
     private GameObject enemyObjectUnderMouse;
 
@@ -710,15 +698,6 @@ public class PlayerController : MonoBehaviour
 
     }
     */
-   
-    
-
-    
-
-    public void setMousedOverCard(GameObject card)
-    {
-        mousedOverCard = card;
-    }
    
     public void drawLineOn()
     {

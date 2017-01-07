@@ -148,13 +148,13 @@ public class CreatureTargetSpellCard : Card {
 		Debug.Log (gameObject.name);
 		if (photonView.isMine) 
 		{
-			localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+			//localPlayer.GetComponent<PlayerController>().setMousedOverCard(gameObject);
 			//TEST
 			//p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
 		} 
 		else 
 		{
-			networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
+			//networkOpponent.GetComponent<PlayerController>().setMousedOverCard(gameObject);
 			//TEST
 			//p2Manager.GetComponent<Player2Manager> ().setMousedOverCard (gameObject);
 		}

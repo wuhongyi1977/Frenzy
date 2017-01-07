@@ -277,7 +277,7 @@ public class CreatureCard : Card
         if(photonView.isMine && localPlayerController != null)
         {
 
-            localPlayerController.setMousedOverCard(gameObject);
+            //localPlayerController.setMousedOverCard(gameObject);
 			if (!playedCardSelectedSound) 
 			{
 				audioManager.playCardSelect ();
@@ -294,7 +294,7 @@ public class CreatureCard : Card
         }
         else if(opponentPlayerController != null)
         {
-            opponentPlayerController.setMousedOverCard(gameObject);
+            //opponentPlayerController.setMousedOverCard(gameObject);
 
         }
 

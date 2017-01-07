@@ -7,18 +7,26 @@ using UnityEngine.UI;
 /// card in the game. This is an abstract object. It will be used as a
 /// base for all refined cards
 /// </summary>
-public abstract class Card : MonoBehaviour
+public abstract class BaseCard : MonoBehaviour
 {
+    //CARD COMPONENTS
+    //contains all visible components on card
+    protected Transform cardLayoutCanvas;
     //the image to display for the card art
-    public Image cardArtImage;
+    protected Image cardArtImage;
     //the text displayed to the player listing the card's abilities
-    public Text descriptionText;
+    protected Text descriptionText;
+    protected Text summonZoneTextBox;
+    protected Text cardTitleTextBox;
+    protected Text castTimeTextBox;
+    LineRenderer targetLine;
 
-//STATS 
+    //Scaling variables
+    protected Vector3 startingScale, zoomScale;
+
+
+    //STATS 
     //all card stats are here, are assigned by custom data from Playfab
-
-    //name of prefab that this card will utilize
-    public string prefabName;
     //name of art asset to use for card art
     public string artName;
     //name of art asset to use for border art
@@ -55,43 +63,36 @@ public abstract class Card : MonoBehaviour
     public string cardId;
     //the custom data of the card
     private string customData;
-	//The name of the card
-	public string cardTitle;
-	//Used to prevent staying step out of a chunk of code in derived Card Update methods
-	public bool doneAddingToGraveyard = false;
-	//If the card is in the graveyard or not
-	public bool inGraveyard;
-	//If the card is in the summon zone
-	public bool inSummonZone;
-	//The ID of the player that this card belongs to
-	public int playerID;
-	//The card number. Used to correctly delete from the player's hand
-	public int cardNumber;
-	//Checks to see if the player dropped the card.
-	protected bool dropped;
-	
-	protected float currentTime;
-    //Text Boxes
-	public Text summonZoneTextBox;
-	public Text cardTitleTextBox;
-    public Text castTimeTextBox;
+    //The name of the card
+    public string cardTitle;
+    //Used to prevent staying step out of a chunk of code in derived Card Update methods
+    public bool doneAddingToGraveyard = false;
+    //If the card is in the graveyard or not
+    public bool inGraveyard;
+    //If the card is in the summon zone
+    public bool inSummonZone;
+    //The ID of the player that this card belongs to
+    public int playerID;
+    //The card number. Used to correctly delete from the player's hand
+    public int cardNumber;
+    //Checks to see if the player dropped the card.
+    protected bool dropped;
 
-	//Something for the dragging of cards
-	protected Vector3 screenPoint;
-	//Something fo the dragging of cards
-	protected Vector3 offset;
-	//The game object for player 1 manager
-	protected GameObject p1Manager;
-	//The game object for player 2 manager
-	protected GameObject p2Manager;
-	//The position that the card was at when the player picks up the card. 
-	//This is used for when a player makes an invalid placement the card is placed back in it's original hand position
-	protected Vector3 cardHandPos;
-	// Use this for initialization
-	protected bool isDraggable;
+    protected float currentTime;
+   
+    //Something for the dragging of cards
+    protected Vector3 screenPoint;
+    //Something fo the dragging of cards
+    protected Vector3 offset;
+   
+    //The position that the card was at when the player picks up the card. 
+    //This is used for when a player makes an invalid placement the card is placed back in it's original hand position
+    protected Vector3 cardHandPos;
+    // Use this for initialization
+    protected bool isDraggable;
 
-	public GameObject localPlayer;
-	public GameObject networkOpponent;
+    public GameObject localPlayer;
+    public GameObject networkOpponent;
     protected PlayerController localPlayerController;
     protected PlayerController opponentPlayerController;
 
@@ -105,175 +106,169 @@ public abstract class Card : MonoBehaviour
     //PHOTON COMPONENTS
     protected PhotonView photonView;
 
-//SOUND VARIABLES
+    //SOUND VARIABLES
     //The variable for the script attached to the AudioManager object
     protected AudioManager audioManager;
-	//variables to prevent spamming of sounds
-	protected bool playedCardSelectedSound;
-	protected bool playedCardPickupSound;
-	protected bool playedCardBuildupSound;
-	protected bool playedCardReleaseSound;
-	protected bool playedCardInSpellSlotSound;
-//END SOUND VARIABLES 
+    //variables to prevent spamming of sounds
+    protected bool playedCardSelectedSound;
+    protected bool playedCardPickupSound;
+    protected bool playedCardBuildupSound;
+    protected bool playedCardReleaseSound;
+    protected bool playedCardInSpellSlotSound;
+    //END SOUND VARIABLES 
 
-  
+
 
     //This can be used for initialization code that is identical on ALL cards
-    public virtual void Awake()
+    protected virtual void Awake()
     {
         //get photon view component of this card
         photonView = GetComponent<PhotonView>();
         localPlayer = GameObject.Find("LocalPlayer");
         networkOpponent = GameObject.Find("NetworkOpponent");
-        p1Manager = GameObject.Find("Player1Manager");
-        p2Manager = GameObject.Find("Player2Manager");
-        if(cardArtImage == null)
+        //if the layout canvas of this card is found, locate its components
+        if(cardLayoutCanvas = transform.FindChild("CardLayoutCanvas"))
         {
-            cardArtImage = GetComponentInChildren<Image>();
+            //Get all components
+            descriptionText = cardLayoutCanvas.FindChild("DescriptionText").GetComponent<Text>();
+            summonZoneTextBox = cardLayoutCanvas.FindChild("Counter").GetComponent<Text>(); 
+            cardTitleTextBox = cardLayoutCanvas.FindChild("CardTitle").GetComponent<Text>(); 
+            castTimeTextBox = cardLayoutCanvas.FindChild("CastTime").GetComponent<Text>();
+            cardArtImage = cardLayoutCanvas.FindChild("CardArtImage").GetComponent<Image>();
+            targetLine = GetComponent<LineRenderer>();
+            targetLine.enabled = false;
         }
+        startingScale = transform.localScale;
+        zoomScale = startingScale * 2;
+        //audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+       
+
     }
-	public virtual void Start ()				//Abstract method for start
-	{
-		doneAddingToGraveyard = false;
-		currentTime = castTime;
-		inSummonZone = false;
-		summonZoneTextBox = null;
-		isDraggable = true;
-		//gameObject.GetComponentInChildren<Text>();
-		cardTitleTextBox = gameObject.GetComponentInChildren<Text>();
+    public virtual void Start()             //Abstract method for start
+    {
+        doneAddingToGraveyard = false;
+        currentTime = castTime;
+        inSummonZone = false;
+        summonZoneTextBox = null;
+        isDraggable = true;
+       
         cardTitleTextBox.text = cardTitle;
 
 
     }
-	public virtual void Update ()				//Abstract method for Update
-	{
+    public virtual void Update()                //Abstract method for Update
+    {
         //get references to player objects if not assigned
         GetPlayers();
 
         //If the card is Not in the graveyard and is in the summon zone
-        if (!inGraveyard && inSummonZone) 
-		{
-			
-			//Increment the current Time
-			currentTime -= Time.deltaTime;
+        if (!inGraveyard && inSummonZone)
+        {
+
+            //Increment the current Time
+            currentTime -= Time.deltaTime;
             //make sure summon zone text is assigned
-            if (summonZoneTextBox == null)
-            { GetSummonZoneText(); }
-            else
-            { summonZoneTextBox.text = currentTime.ToString("F1"); }
-	
-			//IF the current time is larger than or equal to the cast time
-			isDraggable = false;
-			if (currentTime <= 0) 
-			{
+           
+            summonZoneTextBox.text = currentTime.ToString("F1"); 
+
+            //IF the current time is larger than or equal to the cast time
+            isDraggable = false;
+            if (currentTime <= 0)
+            {
                 //clear summon zone text
                 summonZoneTextBox.text = "";
                 //reset the timer
                 currentTime = 0;
-				//Set state of card to being in the graveyard
-				inGraveyard = true;
-				//Set state of card to not being in the summon zone
-				inSummonZone = false;
-			}
+                //Set state of card to being in the graveyard
+                inGraveyard = true;
+                //Set state of card to not being in the summon zone
+                inSummonZone = false;
+            }
 
-		}
-		//If the card is in the graveyard and manager code hasn't been executed yet
-		if (inGraveyard && doneAddingToGraveyard == false) 
-		{
+        }
+        //If the card is in the graveyard and manager code hasn't been executed yet
+        if (inGraveyard && doneAddingToGraveyard == false)
+        {
             photonView.RPC("SendToGraveyard", PhotonTargets.All);
             //SendToGraveyard();
         }
-	}
+    }
 
-	//Registers that the player has clicked on the card
-	public virtual void OnMouseDown()			
-	{
-		if (photonView.isMine && isDraggable == true) 
-		{
-			cardHandPos = gameObject.transform.position;
-			screenPoint = Camera.main.WorldToScreenPoint (gameObject.transform.position);
-			offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+    //Registers that the player has clicked on the card
+    protected virtual void OnMouseDown()
+    {
+        if (photonView.isMine && isDraggable == true)
+        {
+            cardHandPos = gameObject.transform.position;
+            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
 
-		}
-	}
+        }
+    }
 
-	//Registers that the player has let go of the card
-	public virtual void OnMouseUp()			
-	{
+    //Registers that the player has let go of the card
+    public virtual void OnMouseUp()
+    {
         //if this is the local player, drop the card
         //network player receives drop through RPC call in PlayerController (void PlayCard)
-		if (photonView.isMine)
+        if (photonView.isMine)
         {
             dropped = true;
             localPlayerController.cardIsDropped(gameObject, cardHandPos);
         }
 
-        //Makes sure summon zone textbox is assigned
-        GetSummonZoneText();
-		
-	}
+    }
 
-	//Registers that the card is being dragged
-	public  void OnMouseDrag()			
-	{
-		if (photonView.isMine && isDraggable == true)
+    //Registers that the card is being dragged
+    public void OnMouseDrag()
+    {
+        if (photonView.isMine && isDraggable == true)
         {
-			Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
-			Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
-			transform.position = curPosition;
-		}
-	}
-	//Registers what card is under the mouse
-	public virtual void OnMouseOver()
-	{
-		Debug.Log (gameObject.name);
-		if (photonView.isMine) 
-		{
-            //localPlayerController.setMousedOverCard(gameObject);
-            //TEST
-            //p1Manager.GetComponent<Player1Manager> ().setMousedOverCard (gameObject);
-        } 
-	}
-	//Registers what card is under the mouse
-	public virtual void OnMouseExit()
-	{
-		playedCardSelectedSound = false;
-	}
-
-	//method to return the dropped variable
-	public bool isDropped()
-	{
-		return dropped;
-	}
-	//method to set the dropped variable
-	public void setDroppedState(bool b)
-	{
-		dropped = b;
-	}
-	public float currentCastingTime()
-	{
-		return currentTime;
-	}
-	public void setGraveyardVariables()
-	{
-		inSummonZone = false;
-		inGraveyard = true;
-		doneAddingToGraveyard = true;
-	}
-	public void setSummonZoneTextBox(Text card)
-	{
-		summonZoneTextBox = card;
-	}
-	public Text getSummonZoneTextBox()
-	{
-		return summonZoneTextBox;
-	}
-
-   
+            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+            Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+            transform.position = curPosition;
+        }
+    }
+    //Registers what card is under the mouse
     
+    protected virtual void OnMouseOver()
+    {
+        //if (photonView.isMine)
+        //{
+        transform.localScale = zoomScale;
+       // }
+    }
+    //Registers what card is under the mouse
+    public virtual void OnMouseExit()
+    {
+        playedCardSelectedSound = false;
+        transform.localScale = startingScale;
+    }
+
+    //method to return the dropped variable
+    public bool isDropped()
+    {
+        return dropped;
+    }
+    //method to set the dropped variable
+    public void setDroppedState(bool b)
+    {
+        dropped = b;
+    }
+    public float currentCastingTime()
+    {
+        return currentTime;
+    }
+    public void setGraveyardVariables()
+    {
+        inSummonZone = false;
+        inGraveyard = true;
+        doneAddingToGraveyard = true;
+    }
+
     public void InitializeCard(string id)
     {
-    
+
         Debug.Log("id of this card is: " + id);
 
         /*
@@ -319,11 +314,9 @@ public abstract class Card : MonoBehaviour
             //Debug.Log(currentString);
 
             //Assign variables
-            switch(currentString)
+            switch (currentString)
             {
-                case "PrefabName":
-                    prefabName = nextString;
-                    break;
+               
                 case "ArtName":
                     artName = nextString;
                     break;
@@ -356,11 +349,11 @@ public abstract class Card : MonoBehaviour
                     break;
                 case "OwnerHealthChange":
                     ownerHealthChange = int.Parse(nextString);
-                    break;         
+                    break;
                 case "CreatureAbility":
                     string ability = nextString;
                     creatureAbilities.Add(ability); //= int.Parse(nextString);
-                    break;   
+                    break;
                 default:
                     break;
             }
@@ -369,18 +362,18 @@ public abstract class Card : MonoBehaviour
         //Set the proper art for the card
         SetArt();
         //set all internal variables on a card using this function
-        UpdateInternalVariables();    
+        UpdateInternalVariables();
 
     }
 
     public void SetArt()
     {
-        if(artName != null && artName != "temp")
+        if (artName != null && artName != "temp")
         {
             cardArtImage.overrideSprite = Resources.Load<Sprite>("CardArt/" + artName);
             Debug.Log(Resources.Load("CardArt/" + artName));
         }
-        
+
     }
     //this function should be overridden in child script to update any
     //internal variables that should be set on card initialization
@@ -416,7 +409,7 @@ public abstract class Card : MonoBehaviour
             }
             else
             {
-                summonZoneTextBox = opponentPlayerController.getSummonZone(gameObject);         
+                summonZoneTextBox = opponentPlayerController.getSummonZone(gameObject);
             }
         }
     }
@@ -451,7 +444,7 @@ public abstract class Card : MonoBehaviour
     public void SendToGraveyard()
     {
         Debug.Log(cardTitle + "sent to graveyard");
-       
+
         //Set this to false to prevent multiple executions of this block
         doneAddingToGraveyard = true;
 
@@ -475,7 +468,7 @@ public abstract class Card : MonoBehaviour
             localPlayerController.sendToGraveyard(gameObject);
         }
         else
-        {      
+        {
             //Execute the game manager code
             opponentPlayerController.sendToGraveyard(gameObject);
         }
@@ -485,7 +478,7 @@ public abstract class Card : MonoBehaviour
     //handles the functions for returning a card to a player's hand
     public void ReturnToHand()
     {
-        if(photonView.isMine)
+        if (photonView.isMine)
         {
             Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");
 
@@ -547,8 +540,8 @@ public abstract class Card : MonoBehaviour
     {
         //Graveyard effect goes here
     }
-    
-    
+
+
 
     //Photon Serialize View
     public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -559,7 +552,7 @@ public abstract class Card : MonoBehaviour
             //sync health
             //stream.SendNext(cardId);
             //stream.SendNext(cardTitle);
-            
+
 
         }
         else
