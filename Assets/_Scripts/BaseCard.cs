@@ -24,6 +24,20 @@ public abstract class BaseCard : MonoBehaviour
     //Scaling variables
     protected Vector3 startingScale, zoomScale;
 
+    //Card State
+    public enum cardState { OutOfPlay, InHand, Held, OnField, InGraveyard };
+    public cardState currentCardState = cardState.OutOfPlay;
+
+    //asst. variables
+    public bool isHeld = false; //< checks if card is currently being dragged by player
+    public bool onField = false; //< checks if card is on the field (ie in play)
+    public bool touchingSummonZone = false; //< checks if card is held over summon zone
+   
+    public int zoneIndex; 
+    //The position that the card was at when the player picks up the card. 
+    //This is used for when a player makes an invalid placement the card is placed back in it's original hand position
+    public Vector3 cardHandPos;
+
 
     //STATS 
     //all card stats are here, are assigned by custom data from Playfab
@@ -75,8 +89,7 @@ public abstract class BaseCard : MonoBehaviour
     public int playerID;
     //The card number. Used to correctly delete from the player's hand
     public int cardNumber;
-    //Checks to see if the player dropped the card.
-    protected bool dropped;
+   
 
     protected float currentTime;
    
@@ -85,9 +98,7 @@ public abstract class BaseCard : MonoBehaviour
     //Something fo the dragging of cards
     protected Vector3 offset;
    
-    //The position that the card was at when the player picks up the card. 
-    //This is used for when a player makes an invalid placement the card is placed back in it's original hand position
-    protected Vector3 cardHandPos;
+   
     // Use this for initialization
     protected bool isDraggable;
 
@@ -162,12 +173,10 @@ public abstract class BaseCard : MonoBehaviour
         GetPlayers();
 
         //If the card is Not in the graveyard and is in the summon zone
-        if (!inGraveyard && inSummonZone)
+        if (currentCardState == cardState.OnField)
         {
-
             //Increment the current Time
             currentTime -= Time.deltaTime;
-            //make sure summon zone text is assigned
            
             summonZoneTextBox.text = currentTime.ToString("F1"); 
 
@@ -193,16 +202,25 @@ public abstract class BaseCard : MonoBehaviour
             //SendToGraveyard();
         }
     }
-
+    public void AddCardToHand(int indexToSet)
+    {
+        handIndex = indexToSet;
+        currentCardState = cardState.InHand;
+    }
     //Registers that the player has clicked on the card
     protected virtual void OnMouseDown()
     {
-        if (photonView.isMine && isDraggable == true)
+        if (photonView.isMine)
         {
-            cardHandPos = gameObject.transform.position;
-            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
-
+            transform.localScale = startingScale;
+            if (currentCardState == cardState.InHand)
+            {
+                currentCardState = cardState.Held;
+                cardHandPos = gameObject.transform.position;
+                screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+                offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+                //audioManager.playCardPickup();
+            }
         }
     }
 
@@ -213,8 +231,30 @@ public abstract class BaseCard : MonoBehaviour
         //network player receives drop through RPC call in PlayerController (void PlayCard)
         if (photonView.isMine)
         {
-            dropped = true;
-            localPlayerController.cardIsDropped(gameObject, cardHandPos);
+            if(currentCardState == cardState.Held)
+            {
+                RaycastHit[] hits;
+                hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 100.0F);
+                Debug.Log("Number Of Hits: "+ hits.Length);
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    RaycastHit hit = hits[i];
+                    Debug.Log(hit.transform.name);
+                    if (hit.transform.tag == "Player1SummonZone")
+                    {
+                        currentCardState = cardState.OnField;
+                        localPlayerController.cardIsDropped(gameObject, hit.transform.GetComponent<SummonZone>().GetZoneIndex());
+                    }
+                }
+                Debug.Log("Done iterating hits");
+                if (currentCardState != cardState.OnField)
+                {
+                    //return to hand
+                    currentCardState = cardState.InHand;
+                    transform.position = cardHandPos;
+                    //localPlayerController.ReturnToHand(gameObject);
+                }
+            }
         }
 
     }
@@ -222,21 +262,24 @@ public abstract class BaseCard : MonoBehaviour
     //Registers that the card is being dragged
     public void OnMouseDrag()
     {
-        if (photonView.isMine && isDraggable == true)
+        if (photonView.isMine && currentCardState == cardState.Held)
         {
             Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
             Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
             transform.position = curPosition;
         }
     }
-    //Registers what card is under the mouse
     
+    //Registers what card is under the mouse
     protected virtual void OnMouseOver()
     {
-        //if (photonView.isMine)
-        //{
-        transform.localScale = zoomScale;
-       // }
+        
+        if (photonView.isMine && currentCardState == cardState.InHand)
+        {
+        
+            transform.localScale = zoomScale;
+        }
+        
     }
     //Registers what card is under the mouse
     public virtual void OnMouseExit()
@@ -245,16 +288,7 @@ public abstract class BaseCard : MonoBehaviour
         transform.localScale = startingScale;
     }
 
-    //method to return the dropped variable
-    public bool isDropped()
-    {
-        return dropped;
-    }
-    //method to set the dropped variable
-    public void setDroppedState(bool b)
-    {
-        dropped = b;
-    }
+    
     public float currentCastingTime()
     {
         return currentTime;
@@ -266,19 +300,9 @@ public abstract class BaseCard : MonoBehaviour
         doneAddingToGraveyard = true;
     }
 
-    public void InitializeCard(string id)
+    public void InitializeCard(int ownerID, string id)
     {
-
-        Debug.Log("id of this card is: " + id);
-
-        /*
-        //set the card's id
-        cardId = id;
-        //set cards name 
-        cardTitle = PlayFabDataStore.cardNameList[id];   
-        //set the cards custom data to be the custom data associated with this card id
-        SetCustomData(PlayFabDataStore.cardCustomData[id]); 
-        */
+        playerID = ownerID;
         photonView.RPC("SetCustomData", PhotonTargets.All, id);
     }
 
@@ -396,23 +420,7 @@ public abstract class BaseCard : MonoBehaviour
         return true;
     }
 
-    //checks if the card has a reference to summon zone text
-    //assigns it if not
-    public void GetSummonZoneText()
-    {
-        //finds the text box that corresponds to the summon zone
-        if (summonZoneTextBox == null)
-        {
-            if (photonView.isMine)
-            {
-                summonZoneTextBox = localPlayerController.getSummonZone(gameObject);
-            }
-            else
-            {
-                summonZoneTextBox = opponentPlayerController.getSummonZone(gameObject);
-            }
-        }
-    }
+    
 
     //store all data for player objects
     public void GetPlayers()

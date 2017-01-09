@@ -5,10 +5,14 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    //PLAYER SETTINGS
+    //the number of cards in a player's deck
+    const int deckSize = 40;
+
     public delegate void LoseEvent();
     public static event LoseEvent OnLose;
 
-    // Components
+    // COMPONENTS
     GameObject PlayerManager;
     PlayerController opponent;
     PhotonView photonView;
@@ -34,8 +38,7 @@ public class PlayerController : MonoBehaviour
     int startingHandSize = 5;
     //The speed in seconds in which the player draws a card from the deck
     int libraryDrawSpeed = 7;
-    //the number of cards in a player's deck
-    int deckSize = 40;
+    
     
     //The list of summoning zones
     public GameObject[] SummonZones = new GameObject[3];
@@ -44,7 +47,7 @@ public class PlayerController : MonoBehaviour
     public GameObject[] playerHand = new GameObject[7];
     //public List<GameObject> playerHand = new List<GameObject>(7);
 
-    public List<int> cardDeck = new List<int>(60); //CHANGED 
+    public List<int> cardDeck;
 
 
     //The list that represents the player's graveyard
@@ -81,6 +84,8 @@ public class PlayerController : MonoBehaviour
   
     void Awake()
     {
+        // TODO put back commented section, hard coded for testing only
+        cardDeck = new List<int>(20);//(deckSize);
         //get this object's photon view component
         photonView = GetComponent<PhotonView>();
         //get a reference to the game manager
@@ -162,15 +167,12 @@ public class PlayerController : MonoBehaviour
         {
             //retrieve item id for this item instance id
             string itemId = PlayFabDataStore.itemIdCollection[cardIds[i]];
-            //get the prefab name associated with this item id
-            string cardToDraw = PlayFabDataStore.cardPrefabs[itemId]; //< TODO make all cards use the same prefab, attach proper behavior in code
             //Instantiate the passed card over photon network, place it in the local card pool
-            GameObject cardToAdd = PhotonNetwork.Instantiate(("Cards/" + cardToDraw), cardPool, Quaternion.identity, 0);
+            GameObject cardToAdd = PhotonNetwork.Instantiate(("BaseCardPrefab"), cardPool, Quaternion.identity, 0);
             //get the card's view Id to reference the same card
             int viewId = cardToAdd.GetComponent<PhotonView>().viewID;
             //INITIALIZE CARD
-            cardToAdd.GetComponent<Card>().playerID = playerID;
-            cardToAdd.GetComponent<Card>().InitializeCard(itemId);
+            cardToAdd.GetComponent<BaseCard>().InitializeCard(playerID, itemId);
             //add that card to the deck
             cardDeck.Add(viewId);
         }
@@ -198,7 +200,8 @@ public class PlayerController : MonoBehaviour
         {opponent = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();}
         //keep health text updated to current health
         healthTextBox.text = "Life: " + health;
-        CheckForLoss();
+        //TODO put this back
+        //CheckForLoss();
         DrawTimer();
     }
 
@@ -233,11 +236,13 @@ public class PlayerController : MonoBehaviour
         if (cardToAdd = PhotonView.Find(viewId).gameObject)
         {
             cardToAdd.transform.position = new Vector3(handZone.x + (currentHandSize * 5f), handZone.y, handZone.z);
-            //set the card's player id
-            cardToAdd.GetComponent<Card>().playerID = playerID;
             //add it to the player's hand
             //playerHand.Add(cardToAdd);
-            cardToAdd.GetComponent<Card>().handIndex = AddToHand(cardToAdd); //< returns index of card                                                                             //increment the index of the deck (since a card has now been taken)
+            BaseCard cardScript = cardToAdd.GetComponent<BaseCard>();
+            int handIndex = AddToHand(cardToAdd); //< returns index of card   
+            //set cards hand index and InHand state
+            cardScript.AddCardToHand(handIndex);  
+            //increment the index of the deck (since a card has now been taken)
             currentCardIndex++;
         }
     }
@@ -266,8 +271,6 @@ public class PlayerController : MonoBehaviour
     {
         if (playerHand[index] != null)
         {
-            Debug.Log("CARD REMOVED FROM INDEX: "+ index);
-            Debug.Log("CURRENT HAND SIZE: " + currentHandSize);
             playerHand[index] = null;
             //decrement hand size
             currentHandSize--;
@@ -283,6 +286,17 @@ public class PlayerController : MonoBehaviour
             }
         }
         else { Debug.Log("Unable to remove card from hand, no card at index");}
+    }
+
+    public void ReturnToHand(GameObject card)
+    {
+        BaseCard cardScript = card.GetComponent<BaseCard>();
+        if (cardScript.onField) //< if the card is returned to hand from play
+        {
+            // TODO handle return to hand from play
+        }
+        else//< if card is dropped in an invalid place
+        { card.transform.position = cardScript.cardHandPos; }   
     }
 
     // checks if a player's health has reached 0
@@ -344,60 +358,61 @@ public class PlayerController : MonoBehaviour
       
     }
     //////////////////////FUNCTIONS FROM P1MANAGER//////////////////////////////////////////////////////////////////////
-   
 
-    //Method called for when a card is dropped
-    public void cardIsDropped(GameObject card, Vector3 cardHandPos)
-    {
-
-        //Set the state of being dropped to false
-        card.GetComponent<Card>().setDroppedState(false);
-
-        //Check which zone it was dropped on
-        for (int i = 0; i < SummonZones.Length; i++)
+    
+        //Method called for when a card is dropped
+        public void cardIsDropped(GameObject card, int zoneIndex)
         {
-            //If the summoning zone isn't occupied
-            if (!SummonZones[i].GetComponent<SummonZone>().isOccupied)
+
+              photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  zoneIndex);
+        /*
+            //Set the state of being dropped to false
+            card.GetComponent<Card>().setDroppedState(false);
+
+            //Check which zone it was dropped on
+            for (int i = 0; i < SummonZones.Length; i++)
             {
-                //Get's the position of the zone
-                Vector3 zonePosition = SummonZones[i].transform.position;
-                //Checks if the card is within a square surrounding the zone
-                if (card.transform.position.x > (zonePosition.x - 3) && card.transform.position.x < (zonePosition.x + 3))
+                //If the summoning zone isn't occupied
+                if (!SummonZones[i].GetComponent<SummonZone>().isOccupied)
                 {
-                    if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3))
+                    //Get's the position of the zone
+                    Vector3 zonePosition = SummonZones[i].transform.position;
+                    //Checks if the card is within a square surrounding the zone
+                    if (card.transform.position.x > (zonePosition.x - 3) && card.transform.position.x < (zonePosition.x + 3))
                     {
-                        //Play card, pass the card, the position of the zone, and the index of the zone
-                        photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  i);
-                        //PlayCard(card, zonePosition, i);
-                        //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
-						//If the card is a creature card, add it to the list of creature cards in play
-						if (card.GetComponent<Card> ().cardType == "Creature") {
-							creatureThatJustEntered = card;
-							creatureCardsInPlay.Add (card);
-						}
+                        if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3))
+                        {
+                            //Play card, pass the card, the position of the zone, and the index of the zone
+                            photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  i);
+                            //PlayCard(card, zonePosition, i);
+                            //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
+                            //If the card is a creature card, add it to the list of creature cards in play
+                            if (card.GetComponent<Card> ().cardType == "Creature") {
+                                creatureThatJustEntered = card;
+                                creatureCardsInPlay.Add (card);
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        //If the player picks up the card and drops it anywhere else the card will be placed back in the hand zone
-        if (card.GetComponent<Card>().inSummonZone == false)
-            card.transform.position = cardHandPos;
-    }
-   
+        */
+        }
+        
+
     //New Play Card Function
     [PunRPC]
-    public void PlayCard(int cardId, int i)
+    public void PlayCard(int cardId, int zoneIndex)
     {
         //find the spawned card
         GameObject card = PhotonView.Find(cardId).gameObject;
         //Puts the card in the summoning zone
-        card.transform.position = SummonZones[i].transform.position;
+        card.transform.position = SummonZones[zoneIndex].transform.position;
         //Sets the state of the zone to be occupied
-        SummonZones[i].GetComponent<SummonZone>().isOccupied = true;
+        SummonZones[zoneIndex].GetComponent<SummonZone>().isOccupied = true;
         //Sets the state of the card to being in a summon zone
-        card.GetComponent<Card>().inSummonZone = true;
-        RemoveFromHand(card.GetComponent<Card>().handIndex);
+        //card.GetComponent<Card>().inSummonZone = true;
+        RemoveFromHand(card.GetComponent<BaseCard>().handIndex);
     }
    
 	[PunRPC]
@@ -601,7 +616,7 @@ public class PlayerController : MonoBehaviour
 							//Get's the position of the zone
 							Vector3 zonePosition = SummonZones[i].transform.position;
 							//Play card, pass the card, the position of the zone, and the index of the zone
-							card.GetComponent<CreatureTargetSpellCard>().setSummonZoneTextBox(SummonZones[i].GetComponent<SummonZone>().textBox);
+							//card.GetComponent<CreatureTargetSpellCard>().setSummonZoneTextBox(SummonZones[i].GetComponent<SummonZone>().textBox);
 							card.GetComponent<CreatureTargetSpellCard>().setValidCreatureToDebuff(enemyObjectUnderMouse);
                             //PlayCard(card, zonePosition, i);
                             //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
@@ -659,8 +674,8 @@ public class PlayerController : MonoBehaviour
                 {
                     if (card.transform.position.y > (zonePosition.y - 4) && card.transform.position.y < (zonePosition.y + 4))
                     {
-                        Debug.Log("" + SummonZones[i].GetComponent<SummonZone>().textBox.name);
-                        textBoxToReturn = SummonZones[i].GetComponent<SummonZone>().textBox;
+                        //Debug.Log("" + SummonZones[i].GetComponent<SummonZone>().textBox.name);
+                        //textBoxToReturn = SummonZones[i].GetComponent<SummonZone>().textBox;
                     }
                 }
             }

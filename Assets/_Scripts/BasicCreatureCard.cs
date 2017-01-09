@@ -219,7 +219,7 @@ public class BasicCreatureCard : Card
                 }
                 else
                 {
-                    localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+                    //localPlayer.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
                 }
             }
             else
@@ -231,7 +231,7 @@ public class BasicCreatureCard : Card
                 }
                 else
                 {
-                    networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
+                    //networkOpponent.GetComponent<PlayerController>().cardIsDropped(gameObject, cardHandPos);
                 }
             }
             //Makes sure summon zone textbox is assigned

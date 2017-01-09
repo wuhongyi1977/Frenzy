@@ -205,7 +205,7 @@ public abstract class Card : MonoBehaviour
 		if (photonView.isMine)
         {
             dropped = true;
-            localPlayerController.cardIsDropped(gameObject, cardHandPos);
+            //localPlayerController.cardIsDropped(gameObject, cardHandPos);
         }
 
         //Makes sure summon zone textbox is assigned

@@ -252,7 +252,7 @@ public class CreatureCard : Card
                 }
                 else
                 {
-                    localPlayerController.cardIsDropped(gameObject, cardHandPos);
+                    //localPlayerController.cardIsDropped(gameObject, cardHandPos);
                 }
             }
             else
@@ -260,11 +260,11 @@ public class CreatureCard : Card
                 if (creatureCanAttack)
                 {
 
-                    opponentPlayerController.creatureCardIsDropped(gameObject, cardHandPos);
+                    //opponentPlayerController.creatureCardIsDropped(gameObject, cardHandPos);
                 }
                 else
                 {
-                    opponentPlayerController.cardIsDropped(gameObject, cardHandPos);
+                    //opponentPlayerController.cardIsDropped(gameObject, cardHandPos);
                 }
             }
             //Makes sure summon zone textbox is assigned

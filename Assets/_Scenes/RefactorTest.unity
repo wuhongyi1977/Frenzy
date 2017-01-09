@@ -234,7 +234,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_Name
-      value: SummonZone
+      value: SummonZone1
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_TagString
@@ -1489,7 +1489,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_Name
-      value: SummonZone
+      value: SummonZone1
       objectReference: {fileID: 0}
     - target: {fileID: 469878, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_LocalScale.x
@@ -2070,7 +2070,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_Name
-      value: SummonZone
+      value: SummonZone2
       objectReference: {fileID: 0}
     - target: {fileID: 469878, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_LocalScale.x
@@ -3270,7 +3270,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_Name
-      value: SummonZone
+      value: SummonZone0
       objectReference: {fileID: 0}
     - target: {fileID: 469878, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_LocalScale.x
@@ -3742,7 +3742,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_Name
-      value: SummonZone
+      value: SummonZone2
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_TagString
@@ -3804,7 +3804,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_Name
-      value: SummonZone
+      value: SummonZone0
       objectReference: {fileID: 0}
     - target: {fileID: 149362, guid: 27e0c47fe6efc5a4e9fa9e7ecc91bb36, type: 2}
       propertyPath: m_TagString

@@ -296,11 +296,7 @@ public class PlayfabApiCalls : MonoBehaviour
                         PlayFabDataStore.cardCustomData.Add(item.ItemId, splitResults);//item.CustomData);
                     }
 
-                    //store prefab names for all cards (possibly unnecessary with new custom data)
-                    if (!PlayFabDataStore.cardPrefabs.ContainsKey(item.ItemId))
-                    {
-                        PlayFabDataStore.cardPrefabs.Add(item.ItemId, prefabName);
-                    }
+                   
                     //stores display names for all cards
                     if (!PlayFabDataStore.cardNameList.ContainsKey(item.ItemId))
                     {

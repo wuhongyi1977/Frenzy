@@ -219,7 +219,7 @@ public class OneShotHealth : Card
             if (!canTarget)
             {     
                 //drop card for local player (network player drops it by rpc call)
-                localPlayerController.cardIsDropped(gameObject, cardHandPos);  
+                //localPlayerController.cardIsDropped(gameObject, cardHandPos);  
             }
             else if (waitingForTarget == true)
             {
@@ -337,7 +337,7 @@ public class OneShotHealth : Card
                 objectToTarget = PhotonView.Find(viewId).gameObject;
             }
            
-            targetLine.SetColors(Color.yellow, Color.red);
+           // targetLine.SetColors(Color.yellow, Color.red);
         }
         
         //set the first component of the line renderer to the position of the card

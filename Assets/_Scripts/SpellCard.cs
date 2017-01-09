@@ -43,7 +43,7 @@ public class SpellCard : BaseCard
         {
             if (summonZoneTextBox == null)
             {
-                GetSummonZoneText();
+                //GetSummonZoneText();
             }
             if (castTimeTextBox != null)
             {
@@ -144,7 +144,7 @@ public class SpellCard : BaseCard
     protected override void OnMouseOver()
     {
         base.OnMouseOver();
-
+        /*
         if (photonView.isMine && localPlayerController != null)
         {
             if (!playedCardSelectedSound)
@@ -166,11 +166,13 @@ public class SpellCard : BaseCard
             }
         }
         
-
+        */
     }
 
     public override void OnMouseUp()
     {
+        base.OnMouseUp();
+        /*
         //reset the bool to allow the Pickup sound to play again when the player picks up another card
         playedCardPickupSound = false;
 
@@ -180,13 +182,13 @@ public class SpellCard : BaseCard
             localPlayerController.makeLineInvisible();
             localPlayerController.drawLineOff();
             //set card as dropped
-            dropped = true;
+            //dropped = true;
 
             //if card is being put into play
             if (!canTarget)
             {
                 //drop card for local player (network player drops it by rpc call)
-                localPlayerController.cardIsDropped(gameObject, cardHandPos);
+                //localPlayerController.cardIsDropped(gameObject, cardHandPos);
             }
             else if (waitingForTarget == true)
             {
@@ -215,21 +217,14 @@ public class SpellCard : BaseCard
 
             }
             //Makes sure summon zone textbox is assigned
-            GetSummonZoneText();
+            //GetSummonZoneText();
         }
+        */
     }
 
     protected override void OnMouseDown()
     {
-        base.OnMouseDown();
-        Debug.Log("Mouse Down on: " + cardTitle);
-        if (photonView.isMine && isDraggable == true && isSelectable == true)
-        {
-            cardHandPos = gameObject.transform.position;
-            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
-            audioManager.playCardPickup();
-        }
+        base.OnMouseDown();     
     }
 
     public void SetTarget()
