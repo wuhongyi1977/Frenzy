@@ -233,20 +233,18 @@ public abstract class BaseCard : MonoBehaviour
         {
             if(currentCardState == cardState.Held)
             {
-                RaycastHit[] hits;
-                hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 100.0F);
-                Debug.Log("Number Of Hits: "+ hits.Length);
+                RaycastHit2D[] hits;
+                hits = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 100.0F);
                 for (int i = 0; i < hits.Length; i++)
                 {
-                    RaycastHit hit = hits[i];
-                    Debug.Log(hit.transform.name);
+                    RaycastHit2D hit = hits[i];
                     if (hit.transform.tag == "Player1SummonZone")
                     {
                         currentCardState = cardState.OnField;
                         localPlayerController.cardIsDropped(gameObject, hit.transform.GetComponent<SummonZone>().GetZoneIndex());
+                        break;
                     }
                 }
-                Debug.Log("Done iterating hits");
                 if (currentCardState != cardState.OnField)
                 {
                     //return to hand

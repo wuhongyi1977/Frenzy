@@ -145,8 +145,17 @@ public class PlayerController : MonoBehaviour
         int index = 0;
         foreach (Transform t in PlayerManager.transform)
         {
-            if (t.name == "SummonZone")
-            { SummonZones[index++] = t.gameObject; }
+            if(photonView.isMine)
+            {
+                if (t.tag == "Player1SummonZone")
+                { SummonZones[index++] = t.gameObject; }
+            }
+            else
+            {
+                if (t.tag == "Player2SummonZone")
+                { SummonZones[index++] = t.gameObject; }
+            }
+ 
         }
         //set initial text for health text box
         healthTextBox.text = "Life: " + startingHealth;
@@ -281,7 +290,7 @@ public class PlayerController : MonoBehaviour
                 {
                     playerHand[i].transform.position = new Vector3(handZone.x + ((i - 1) * 5f), handZone.y, 0);
                     //set card's hand index
-                    playerHand[i].GetComponent<Card>().handIndex = (i - 1);
+                    playerHand[i].GetComponent<BaseCard>().handIndex = (i - 1);
                 }                                 
             }
         }
