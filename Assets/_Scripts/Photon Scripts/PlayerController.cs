@@ -300,7 +300,7 @@ public class PlayerController : MonoBehaviour
     public void ReturnToHand(GameObject card)
     {
         BaseCard cardScript = card.GetComponent<BaseCard>();
-        if (cardScript.onField) //< if the card is returned to hand from play
+        if (cardScript.currentCardState == BaseCard.cardState.OnField) //< if the card is returned to hand from play
         {
             // TODO handle return to hand from play
         }
@@ -417,8 +417,6 @@ public class PlayerController : MonoBehaviour
         GameObject card = PhotonView.Find(cardId).gameObject;
         //Puts the card in the summoning zone
         card.transform.position = SummonZones[zoneIndex].transform.position;
-        //Sets the state of the zone to be occupied
-        SummonZones[zoneIndex].GetComponent<SummonZone>().isOccupied = true;
         //Sets the state of the card to being in a summon zone
         //card.GetComponent<Card>().inSummonZone = true;
         RemoveFromHand(card.GetComponent<BaseCard>().handIndex);

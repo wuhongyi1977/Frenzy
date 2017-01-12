@@ -12,6 +12,7 @@ public abstract class BaseCard : MonoBehaviour
     //CARD COMPONENTS
     //contains all visible components on card
     protected Transform cardLayoutCanvas;
+    protected Canvas cardCanvasScript;
     //the image to display for the card art
     protected Image cardArtImage;
     //the text displayed to the player listing the card's abilities
@@ -21,19 +22,17 @@ public abstract class BaseCard : MonoBehaviour
     protected Text castTimeTextBox;
     LineRenderer targetLine;
 
-    //Scaling variables
+    //Scaling variables and sorting layer
     protected Vector3 startingScale, zoomScale;
 
     //Card State
     public enum cardState { OutOfPlay, InHand, Held, OnField, InGraveyard };
     public cardState currentCardState = cardState.OutOfPlay;
 
-    //asst. variables
-    public bool isHeld = false; //< checks if card is currently being dragged by player
-    public bool onField = false; //< checks if card is on the field (ie in play)
-    public bool touchingSummonZone = false; //< checks if card is held over summon zone
-   
-    public int zoneIndex; 
+    //reference to zone this card is occupying
+    SummonZone currentZone = null;
+    public int zoneIndex;
+     
     //The position that the card was at when the player picks up the card. 
     //This is used for when a player makes an invalid placement the card is placed back in it's original hand position
     public Vector3 cardHandPos;
@@ -148,6 +147,8 @@ public abstract class BaseCard : MonoBehaviour
             cardArtImage = cardLayoutCanvas.FindChild("CardArtImage").GetComponent<Image>();
             targetLine = GetComponent<LineRenderer>();
             targetLine.enabled = false;
+
+            cardCanvasScript = cardLayoutCanvas.GetComponent<Canvas>();
         }
         startingScale = transform.localScale;
         zoomScale = startingScale * 2;
@@ -217,8 +218,6 @@ public abstract class BaseCard : MonoBehaviour
             {
                 currentCardState = cardState.Held;
                 cardHandPos = gameObject.transform.position;
-                screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-                offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
                 //audioManager.playCardPickup();
             }
         }
@@ -229,32 +228,30 @@ public abstract class BaseCard : MonoBehaviour
     {
         //if this is the local player, drop the card
         //network player receives drop through RPC call in PlayerController (void PlayCard)
-        if (photonView.isMine)
-        {
-            if(currentCardState == cardState.Held)
+        if (photonView.isMine && currentCardState == cardState.Held)
+        {                   
+            RaycastHit2D[] hits = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 100.0F);
+            for (int i = 0; i < hits.Length; i++)
             {
-                RaycastHit2D[] hits;
-                hits = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 100.0F);
-                for (int i = 0; i < hits.Length; i++)
+                //if a hit happens, card is over an unoccupied zone
+                if (hits[i].transform.tag == "Player1SummonZone")
                 {
-                    RaycastHit2D hit = hits[i];
-                    if (hit.transform.tag == "Player1SummonZone")
-                    {
-                        currentCardState = cardState.OnField;
-                        localPlayerController.cardIsDropped(gameObject, hit.transform.GetComponent<SummonZone>().GetZoneIndex());
-                        break;
-                    }
-                }
-                if (currentCardState != cardState.OnField)
-                {
-                    //return to hand
-                    currentCardState = cardState.InHand;
-                    transform.position = cardHandPos;
-                    //localPlayerController.ReturnToHand(gameObject);
+                    currentCardState = cardState.OnField;
+                    currentZone = hits[i].transform.GetComponent<SummonZone>();
+                    //tries to occupy the zone, returns -1 if zone is already occupied
+                    int zoneIndex = currentZone.SetOccupied(true);            
+                    //notify player controller that card was dropped
+                    localPlayerController.cardIsDropped(gameObject, zoneIndex);
+                    break;                       
                 }
             }
-        }
-
+            if (currentCardState != cardState.OnField)
+            {
+                //return to hand
+                currentCardState = cardState.InHand;
+                transform.position = cardHandPos;
+            }
+        }       
     }
 
     //Registers that the card is being dragged
@@ -263,7 +260,7 @@ public abstract class BaseCard : MonoBehaviour
         if (photonView.isMine && currentCardState == cardState.Held)
         {
             Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
-            Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+            Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint);
             transform.position = curPosition;
         }
     }
@@ -274,7 +271,7 @@ public abstract class BaseCard : MonoBehaviour
         
         if (photonView.isMine && currentCardState == cardState.InHand)
         {
-        
+            cardCanvasScript.sortingLayerName = "ActiveCard";
             transform.localScale = zoomScale;
         }
         
@@ -283,6 +280,7 @@ public abstract class BaseCard : MonoBehaviour
     public virtual void OnMouseExit()
     {
         playedCardSelectedSound = false;
+        cardCanvasScript.sortingLayerName = "Default";
         transform.localScale = startingScale;
     }
 
@@ -449,6 +447,14 @@ public abstract class BaseCard : MonoBehaviour
     [PunRPC]
     public void SendToGraveyard()
     {
+        //New Code
+        //set current zone to unoccupied
+        currentZone.SetOccupied(false);
+        currentZone = null;
+
+
+        ///end new code
+        ///
         Debug.Log(cardTitle + "sent to graveyard");
 
         //Set this to false to prevent multiple executions of this block

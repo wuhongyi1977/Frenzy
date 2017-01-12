@@ -22,24 +22,28 @@ public class SummonZone : MonoBehaviour
         zoneIndex = int.Parse(name.Substring(name.Length-1));
 	}
 	
-	// Update is called once per frame
-	void Update () 
-	{
-        //if a card is in the summon zone
-		if (isOccupied) 
-		{
-            //disable the zone's collider
-            zoneCollider.enabled = false;
-		}
-        else
-        {
-            //enable the zone's collider
-            zoneCollider.enabled = true;
-        }
-	}
 
     public int GetZoneIndex()
     {
+        return zoneIndex;
+    }
+
+    //Pass in a bool to set whether this zone is becoming occupied (true) or unoccupied (false)
+    //returns zone index, returns -1 if invalid
+    public int SetOccupied(bool occupy)
+    {
+        if(occupy)
+        {       
+            isOccupied = true;
+            //disable the zone's collider
+            zoneCollider.enabled = false;                 
+        }
+        else
+        {
+            isOccupied = false;
+            //enable the zone's collider
+            zoneCollider.enabled = true;
+        }
         return zoneIndex;
     }
 }
