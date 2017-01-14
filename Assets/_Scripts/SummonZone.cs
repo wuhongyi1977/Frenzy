@@ -28,22 +28,28 @@ public class SummonZone : MonoBehaviour
         return zoneIndex;
     }
 
-    //Pass in a bool to set whether this zone is becoming occupied (true) or unoccupied (false)
-    //returns zone index, returns -1 if invalid
-    public int SetOccupied(bool occupy)
+    //Pass in a card if this zone is becoming occupied (true) or null if unoccupied (false)
+    public void SetOccupied(BaseCard card , bool occupy)
     {
+        if(card == null)
+        {
+           Debug.LogError("No card passed to: " + this.gameObject.name);
+           return;
+        }
         if(occupy)
-        {       
+        {
+            //pass this script to the card as its current zone
+            card.SetOccupiedZone(this); 
             isOccupied = true;
             //disable the zone's collider
             zoneCollider.enabled = false;                 
         }
         else
         {
+            card.SetOccupiedZone(null);
             isOccupied = false;
             //enable the zone's collider
             zoneCollider.enabled = true;
         }
-        return zoneIndex;
     }
 }

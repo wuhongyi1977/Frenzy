@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 public class SpellCard : BaseCard
 {
+    /*
     //positive values for healing, negative values for damage
     public int ownerHealth = 0;
     public int opponentHealth = 0;
@@ -22,7 +23,7 @@ public class SpellCard : BaseCard
     public Text[] textBoxes;
 
     LineRenderer targetLine;
-
+    */
 
     protected override void Awake()                //Abstract method for start
     {
@@ -34,7 +35,8 @@ public class SpellCard : BaseCard
     }
     public override void Update()               //Abstract method for Update
     {
-   
+        base.Update();
+        /*
         //get references to player objects if not assigned
         GetPlayers();
 
@@ -91,6 +93,7 @@ public class SpellCard : BaseCard
             }
 
         }
+        */
 
     }
 
@@ -98,6 +101,7 @@ public class SpellCard : BaseCard
     //handles card's function upon casting
     public override void OnCast()
     {
+        /*
         //Debug.Log(photonView.owner + " cast "+ cardTitle + " on " + currentTarget.name +" successfully!");
 
         //disable targetting line
@@ -139,6 +143,7 @@ public class SpellCard : BaseCard
             }
 
         }
+        */
     }
 
     protected override void OnMouseOver()
@@ -229,6 +234,7 @@ public class SpellCard : BaseCard
 
     public void SetTarget()
     {
+        /*
         if (targetAssignment == false)
         {
             //if the target can only be the player, begin countdown
@@ -246,11 +252,16 @@ public class SpellCard : BaseCard
             }
             targetAssignment = true;
         }
+        */
     }
 
     //verify that the proper type of target is being selected
     public override bool VerifyTarget()
     {
+        base.VerifyTarget();
+
+        return false;
+        /*
         //copy this block into all cards, cards cannot target nothing or themselves
         if (targetObject == null || targetObject == this.gameObject)
         { return false; }
@@ -268,11 +279,13 @@ public class SpellCard : BaseCard
         {
             return false;
         }
+        */
 
     }
     [PunRPC]
     public void DrawTargetLine(int viewId, string targetTag)
     {
+        /*
         GameObject objectToTarget;
         targetLine.enabled = true;
         //set line color based on if this is your card or opponents
@@ -308,11 +321,13 @@ public class SpellCard : BaseCard
 
         //set the second component of the line renderer to the position of the target
         targetLine.SetPosition(1, objectToTarget.transform.position);
-
+        */
     }
     //Photon Serialize View
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
+        base.OnPhotonSerializeView(stream, info);
+        /*
         if (stream.isWriting)
         {
             //We own this player: send the others our data
@@ -328,6 +343,7 @@ public class SpellCard : BaseCard
             targetSelected = (bool)stream.ReceiveNext();
             //cardTitleTextBox.text = cardTitle;
         }
+        */
 
     }
 }

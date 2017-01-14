@@ -373,7 +373,7 @@ public class PlayerController : MonoBehaviour
         public void cardIsDropped(GameObject card, int zoneIndex)
         {
 
-              photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  zoneIndex);
+             photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  zoneIndex);
         /*
             //Set the state of being dropped to false
             card.GetComponent<Card>().setDroppedState(false);
@@ -415,10 +415,13 @@ public class PlayerController : MonoBehaviour
     {
         //find the spawned card
         GameObject card = PhotonView.Find(cardId).gameObject;
+        //find the proper summon zone
+        GameObject summonZone = SummonZones[zoneIndex];
+        //sets the zone as occupied, passes the card to occupy
+        summonZone.GetComponent<SummonZone>().SetOccupied(card.GetComponent<BaseCard>(), true);
         //Puts the card in the summoning zone
-        card.transform.position = SummonZones[zoneIndex].transform.position;
-        //Sets the state of the card to being in a summon zone
-        //card.GetComponent<Card>().inSummonZone = true;
+        card.transform.position = summonZone.transform.position;
+        //Remove card from hand
         RemoveFromHand(card.GetComponent<BaseCard>().handIndex);
     }
    
