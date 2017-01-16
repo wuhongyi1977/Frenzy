@@ -472,12 +472,12 @@ public abstract class Card : MonoBehaviour
         if (photonView.isMine)
         {
             //Execute the game manager code
-            localPlayerController.sendToGraveyard(gameObject);
+            localPlayerController.sendToGraveyard(gameObject, -1);
         }
         else
         {      
             //Execute the game manager code
-            opponentPlayerController.sendToGraveyard(gameObject);
+            opponentPlayerController.sendToGraveyard(gameObject, -1);
         }
         //handle graveyard effect of this card, if any
         OnGraveyard();

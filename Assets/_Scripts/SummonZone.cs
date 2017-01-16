@@ -39,14 +39,14 @@ public class SummonZone : MonoBehaviour
         if(occupy)
         {
             //pass this script to the card as its current zone
-            card.SetOccupiedZone(this); 
+          
             isOccupied = true;
             //disable the zone's collider
             zoneCollider.enabled = false;                 
         }
         else
         {
-            card.SetOccupiedZone(null);
+          
             isOccupied = false;
             //enable the zone's collider
             zoneCollider.enabled = true;

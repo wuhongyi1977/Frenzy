@@ -66,7 +66,7 @@ public class CreatureBuffCard : CreatureTargetSpellCard {
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
 				//Execute the game manager code
-				localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+				localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
 				//TEST
 				//p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
 			} 
@@ -77,7 +77,7 @@ public class CreatureBuffCard : CreatureTargetSpellCard {
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
 				//Execute the game manager code
-				networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+				networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
 				//TEST
 				//p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
 			}

@@ -90,13 +90,13 @@ public class CreatureETBDamageCard : CreatureCard {
 					inSummonZone = false;
 					if (photonView.isMine)
                     {
-                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
                         //TEST
                         //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
                     } 
 					else 
 					{
-                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
                         //TEST
                         //p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
                     }

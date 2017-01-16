@@ -162,15 +162,17 @@ public abstract class BaseCard : MonoBehaviour
         currentTime = castTime;
         inSummonZone = false;
         isDraggable = true;
-       
+
+        //get references to player objects if not assigned
+        GetPlayers();
         cardTitleTextBox.text = cardTitle;
 
 
     }
     public virtual void Update()                //Abstract method for Update
     {
-        //get references to player objects if not assigned
-        GetPlayers();
+        //
+        //GetPlayers();
 
         //If the card is Not in the graveyard and is in the summon zone
         if (currentCardState == cardState.OnField)
@@ -235,35 +237,26 @@ public abstract class BaseCard : MonoBehaviour
 
     protected void CheckForZone()
     {
-        Debug.Log("Checking hits for OnMouseUp!!!!!!!!");
         RaycastHit2D[] hits = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 100.0F);
         for (int i = 0; i < hits.Length; i++)
         {
+            Transform hit = hits[i].transform;
             //if a hit happens, card is over an unoccupied zone
-            if (hits[i].transform.tag == "Player1SummonZone")
-            {
-                SummonZone hitZone = hits[i].transform.GetComponent<SummonZone>();             
-                Debug.Log("Zone found, putting into play!!!!!!!!");
-                localPlayerController.cardIsDropped(gameObject, hitZone.GetZoneIndex());
+            if (hit.tag == "Player1SummonZone")
+            {             
+                zoneIndex = int.Parse(hit.name.Substring(hit.name.Length - 1));
+                bool droppedSuccess = localPlayerController.cardIsDropped(gameObject, zoneIndex);
+                if ( droppedSuccess== true)
+                {currentCardState = cardState.OnField;}
                 break;
             }
         }
         if (currentCardState != cardState.OnField)
         {
-            Debug.Log("Returning card to hand!!!!!!!!");
             //return to hand
             currentCardState = cardState.InHand;
             transform.position = cardHandPos;
         }
-    }
-
-
-    public void SetOccupiedZone(SummonZone zone)
-    {
-        if(zone != null)
-        {currentCardState = cardState.OnField;}  
-            
-        currentZone = zone;
     }
 
 
@@ -404,7 +397,6 @@ public abstract class BaseCard : MonoBehaviour
         if (artName != null && artName != "temp")
         {
             cardArtImage.overrideSprite = Resources.Load<Sprite>("CardArt/" + artName);
-            Debug.Log(Resources.Load("CardArt/" + artName));
         }
 
     }
@@ -430,7 +422,7 @@ public abstract class BaseCard : MonoBehaviour
     }
 
     
-
+    
     //store all data for player objects
     public void GetPlayers()
     {
@@ -457,6 +449,7 @@ public abstract class BaseCard : MonoBehaviour
             localPlayerController = localPlayer.GetComponent<PlayerController>();
         }
     }
+    
 
     [PunRPC]
     public void SendToGraveyard()
@@ -466,8 +459,6 @@ public abstract class BaseCard : MonoBehaviour
             Debug.Log(cardTitle + "sent to graveyard");
             //Set state of card to being in the graveyard
             currentCardState = cardState.InGraveyard;
-            //set current zone to unoccupied
-            currentZone.SetOccupied(this, false);
             summonZoneTextBox.text = "";
             //reset the timer
             currentTime = 0;
@@ -480,9 +471,9 @@ public abstract class BaseCard : MonoBehaviour
 
             //If the card beings to player 1
             if (photonView.isMine)
-            {localPlayerController.sendToGraveyard(gameObject);}
+            {localPlayerController.sendToGraveyard(gameObject, zoneIndex);}
             else
-            {opponentPlayerController.sendToGraveyard(gameObject);}
+            {opponentPlayerController.sendToGraveyard(gameObject, zoneIndex);}
             //handle graveyard effect of this card, if any
             OnGraveyard();
         }   

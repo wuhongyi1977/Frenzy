@@ -191,13 +191,13 @@ public class CreatureCard : Card
                     //if this is the local card object
                     if (photonView.isMine)
                     {
-                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
                         localPlayer.GetComponent<PlayerController>().creatureDied();
 
                     }
                     else
                     {
-                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
                         networkOpponent.GetComponent<PlayerController>().creatureDied();
 
                     }

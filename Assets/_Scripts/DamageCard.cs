@@ -78,7 +78,7 @@ public class DamageCard : Card
 			//Set this to false to prevent multiple executions of this block
 			doneAddingToGraveyard = true;
 			networkOpponent.GetComponent<PlayerController> ().ChangeHealth (damageToDeal * -1);
-            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
             //TEST
             //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
             /*

@@ -76,7 +76,7 @@ public class HealCard : Card {
 			//Set this to false to prevent multiple executions of this block
 			doneAddingToGraveyard = true;
 			localPlayer.GetComponent<PlayerController> ().ChangeHealth (healAmount);
-            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
             //TEST
             //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
             /*

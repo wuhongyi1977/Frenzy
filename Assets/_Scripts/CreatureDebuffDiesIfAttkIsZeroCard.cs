@@ -68,7 +68,7 @@ public class CreatureDebuffDiesIfAttkIsZeroCard : CreatureDebuffCard {
 					//The creature dies, send it to the graveyard
 					theCreature.GetComponent<CreatureCard>().setGraveyardVariables();
 					Debug.Log ("Creature attack damage: " + theCreature.GetComponent<CreatureCard> ().damageToDeal);
-					networkOpponent.GetComponent<PlayerController> ().sendToGraveyard (theCreature);
+					networkOpponent.GetComponent<PlayerController> ().sendToGraveyard (theCreature, -1);
 				}
 			}
 
@@ -83,7 +83,7 @@ public class CreatureDebuffDiesIfAttkIsZeroCard : CreatureDebuffCard {
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
 				//Execute the game manager code
-				localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+				localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
 				//TEST
 				//p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
 			} 
@@ -94,7 +94,7 @@ public class CreatureDebuffDiesIfAttkIsZeroCard : CreatureDebuffCard {
 				//Set this to false to prevent multiple executions of this block
 				doneAddingToGraveyard = true;
 				//Execute the game manager code
-				networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+				networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
 				//TEST
 				//p2Manager.GetComponent<Player2Manager> ().sendToGraveyard (gameObject);
 			}

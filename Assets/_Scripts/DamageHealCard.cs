@@ -71,7 +71,7 @@ public class DamageHealCard : Card {
 			doneAddingToGraveyard = true;
 			localPlayer.GetComponent<PlayerController> ().ChangeHealth (healAmount);
 			networkOpponent.GetComponent<PlayerController> ().ChangeHealth (damageToDeal * -1);
-            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject);
+            localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
             //TEST
             //p1Manager.GetComponent<Player1Manager> ().sendToGraveyard (gameObject);
             /*

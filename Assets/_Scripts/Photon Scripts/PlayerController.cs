@@ -42,6 +42,9 @@ public class PlayerController : MonoBehaviour
     
     //The list of summoning zones
     public GameObject[] SummonZones = new GameObject[3];
+    public Dictionary<int, bool> OccupiedZones = new Dictionary<int, bool>();//< stores whether a zone is occupied
+
+
     //The list that represents the player's hand
     //public Dictionary<int, GameObject> playerHand = new Dictionary<int, GameObject>();//< stores a card at an index
     public GameObject[] playerHand = new GameObject[7];
@@ -148,12 +151,18 @@ public class PlayerController : MonoBehaviour
             if(photonView.isMine)
             {
                 if (t.tag == "Player1SummonZone")
-                { SummonZones[index++] = t.gameObject; }
+                {
+                    SummonZones[index] = t.gameObject;
+                    OccupiedZones.Add(index++, false);
+                }
             }
             else
             {
                 if (t.tag == "Player2SummonZone")
-                { SummonZones[index++] = t.gameObject; }
+                {
+                    SummonZones[index] = t.gameObject;
+                    OccupiedZones.Add(index++, false);
+                }
             }
  
         }
@@ -369,11 +378,23 @@ public class PlayerController : MonoBehaviour
     //////////////////////FUNCTIONS FROM P1MANAGER//////////////////////////////////////////////////////////////////////
 
     
-        //Method called for when a card is dropped
-        public void cardIsDropped(GameObject card, int zoneIndex)
+    //Method called for when a card is dropped
+    public bool cardIsDropped(GameObject card, int zoneIndex)
+    {
+        //if zone is unoccupied
+        if(OccupiedZones[zoneIndex] == false)
         {
-
-             photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  zoneIndex);
+            Debug.Log("Zone is not occupied, playing card in zone: "+zoneIndex);
+            OccupiedZones[zoneIndex] = true;
+            photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID, zoneIndex);
+            return true;
+        }
+        else
+        {
+            Debug.Log("Zone "+ zoneIndex+ " is occupied, invalid play");
+            return false;
+        }
+      
         /*
             //Set the state of being dropped to false
             card.GetComponent<Card>().setDroppedState(false);
@@ -417,8 +438,11 @@ public class PlayerController : MonoBehaviour
         GameObject card = PhotonView.Find(cardId).gameObject;
         //find the proper summon zone
         GameObject summonZone = SummonZones[zoneIndex];
+        /*
         //sets the zone as occupied, passes the card to occupy
         summonZone.GetComponent<SummonZone>().SetOccupied(card.GetComponent<BaseCard>(), true);
+        */
+
         //Puts the card in the summoning zone
         card.transform.position = summonZone.transform.position;
         //Remove card from hand
@@ -637,7 +661,7 @@ public class PlayerController : MonoBehaviour
 					{
 						Debug.Log ("INVALID PLAY, SEND TO GY");
 						card.GetComponent<CreatureTargetSpellCard>().setGraveyardVariables();
-						sendToGraveyard (card);
+						sendToGraveyard (card, card.GetComponent<BaseCard>().zoneIndex);
 					}
 				}
 			}
@@ -646,19 +670,10 @@ public class PlayerController : MonoBehaviour
    
 
     //This method is called when the card is done casting
-    public void sendToGraveyard(GameObject card)
+    public void sendToGraveyard(GameObject card, int zoneIndex)
     {
-
-        //Find the zone that the card is in and set it to unoccupied
-        for (int i = 0; i < SummonZones.Length; i++)
-        {
-            //Debug.Log ("HERE");
-            if (card.transform.position.x == SummonZones[i].transform.position.x)
-            {
-                //Debug.Log ("HERE2");
-                SummonZones[i].GetComponent<SummonZone>().isOccupied = false;
-            }
-        }
+        // set occupied zone as empty
+        OccupiedZones[zoneIndex] = false;
 
         //Add card to graveyard
         graveyard.Add(card);
