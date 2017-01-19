@@ -309,7 +309,7 @@ public class PlayerController : MonoBehaviour
     public void ReturnToHand(GameObject card)
     {
         BaseCard cardScript = card.GetComponent<BaseCard>();
-        if (cardScript.currentCardState == BaseCard.cardState.OnField) //< if the card is returned to hand from play
+        if (cardScript.currentCardState == BaseCard.cardState.InPlay) //< if the card is returned to hand from play
         {
             // TODO handle return to hand from play
         }
@@ -375,7 +375,6 @@ public class PlayerController : MonoBehaviour
         }
       
     }
-    //////////////////////FUNCTIONS FROM P1MANAGER//////////////////////////////////////////////////////////////////////
 
     
     //Method called for when a card is dropped
@@ -394,40 +393,14 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Zone "+ zoneIndex+ " is occupied, invalid play");
             return false;
         }
-      
-        /*
-            //Set the state of being dropped to false
-            card.GetComponent<Card>().setDroppedState(false);
-
-            //Check which zone it was dropped on
-            for (int i = 0; i < SummonZones.Length; i++)
-            {
-                //If the summoning zone isn't occupied
-                if (!SummonZones[i].GetComponent<SummonZone>().isOccupied)
-                {
-                    //Get's the position of the zone
-                    Vector3 zonePosition = SummonZones[i].transform.position;
-                    //Checks if the card is within a square surrounding the zone
-                    if (card.transform.position.x > (zonePosition.x - 3) && card.transform.position.x < (zonePosition.x + 3))
-                    {
-                        if (card.transform.position.y > (zonePosition.y - 3) && card.transform.position.y < (zonePosition.y + 3))
-                        {
-                            //Play card, pass the card, the position of the zone, and the index of the zone
-                            photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID,  i);
-                            //PlayCard(card, zonePosition, i);
-                            //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
-                            //If the card is a creature card, add it to the list of creature cards in play
-                            if (card.GetComponent<Card> ().cardType == "Creature") {
-                                creatureThatJustEntered = card;
-                                creatureCardsInPlay.Add (card);
-                            }
-                        }
-                    }
-                }
-            }
-
-        */
-        }
+      /*
+        //If the card is a creature card, add it to the list of creature cards in play
+        if (card.GetComponent<Card> ().cardType == "Creature") {
+            creatureThatJustEntered = card;
+            creatureCardsInPlay.Add (card);
+     */
+       
+    }
         
 
     //New Play Card Function
@@ -497,8 +470,8 @@ public class PlayerController : MonoBehaviour
 
         GameObject attacker = PhotonView.Find(attackerId).gameObject;
         GameObject target = PhotonView.Find(targetId).gameObject;
-        Card attackerScript = attacker.GetComponent<Card>();
-        Card targetScript = target.GetComponent<Card>();
+        BaseCard attackerScript = attacker.GetComponent<BaseCard>();
+        BaseCard targetScript = target.GetComponent<BaseCard>();
 
         Debug.Log("Resolving damage from "+attacker.name+" to "+target.name);
         CreatureCard targetCreature = target.GetComponent<CreatureCard>();
@@ -546,10 +519,10 @@ public class PlayerController : MonoBehaviour
             Debug.Log(attackingCard + " dealing damage to " + currentTarget);
 
             //get the card component of the dragged card
-            Card attackCardScript = attackingCard.GetComponent<Card>();
+            BaseCard attackCardScript = attackingCard.GetComponent<BaseCard>();
            
             //if the target is a card
-            if(currentTarget.GetComponent<Card>() != null)
+            if(currentTarget.GetComponent<BaseCard>() != null)
             {
                 //if the hit object is a creature card
                 if (currentTarget.tag == "CreatureCard")
@@ -621,7 +594,7 @@ public class PlayerController : MonoBehaviour
             else if (enemyObjectUnderMouse.tag == "Player2")
             {
                 card.GetComponent<CreatureCard>().creatureCanAttack = false;
-                gameManager.dealDamage(card.GetComponent<DamageCard>().damageToDeal, playerID);
+                //gameManager.dealDamage(card.GetComponent<DamageCard>().damageToDeal, playerID);
             }
         }
     }
@@ -642,6 +615,7 @@ public class PlayerController : MonoBehaviour
 				//If the creature card is in the battlefield
 				if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().inBattlefield) 
 				{
+                    /*
 					//Find an open summoning slot
 					for (int i = 0; i < SummonZones.Length; i++) 
 					{
@@ -663,6 +637,7 @@ public class PlayerController : MonoBehaviour
 						card.GetComponent<CreatureTargetSpellCard>().setGraveyardVariables();
 						sendToGraveyard (card, card.GetComponent<BaseCard>().zoneIndex);
 					}
+                    */
 				}
 			}
 		}
@@ -684,29 +659,7 @@ public class PlayerController : MonoBehaviour
 		if (card.GetComponent<CreatureCard>() != null)
 			creatureCardsInPlay.Remove (card);
     }
-    public Text getSummonZone(GameObject card)
-    {
-        Text textBoxToReturn = null;
-        for (int i = 0; i < SummonZones.Length; i++)
-        {
-            //If the summoning zone is occupied
-            if (SummonZones[i].GetComponent<SummonZone>().isOccupied)
-            {
-                //Get's the position of the zone
-                Vector3 zonePosition = SummonZones[i].transform.position;
-                //Checks if the card is within a square surrounding the zone
-                if (card.transform.position.x > (zonePosition.x - 4) && card.transform.position.x < (zonePosition.x + 4))
-                {
-                    if (card.transform.position.y > (zonePosition.y - 4) && card.transform.position.y < (zonePosition.y + 4))
-                    {
-                        //Debug.Log("" + SummonZones[i].GetComponent<SummonZone>().textBox.name);
-                        //textBoxToReturn = SummonZones[i].GetComponent<SummonZone>().textBox;
-                    }
-                }
-            }
-        }
-        return textBoxToReturn;
-    }
+   
 
     //Takes the carddeck and shuffles its contents
     private void ShuffleDeck()
@@ -719,25 +672,7 @@ public class PlayerController : MonoBehaviour
             cardDeck[randomIndex] = temp;
         } 
     }
-    /*
-    public static List<string> shuffleDeck(List<string> library)
-    {
-        System.Random _random = new System.Random();
-        string temp;
-
-        int n = library.Count;
-        for (int i = 0; i < n; i++)
-        {
-
-            int r = i + (int)(_random.NextDouble() * (n - i));
-            temp = library[r];
-            library[r] = library[i];
-            library[i] = temp;
-        }
-        return library;
-
-    }
-    */
+    
    
     public void drawLineOn()
     {

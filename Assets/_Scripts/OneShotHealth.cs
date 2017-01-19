@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-public class OneShotHealth : Card
+public class OneShotHealth : BaseCard
 {
     //positive values for healing, negative values for damage
     public int ownerHealth = 0;
@@ -30,13 +30,12 @@ public class OneShotHealth : Card
         //find components
         localPlayer = GameObject.Find("LocalPlayer");
         networkOpponent = GameObject.Find("NetworkOpponent");
-        p1Manager = GameObject.Find("Player1Manager");
-        p2Manager = GameObject.Find("Player2Manager");
+       
         doneAddingToGraveyard = false;
-        currentTime = castTime;
+       
         inSummonZone = false;
         summonZoneTextBox = null;
-        isDraggable = true;
+       
         //gameObject.GetComponentInChildren<Text>();
         textBoxes = gameObject.GetComponentsInChildren<Text>();
         for (int i = 0; i < textBoxes.Length; i++)
@@ -71,16 +70,7 @@ public class OneShotHealth : Card
         //If the card is Not in the graveyard and is in the summon zone
         if (!inGraveyard && inSummonZone)
         {
-			if (summonZoneTextBox == null)
-			{
-				GetSummonZoneText();
-			}
-			if (castTimeTextBox != null)
-			{
-				castTimeTextBox.text = castTime.ToString();
-			}
-            //IF the current time is larger than or equal to the cast time
-            isDraggable = false;
+			
             //allow player to choose target
             canTarget = true;
             //assign this cards target based on CustomData
@@ -97,27 +87,7 @@ public class OneShotHealth : Card
             if (targetSelected == true)
             {
                 
-                //Decrement the current Time
-                currentTime -= Time.deltaTime;
-               
-                //set summon zone text to current time
-                summonZoneTextBox.text = currentTime.ToString("F1");
-                //play card builduup sound when current time is near 0
-				if (currentTime <= 3.25f && !playedCardBuildupSound) 
-				{
-					playedCardBuildupSound = true;
-					audioManager.playCardBuildUp ();
-				}
-                //if the cast time completes
-                if (currentTime <= 0)
-                {
-                    //run this card's OnCast function
-                    OnCast();
-
-                    //send to graveyard
-                    SendToGraveyard();
-                   
-                }
+                
             }
 
         }
@@ -171,7 +141,7 @@ public class OneShotHealth : Card
         }    
     }
 
-    public override void OnMouseOver()
+    protected override void OnMouseOver()
     {
        
        
@@ -202,7 +172,7 @@ public class OneShotHealth : Card
        
     }
     
-    public override void OnMouseUp()
+    protected override void OnMouseUp()
     {
         //reset the bool to allow the Pickup sound to play again when the player picks up another card
         playedCardPickupSound = false;
@@ -212,8 +182,6 @@ public class OneShotHealth : Card
             //make drag line invisible
             localPlayerController.makeLineInvisible();
             localPlayerController.drawLineOff();
-            //set card as dropped
-            dropped = true;
             
             //if card is being put into play
             if (!canTarget)
@@ -247,15 +215,14 @@ public class OneShotHealth : Card
                 }
               
             }
-            //Makes sure summon zone textbox is assigned
-            GetSummonZoneText();
+            
         }   
     }
 
-    public override void OnMouseDown()
+    protected override void OnMouseDown()
     {
         Debug.Log("Mouse Down on: "+cardTitle);
-        if (photonView.isMine && isDraggable == true && isSelectable == true)
+        if (photonView.isMine && isSelectable == true)
         {
             cardHandPos = gameObject.transform.position;
             screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);

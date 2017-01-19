@@ -26,16 +26,19 @@ public abstract class BaseCard : MonoBehaviour
     protected Vector3 startingScale, zoomScale;
 
     //Card State
-    public enum cardState { OutOfPlay, InHand, Held, OnField, InGraveyard };
+    public enum cardState { OutOfPlay, InHand, Held, Casting, InPlay, InGraveyard };
     public cardState currentCardState = cardState.OutOfPlay;
 
     //reference to zone this card is occupying
-    SummonZone currentZone = null;
     public int zoneIndex;
      
     //The position that the card was at when the player picks up the card. 
     //This is used for when a player makes an invalid placement the card is placed back in it's original hand position
     public Vector3 cardHandPos;
+    public int handIndex;
+
+    bool casting = false;
+    float castCountdown;
 
 
     //STATS 
@@ -44,14 +47,22 @@ public abstract class BaseCard : MonoBehaviour
     public string artName;
     //name of art asset to use for border art
     public string borderArt;
-    //The faction that the card belongs to. Neutral means it is available to all factions
-    public string faction = "Neutral";
+
     //the type of card classification this card has (creature, spell, etc.)
     public string cardType;
-    //The potential targets for this card (could be creature, player, all)
-    public string target;
     //The time it takes for the card to be casted
     public float castTime;
+    //The potential targets for this cards abilities (could be creature, player, all, autocast)
+    //does not include types of targets for a creature attack, but DOES include targets for special creature abilites (like direct damage on summon)
+    public string target;
+    //The faction that the card belongs to. Neutral means it is available to all factions
+    public string faction = "Neutral";
+    
+   
+    /// <summary>
+    ///  All of these only apply to specific types of cards (creature, spell, etc)
+    ///  TODO should be moved to proper script
+    /// </summary>
     //the time it takes for this card to recharge after a use (ex: time it takes a creature before it can attack again)
     public float rechargeTime;
     //the attack power of this card (if its a creature)
@@ -90,16 +101,12 @@ public abstract class BaseCard : MonoBehaviour
     public int cardNumber;
    
 
-    protected float currentTime;
    
     //Something for the dragging of cards
     protected Vector3 screenPoint;
     //Something fo the dragging of cards
     protected Vector3 offset;
    
-   
-    // Use this for initialization
-    protected bool isDraggable;
 
     public GameObject localPlayer;
     public GameObject networkOpponent;
@@ -109,9 +116,6 @@ public abstract class BaseCard : MonoBehaviour
     protected SpriteRenderer spriteRender;
 
     protected GameObject targetObject = null;
-
-    //ADDED CODE FOR HAND INDEX
-    public int handIndex;
 
     //PHOTON COMPONENTS
     protected PhotonView photonView;
@@ -159,9 +163,7 @@ public abstract class BaseCard : MonoBehaviour
     public virtual void Start()             //Abstract method for start
     {
         doneAddingToGraveyard = false;
-        currentTime = castTime;
         inSummonZone = false;
-        isDraggable = true;
 
         //get references to player objects if not assigned
         GetPlayers();
@@ -171,32 +173,20 @@ public abstract class BaseCard : MonoBehaviour
     }
     public virtual void Update()                //Abstract method for Update
     {
-        //
-        //GetPlayers();
-
-        //If the card is Not in the graveyard and is in the summon zone
-        if (currentCardState == cardState.OnField)
+        if(casting)
         {
-            //Increment the current Time
-            currentTime -= Time.deltaTime;
-           
-            summonZoneTextBox.text = currentTime.ToString("F1"); 
-
-            //IF the current time is larger than or equal to the cast time
-            isDraggable = false;
-            if (currentTime <= 0)
+            castCountdown -= Time.deltaTime;
+            summonZoneTextBox.text = castCountdown.ToString("F1");
+            if(castCountdown <= 0)
             {
+                casting = false;
                 //clear summon zone text
                 summonZoneTextBox.text = "";
-                //reset the timer
-                currentTime = 0;
-                //Set state of card to being in the graveyard
-                inGraveyard = true;
-                //Set state of card to not being in the summon zone
-                inSummonZone = false;
+                PutIntoPlay();               
             }
-
         }
+       
+
         //If the card is in the graveyard and manager code hasn't been executed yet
         if (inGraveyard && doneAddingToGraveyard == false)
         {
@@ -204,39 +194,68 @@ public abstract class BaseCard : MonoBehaviour
             //SendToGraveyard();
         }
     }
+
+    /// <summary>
+    /// Standard functions for all cards
+    /// </summary>
+
+    //Draws card
     public void AddCardToHand(int indexToSet)
     {
         handIndex = indexToSet;
         currentCardState = cardState.InHand;
     }
+ 
     //Registers that the player has clicked on the card
+    //handles functions for pickup and target selection
     protected virtual void OnMouseDown()
     {
-        if (photonView.isMine)
+        if(photonView.isMine)
         {
-            transform.localScale = startingScale;
-            if (currentCardState == cardState.InHand)
+            switch(currentCardState)
             {
-                currentCardState = cardState.Held;
-                cardHandPos = gameObject.transform.position;
-                //audioManager.playCardPickup();
+                case (cardState.InHand):
+                    Pickup();
+                    break;
+                case (cardState.InPlay):
+                    SetTarget();
+                    break;
+                default:
+                    Debug.Log(cardTitle+": No function for OnMouseDown in current state");
+                    break;
             }
-        }
+        }   
+    }
+    //Picks up a card (while in hand)
+    protected virtual void Pickup()
+    {
+        transform.localScale = startingScale;
+        currentCardState = cardState.Held;
+        cardHandPos = gameObject.transform.position;
+        //audioManager.playCardPickup();    
+    }
+
+    protected virtual void SetTarget()
+    {
+
     }
 
     //Registers that the player has let go of the card
-    public virtual void OnMouseUp()
+    protected virtual void OnMouseUp()
     {
         //if this is the local player, drop the card
         //network player receives drop through RPC call in PlayerController (void PlayCard)
         if (photonView.isMine && currentCardState == cardState.Held)
         {
-            CheckForZone();    
+            Drop();    
         }       
     }
 
-    protected void CheckForZone()
+    //Drops a held card
+    //handles drop over summon zone and drop over other areas
+    protected void Drop()
     {
+        bool droppedSuccess = false;
         RaycastHit2D[] hits = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 100.0F);
         for (int i = 0; i < hits.Length; i++)
         {
@@ -245,17 +264,63 @@ public abstract class BaseCard : MonoBehaviour
             if (hit.tag == "Player1SummonZone")
             {             
                 zoneIndex = int.Parse(hit.name.Substring(hit.name.Length - 1));
-                bool droppedSuccess = localPlayerController.cardIsDropped(gameObject, zoneIndex);
+                droppedSuccess = localPlayerController.cardIsDropped(gameObject, zoneIndex);
                 if ( droppedSuccess== true)
-                {currentCardState = cardState.OnField;}
+                {Cast();}
                 break;
             }
         }
-        if (currentCardState != cardState.OnField)
+        if (!droppedSuccess)
         {
             //return to hand
             currentCardState = cardState.InHand;
             transform.position = cardHandPos;
+        }
+    }
+
+    //runs casting countdown timer, plays card when timer reaches 0
+    protected virtual void Cast()
+    {
+        Debug.Log("Casting card....");
+        //if target != autocast
+        // wait for target to be selected before casting
+        currentCardState = cardState.Casting;
+        castCountdown = castTime;
+        //begins countdown in update
+        casting = true;
+    }
+
+    //called when casting finishes successfully
+    protected virtual void PutIntoPlay()
+    {
+        Debug.Log("Card entering play");
+        currentCardState = cardState.InPlay;
+        //other cards will call important code in override
+    }
+
+    [PunRPC]
+    public void SendToGraveyard()
+    {
+        if (currentCardState != cardState.InGraveyard)
+        {
+            Debug.Log(cardTitle + "sent to graveyard");
+            //Set state of card to being in the graveyard
+            currentCardState = cardState.InGraveyard;
+            summonZoneTextBox.text = "";
+
+            if (!playedCardReleaseSound && audioManager != null)
+            {
+                playedCardReleaseSound = true;
+                audioManager.playCardRelease();
+            }
+
+            //If the card beings to player 1
+            if (photonView.isMine)
+            { localPlayerController.sendToGraveyard(gameObject, zoneIndex); }
+            else
+            { opponentPlayerController.sendToGraveyard(gameObject, zoneIndex); }
+            //handle graveyard effect of this card, if any
+            OnGraveyard();
         }
     }
 
@@ -278,6 +343,7 @@ public abstract class BaseCard : MonoBehaviour
         if (photonView.isMine && currentCardState == cardState.InHand)
         {
             cardCanvasScript.sortingLayerName = "ActiveCard";
+            //cardCanvasScript.sortingLayerID = 0;
             transform.localScale = zoomScale;
         }
         
@@ -291,10 +357,6 @@ public abstract class BaseCard : MonoBehaviour
     }
 
     
-    public float currentCastingTime()
-    {
-        return currentTime;
-    }
     public void setGraveyardVariables()
     {
         inSummonZone = false;
@@ -451,33 +513,7 @@ public abstract class BaseCard : MonoBehaviour
     }
     
 
-    [PunRPC]
-    public void SendToGraveyard()
-    {
-        if (currentCardState != cardState.InGraveyard)
-        {
-            Debug.Log(cardTitle + "sent to graveyard");
-            //Set state of card to being in the graveyard
-            currentCardState = cardState.InGraveyard;
-            summonZoneTextBox.text = "";
-            //reset the timer
-            currentTime = 0;
-
-            if (!playedCardReleaseSound && audioManager != null)
-            {
-                playedCardReleaseSound = true;
-                audioManager.playCardRelease();
-            }
-
-            //If the card beings to player 1
-            if (photonView.isMine)
-            {localPlayerController.sendToGraveyard(gameObject, zoneIndex);}
-            else
-            {opponentPlayerController.sendToGraveyard(gameObject, zoneIndex);}
-            //handle graveyard effect of this card, if any
-            OnGraveyard();
-        }   
-    }
+   
 
     //handles the functions for returning a card to a player's hand
     public void ReturnToHand()
@@ -501,8 +537,7 @@ public abstract class BaseCard : MonoBehaviour
                 localPlayerController.creatureCardsInPlay.Remove(gameObject);
             }
 
-            //reset the timer
-            currentTime = 0;
+          
             //Set state of card to being in the graveyard
             inGraveyard = false;
             //Set state of card to not being in the summon zone
@@ -511,8 +546,7 @@ public abstract class BaseCard : MonoBehaviour
             doneAddingToGraveyard = false;
             //clear summon zone text box
             summonZoneTextBox = null;
-            //allow dragging
-            isDraggable = true;
+          
 
 
             //play card return sound

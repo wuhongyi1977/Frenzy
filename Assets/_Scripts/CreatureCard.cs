@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-public class CreatureCard : Card
+public class CreatureCard : BaseCard
 {
     //STATS
     public int health;
@@ -35,13 +35,12 @@ public class CreatureCard : Card
     {
         localPlayer = GameObject.Find("LocalPlayer");
         networkOpponent = GameObject.Find("NetworkOpponent");
-        p1Manager = GameObject.Find("Player1Manager");
-        p2Manager = GameObject.Find("Player2Manager");
+        
         doneAddingToGraveyard = false;
-        currentTime = castTime;
+      
         inSummonZone = false;
         summonZoneTextBox = null;
-        isDraggable = true;
+       
         textBoxes = gameObject.GetComponentsInChildren<Text>();
         for (int i = 0; i < textBoxes.Length; i++)
         {
@@ -87,21 +86,9 @@ public class CreatureCard : Card
 
         creatureStatsTextBox.text = damageToDeal + "/" + health + "/" + attackSpeed;
        
-        //If the creature is frozen
-        if (isFrozen)
-        {
-            currentTime -= Time.deltaTime;
-            summonZoneTextBox.text = currentTime.ToString("F1");
-            if (currentTime <= 0)
-            {
-                summonZoneTextBox.text = "";
-                isFrozen = false;
-                isSelectable = true;
-                creatureCanAttack = true;
-            }
-        }
+        
         //If the card is Not in the graveyard and is in the summon zone
-        else if (!inGraveyard && inSummonZone)
+       if (!inGraveyard && inSummonZone)
         {
 			if (!playedCardInSpellSlotSound) 
 			{
@@ -110,37 +97,20 @@ public class CreatureCard : Card
 			}
             if (!stopCastingTimer)
             {
-                //Increment the current Time
-                isDraggable = false;
-                currentTime -= Time.deltaTime;
-                if (summonZoneTextBox == null)
-                {
-                    //Makes sure summon zone textbox is assigned
-                    GetSummonZoneText();
-                }
-                else
-                {
-                    summonZoneTextBox.text = currentTime.ToString("F1");
-                }
+                
 
             }
             //IF the current time is larger than or equal to the cast time
             if (!isAttackable)
             {
-                currentTime -= Time.deltaTime;
-                summonZoneTextBox.text = currentTime.ToString("F1");
-                if (currentTime <= 0)
-                {
-                    summonZoneTextBox.text = "";
-                }
+               
             }
-			if (currentTime <= 3.25f && !playedCardBuildUpOnce) 
+			if (!playedCardBuildUpOnce) 
 			{
 				playedCardBuildUpOnce = true;
 				audioManager.playCardBuildUp ();
 			}
-            if (currentTime <= 0)
-            {
+            
                 if (!stopCastingTimer)
                 {
                     stopCastingTimer = true;
@@ -202,12 +172,12 @@ public class CreatureCard : Card
 
                     }
                 }
-            }
+            
         }
     }
-    public override void OnMouseDown()
+    protected override void OnMouseDown()
     {
-        if (photonView.isMine && isDraggable == true && isSelectable == true)
+        if (photonView.isMine  && isSelectable == true)
         {
             cardHandPos = gameObject.transform.position;
             screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
@@ -219,7 +189,7 @@ public class CreatureCard : Card
 			}
         }
     }
-    public override void OnMouseUp()
+    protected override void OnMouseUp()
     {
 		//reset the bool to allow the Pickup sound to play again when the player picks up another card
 		playedCardPickupSound = false;
@@ -229,7 +199,7 @@ public class CreatureCard : Card
             localPlayerController.makeLineInvisible();
             localPlayerController.drawLineOff();
 
-            dropped = true;
+            
             //if this is the local card object
             if (photonView.isMine)
             {
@@ -267,12 +237,11 @@ public class CreatureCard : Card
                     //opponentPlayerController.cardIsDropped(gameObject, cardHandPos);
                 }
             }
-            //Makes sure summon zone textbox is assigned
-            GetSummonZoneText();
+            
         }
 
     }
-    public override void OnMouseOver()
+    protected override void OnMouseOver()
     {
         if(photonView.isMine && localPlayerController != null)
         {
@@ -359,12 +328,12 @@ public class CreatureCard : Card
         isFrozen = true;
         isSelectable = false;
         creatureCanAttack = false;
-        currentTime = numbSecs;
+        
     }
     public void makeUnattackable(int numbSecs)
     {
         isAttackable = false;
-        currentTime = numbSecs;
+        
     }
 
     public override void UpdateInternalVariables()

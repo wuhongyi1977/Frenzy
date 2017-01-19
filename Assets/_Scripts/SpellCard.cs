@@ -97,6 +97,15 @@ public class SpellCard : BaseCard
 
     }
 
+    protected override void Cast()
+    {
+        base.Cast();
+    }
+
+    protected override void PutIntoPlay()
+    {
+        base.PutIntoPlay();
+    }
 
     //handles card's function upon casting
     public override void OnCast()
@@ -174,7 +183,7 @@ public class SpellCard : BaseCard
         */
     }
 
-    public override void OnMouseUp()
+    protected override void OnMouseUp()
     {
         base.OnMouseUp();
         /*
@@ -232,8 +241,9 @@ public class SpellCard : BaseCard
         base.OnMouseDown();     
     }
 
-    public void SetTarget()
+    protected override void SetTarget()
     {
+        base.SetTarget();
         /*
         if (targetAssignment == false)
         {
