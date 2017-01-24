@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     PhotonView photonView;
     private Text healthTextBox;   
     Vector3 handZone; //< The empty game object for the position of the handzone
+    Dictionary<int, Vector3> handPositions = new Dictionary<int, Vector3>();//< position of cards in hand by index
+    float cardSpacing = 5.0f;
     Vector3 graveyardPos; //< The position of the graveyard. (off screen) 
     Vector3 cardPool; //< The position of the card pool (off screen)
     private GameObject line; 
@@ -136,6 +138,10 @@ public class PlayerController : MonoBehaviour
     {
         //get player's handzone
         handZone = PlayerManager.transform.FindChild("HandZone").position;
+        for(int i = 0; i < playerHand.Length; i++)
+        {
+            handPositions[i] = handZone + new Vector3(cardSpacing*i, 0, 0);
+        }
         //set the health text box of this controller to the playerhealthbox
         healthTextBox = PlayerManager.transform.FindChild("PlayerUI").GetComponentInChildren<Text>();
         //get the player's attack line
@@ -252,12 +258,12 @@ public class PlayerController : MonoBehaviour
         GameObject cardToAdd = null;
         //find the spawned card, Set cards position
         if (cardToAdd = PhotonView.Find(viewId).gameObject)
-        {
-            cardToAdd.transform.position = new Vector3(handZone.x + (currentHandSize * 5f), handZone.y, handZone.z);
+        {           
             //add it to the player's hand
             //playerHand.Add(cardToAdd);
             BaseCard cardScript = cardToAdd.GetComponent<BaseCard>();
             int handIndex = AddToHand(cardToAdd); //< returns index of card   
+            cardToAdd.transform.position = handPositions[handIndex];//new Vector3(handZone.x + (currentHandSize * 5f), handZone.y, handZone.z);
             //set cards hand index and InHand state
             cardScript.AddCardToHand(handIndex);  
             //increment the index of the deck (since a card has now been taken)
@@ -287,20 +293,23 @@ public class PlayerController : MonoBehaviour
     //shifts cards down to fill empty slot
     void RemoveFromHand(int index)
     {
+        Debug.Log("Trying to remove index: " + index);
         if (playerHand[index] != null)
         {
             playerHand[index] = null;
             //decrement hand size
             currentHandSize--;
-            //shift cards down
-            for (int i = (index +1); i <= currentHandSize; i++)
+
+            for (int i = index+1; i < playerHand.Length; i++)
             {
                 if (playerHand[i] != null)
                 {
-                    playerHand[i].transform.position = new Vector3(handZone.x + ((i - 1) * 5f), handZone.y, 0);
                     //set card's hand index
-                    playerHand[i].GetComponent<BaseCard>().handIndex = (i - 1);
-                }                                 
+                    int cardHandindex = (playerHand[i].GetComponent<BaseCard>().handIndex -= 1);
+                    playerHand[i].transform.position = handPositions[cardHandindex];
+                    playerHand[i - 1] = playerHand[i];
+                    playerHand[i] = null;
+                }
             }
         }
         else { Debug.Log("Unable to remove card from hand, no card at index");}
@@ -420,6 +429,7 @@ public class PlayerController : MonoBehaviour
         card.transform.position = summonZone.transform.position;
         //Remove card from hand
         RemoveFromHand(card.GetComponent<BaseCard>().handIndex);
+        
     }
    
 	[PunRPC]

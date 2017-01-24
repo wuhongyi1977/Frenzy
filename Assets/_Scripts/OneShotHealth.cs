@@ -225,8 +225,8 @@ public class OneShotHealth : BaseCard
         if (photonView.isMine && isSelectable == true)
         {
             cardHandPos = gameObject.transform.position;
-            screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+            //screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+            //offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
 			audioManager.playCardPickup ();
         }
     }

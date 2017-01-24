@@ -98,15 +98,7 @@ public abstract class BaseCard : MonoBehaviour
     //The ID of the player that this card belongs to
     public int playerID;
     //The card number. Used to correctly delete from the player's hand
-    public int cardNumber;
-   
-
-   
-    //Something for the dragging of cards
-    protected Vector3 screenPoint;
-    //Something fo the dragging of cards
-    protected Vector3 offset;
-   
+    public int cardNumber; 
 
     public GameObject localPlayer;
     public GameObject networkOpponent;
@@ -282,6 +274,7 @@ public abstract class BaseCard : MonoBehaviour
     protected virtual void Cast()
     {
         Debug.Log("Casting card....");
+        handIndex = -1;
         //if target != autocast
         // wait for target to be selected before casting
         currentCardState = cardState.Casting;
@@ -330,8 +323,9 @@ public abstract class BaseCard : MonoBehaviour
     {
         if (photonView.isMine && currentCardState == cardState.Held)
         {
-            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
             Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint);
+            curPosition.z = transform.position.z;
             transform.position = curPosition;
         }
     }
@@ -352,8 +346,11 @@ public abstract class BaseCard : MonoBehaviour
     public virtual void OnMouseExit()
     {
         playedCardSelectedSound = false;
-        cardCanvasScript.sortingLayerName = "Default";
-        transform.localScale = startingScale;
+        if (photonView.isMine && currentCardState == cardState.InHand)
+        {
+            cardCanvasScript.sortingLayerName = "Default";
+            transform.localScale = startingScale;
+        }
     }
 
     
@@ -566,6 +563,7 @@ public abstract class BaseCard : MonoBehaviour
 
 
     }
+
 
     //used to hold a card's effect upon being put into play (if it has any)
     public virtual void OnCast()
