@@ -140,7 +140,7 @@ public class OneShotHealth : BaseCard
 
         }    
     }
-
+/*
     protected override void OnMouseOver()
     {
        
@@ -230,7 +230,7 @@ public class OneShotHealth : BaseCard
 			audioManager.playCardPickup ();
         }
     }
-
+    */
     public void SetTarget()
     {
         if (targetAssignment == false)
@@ -251,7 +251,7 @@ public class OneShotHealth : BaseCard
             targetAssignment = true;
         }
     }
-
+    /*
     //verify that the proper type of target is being selected
     public override bool VerifyTarget()
     {
@@ -274,6 +274,7 @@ public class OneShotHealth : BaseCard
         }
     
     }
+    */
     [PunRPC]
     public void DrawTargetLine(int viewId, string targetTag)
     {  

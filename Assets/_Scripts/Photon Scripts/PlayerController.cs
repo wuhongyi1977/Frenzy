@@ -5,6 +5,14 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+
+    //Player State
+    public enum clickState { Empty,  HoldingCard, Targetting};
+    public clickState currentClickState = clickState.Empty;
+
+    private Transform selectedCard = null;
+    private BaseCard selectedCardScript = null;
+
     //PLAYER SETTINGS
     //the number of cards in a player's deck
     const int deckSize = 40;
@@ -72,6 +80,8 @@ public class PlayerController : MonoBehaviour
 
     //The game manager object
     GameManager gameManager;
+
+    //TODO check if the following variables are necessary
    
     private GameObject enemyObjectUnderMouse;
 
@@ -219,6 +229,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        //checks for mouse clicks and collisions
+        CheckInput();
         //if this controller belongs to the local player
         if(opponent == null && photonView.isMine && GameObject.Find("NetworkOpponent") != null)
         {opponent = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();}
@@ -227,6 +239,113 @@ public class PlayerController : MonoBehaviour
         //TODO put this back
         //CheckForLoss();
         DrawTimer();
+    }
+
+    void CheckInput()
+    {      
+        if (Input.GetMouseButtonDown(0))
+        {
+            CheckClickDown();
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            CheckDrag();
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            CheckClickUp();
+        }   
+         
+    }
+
+    Transform GetTransformUnderMouse()
+    {
+        RaycastHit2D hit;
+        if (hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 100.0F))
+        { return hit.transform;}       
+        return null;    
+    }
+
+    void CheckClickDown()
+    {
+        Transform hit = GetTransformUnderMouse();
+        if (currentClickState == clickState.Empty)
+        {
+            Debug.Log("Hit: " + hit.name);
+            BaseCard cardScript;
+            //if the player clicks a card and they own the card
+            if (hit.tag == "Card" && (cardScript = hit.GetComponent<BaseCard>()) && cardScript.IsOwner())
+            {              
+                switch (cardScript.GetCardState())
+                {
+                    case (BaseCard.cardState.InHand):
+                        //pick up card
+                        SetSelectedCard(hit);
+                        currentClickState = clickState.HoldingCard;
+                        cardScript.Pickup();
+                        break;
+                    case (BaseCard.cardState.WaitForCastTarget):
+                        Debug.Log("Cardstate is: " + cardScript.GetCardState());
+                        currentClickState = clickState.Targetting;
+                        //handle target selection before casting
+                        SetSelectedCard(hit);
+                        break;
+                    case (BaseCard.cardState.InPlay):
+                        //handle click abilities (targetting, attacking, etc.)
+                        break;
+                    default:
+                        Debug.Log("No click function on card in this state");
+                        break;
+                }
+            }         
+        }
+    }
+
+    private void SetSelectedCard(Transform hit)
+    {
+        if(hit == null)
+        {
+            selectedCard = null;
+            selectedCardScript = null;
+        }
+        else
+        {
+            selectedCard = hit;
+            selectedCardScript = hit.GetComponent<BaseCard>();
+        }       
+    }
+
+    void CheckDrag()
+    {
+        Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
+        Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint);      
+        if (currentClickState == clickState.HoldingCard)
+        {
+            curPosition.z = selectedCard.position.z;
+            selectedCard.position = curPosition;
+        }
+        else if(currentClickState == clickState.Targetting)
+        {
+            selectedCardScript.MoveReticle(curPosition);
+        }
+    }
+
+    void CheckClickUp()
+    {
+        if (currentClickState == clickState.HoldingCard)
+        {
+            //drop card
+            currentClickState = clickState.Empty;
+            selectedCardScript.Drop();
+            SetSelectedCard(null);
+        }
+        else if (currentClickState == clickState.Targetting)
+        {
+            //drop card
+            currentClickState = clickState.Empty;
+            selectedCardScript.SetTarget(GetTransformUnderMouse());
+            SetSelectedCard(null);
+        }
     }
 
     //Checks if enough time has passed to draw a card
@@ -426,7 +545,7 @@ public class PlayerController : MonoBehaviour
         */
 
         //Puts the card in the summoning zone
-        card.transform.position = summonZone.transform.position;
+        card.transform.position = new Vector3(summonZone.transform.position.x, summonZone.transform.position.y, card.transform.position.z);
         //Remove card from hand
         RemoveFromHand(card.GetComponent<BaseCard>().handIndex);
         

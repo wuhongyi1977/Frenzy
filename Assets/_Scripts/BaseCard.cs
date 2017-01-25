@@ -20,13 +20,17 @@ public abstract class BaseCard : MonoBehaviour
     protected Text summonZoneTextBox;
     protected Text cardTitleTextBox;
     protected Text castTimeTextBox;
+    protected Image inactiveFilter; // makes card grayed out when inactive (e.g. casting)
     LineRenderer targetLine;
+    GameObject targetReticle;
+
+    protected GameObject targetObject = null;
 
     //Scaling variables and sorting layer
     protected Vector3 startingScale, zoomScale;
 
     //Card State
-    public enum cardState { OutOfPlay, InHand, Held, Casting, InPlay, InGraveyard };
+    public enum cardState { OutOfPlay, InHand, Held, WaitForCastTarget, Casting, InPlay, InGraveyard };
     public cardState currentCardState = cardState.OutOfPlay;
 
     //reference to zone this card is occupying
@@ -52,6 +56,7 @@ public abstract class BaseCard : MonoBehaviour
     public string cardType;
     //The time it takes for the card to be casted
     public float castTime;
+    public string castTarget = null;
     //The potential targets for this cards abilities (could be creature, player, all, autocast)
     //does not include types of targets for a creature attack, but DOES include targets for special creature abilites (like direct damage on summon)
     public string target;
@@ -107,7 +112,7 @@ public abstract class BaseCard : MonoBehaviour
 
     protected SpriteRenderer spriteRender;
 
-    protected GameObject targetObject = null;
+   
 
     //PHOTON COMPONENTS
     protected PhotonView photonView;
@@ -132,8 +137,11 @@ public abstract class BaseCard : MonoBehaviour
         photonView = GetComponent<PhotonView>();
         localPlayer = GameObject.Find("LocalPlayer");
         networkOpponent = GameObject.Find("NetworkOpponent");
+        targetReticle = transform.FindChild("TargetReticle").gameObject;
+        targetReticle.SetActive(false);
+        
         //if the layout canvas of this card is found, locate its components
-        if(cardLayoutCanvas = transform.FindChild("CardLayoutCanvas"))
+        if (cardLayoutCanvas = transform.FindChild("CardLayoutCanvas"))
         {
             //Get all components
             descriptionText = cardLayoutCanvas.FindChild("DescriptionText").GetComponent<Text>();
@@ -141,6 +149,8 @@ public abstract class BaseCard : MonoBehaviour
             cardTitleTextBox = cardLayoutCanvas.FindChild("CardTitle").GetComponent<Text>(); 
             castTimeTextBox = cardLayoutCanvas.FindChild("CastTime").GetComponent<Text>();
             cardArtImage = cardLayoutCanvas.FindChild("CardArtImage").GetComponent<Image>();
+            inactiveFilter = cardLayoutCanvas.FindChild("InactiveFilter").GetComponent<Image>();
+            inactiveFilter.enabled = false;
             targetLine = GetComponent<LineRenderer>();
             targetLine.enabled = false;
 
@@ -191,6 +201,18 @@ public abstract class BaseCard : MonoBehaviour
     /// Standard functions for all cards
     /// </summary>
 
+    //returns the cards state to calling script
+    public cardState GetCardState()
+    {
+        return currentCardState;
+    }
+
+    //returns true if this card belongs to the local player
+    public bool IsOwner()
+    {
+        return photonView.isMine;
+    }
+
     //Draws card
     public void AddCardToHand(int indexToSet)
     {
@@ -198,28 +220,9 @@ public abstract class BaseCard : MonoBehaviour
         currentCardState = cardState.InHand;
     }
  
-    //Registers that the player has clicked on the card
-    //handles functions for pickup and target selection
-    protected virtual void OnMouseDown()
-    {
-        if(photonView.isMine)
-        {
-            switch(currentCardState)
-            {
-                case (cardState.InHand):
-                    Pickup();
-                    break;
-                case (cardState.InPlay):
-                    SetTarget();
-                    break;
-                default:
-                    Debug.Log(cardTitle+": No function for OnMouseDown in current state");
-                    break;
-            }
-        }   
-    }
+   
     //Picks up a card (while in hand)
-    protected virtual void Pickup()
+    public virtual void Pickup()
     {
         transform.localScale = startingScale;
         currentCardState = cardState.Held;
@@ -227,25 +230,53 @@ public abstract class BaseCard : MonoBehaviour
         //audioManager.playCardPickup();    
     }
 
-    protected virtual void SetTarget()
+    public void MoveReticle(Vector3 pos)
     {
-
+        targetReticle.transform.position = new Vector3(pos.x, pos.y, targetReticle.transform.position.z);
     }
 
-    //Registers that the player has let go of the card
-    protected virtual void OnMouseUp()
+    public void SetTarget(Transform potentialTarget)
     {
-        //if this is the local player, drop the card
-        //network player receives drop through RPC call in PlayerController (void PlayCard)
-        if (photonView.isMine && currentCardState == cardState.Held)
+        //copy this block into all cards, cards cannot target nothing or themselves
+        if (potentialTarget == null || potentialTarget == this.gameObject)
         {
-            Drop();    
-        }       
+            MoveReticle(transform.position);
+            return;
+        }
+
+        if (currentCardState == cardState.WaitForCastTarget)
+        {
+            //check against cast target list
+            if(castTarget == "Player" && (potentialTarget.tag == "Player1" || potentialTarget.tag == "Player2"))
+            {
+                MoveReticle(potentialTarget.position);
+                targetObject = potentialTarget.gameObject;
+                Cast();
+                return;
+            }
+            else if (castTarget == "Creature" && potentialTarget.GetComponent<CreatureCard>())
+            {
+                MoveReticle(potentialTarget.position);
+                targetObject = potentialTarget.gameObject;
+                Cast();
+                return;
+            }
+            else
+            {
+                MoveReticle(transform.position);
+                return;
+            }
+        }
+        else if (currentCardState == cardState.InPlay)
+        {
+            // check against normal target list
+        }
     }
+
 
     //Drops a held card
     //handles drop over summon zone and drop over other areas
-    protected void Drop()
+    public void Drop()
     {
         bool droppedSuccess = false;
         RaycastHit2D[] hits = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 100.0F);
@@ -258,7 +289,11 @@ public abstract class BaseCard : MonoBehaviour
                 zoneIndex = int.Parse(hit.name.Substring(hit.name.Length - 1));
                 droppedSuccess = localPlayerController.cardIsDropped(gameObject, zoneIndex);
                 if ( droppedSuccess== true)
-                {Cast();}
+                {
+                    inactiveFilter.enabled = true;
+                    handIndex = -1;
+                    GetCastingTarget();
+                }
                 break;
             }
         }
@@ -270,11 +305,25 @@ public abstract class BaseCard : MonoBehaviour
         }
     }
 
+    protected virtual void GetCastingTarget()
+    {
+        if(castTarget != null)
+        {
+            //handle target selection
+            targetReticle.SetActive(true);
+            currentCardState = cardState.WaitForCastTarget;
+        }
+        else
+        {
+            //cast the card
+            Cast();
+        }     
+    }
+
     //runs casting countdown timer, plays card when timer reaches 0
     protected virtual void Cast()
     {
         Debug.Log("Casting card....");
-        handIndex = -1;
         //if target != autocast
         // wait for target to be selected before casting
         currentCardState = cardState.Casting;
@@ -286,8 +335,11 @@ public abstract class BaseCard : MonoBehaviour
     //called when casting finishes successfully
     protected virtual void PutIntoPlay()
     {
+
         Debug.Log("Card entering play");
         currentCardState = cardState.InPlay;
+        inactiveFilter.enabled = false;
+        targetReticle.SetActive(false);
         //other cards will call important code in override
     }
 
@@ -318,39 +370,20 @@ public abstract class BaseCard : MonoBehaviour
     }
 
 
-    //Registers that the card is being dragged
-    public void OnMouseDrag()
+    public void ZoomCard(bool zoomIn)
     {
-        if (photonView.isMine && currentCardState == cardState.Held)
-        {
-            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
-            Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint);
-            curPosition.z = transform.position.z;
-            transform.position = curPosition;
-        }
-    }
-    
-    //Registers what card is under the mouse
-    protected virtual void OnMouseOver()
-    {
-        
-        if (photonView.isMine && currentCardState == cardState.InHand)
+        if(zoomIn)
         {
             cardCanvasScript.sortingLayerName = "ActiveCard";
             //cardCanvasScript.sortingLayerID = 0;
             transform.localScale = zoomScale;
         }
-        
-    }
-    //Registers what card is under the mouse
-    public virtual void OnMouseExit()
-    {
-        playedCardSelectedSound = false;
-        if (photonView.isMine && currentCardState == cardState.InHand)
+        else
         {
             cardCanvasScript.sortingLayerName = "Default";
             transform.localScale = startingScale;
         }
+       
     }
 
     
@@ -414,6 +447,9 @@ public abstract class BaseCard : MonoBehaviour
                 case "CardType":
                     cardType = nextString;
                     break;
+                case "CastTarget":
+                    castTarget = nextString;
+                    break;
                 case "Target":
                     target = nextString;
                     break;
@@ -439,6 +475,7 @@ public abstract class BaseCard : MonoBehaviour
                     string ability = nextString;
                     creatureAbilities.Add(ability); //= int.Parse(nextString);
                     break;
+               
                 default:
                     break;
             }
@@ -466,19 +503,6 @@ public abstract class BaseCard : MonoBehaviour
         //variables go here
     }
 
-    //this function should be overridden in child script to verify that
-    //the proper type of target is being selected
-    public virtual bool VerifyTarget()
-    {
-        //copy this block into all cards, cards cannot target nothing or themselves
-        if (targetObject == null || targetObject == this.gameObject)
-        { return false; }
-
-        //test if target is proper
-
-        //else
-        return true;
-    }
 
     
     

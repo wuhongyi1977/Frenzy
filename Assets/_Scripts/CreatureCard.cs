@@ -175,6 +175,7 @@ public class CreatureCard : BaseCard
             
         }
     }
+    /*
     protected override void OnMouseDown()
     {
         if (photonView.isMine  && isSelectable == true)
@@ -269,8 +270,9 @@ public class CreatureCard : BaseCard
 
        
     }
-
+    */
     //verify that the proper type of target is being selected
+    /*
     public override bool VerifyTarget()
     {
         Debug.Log("Verifying target");
@@ -307,6 +309,7 @@ public class CreatureCard : BaseCard
         }
 
     }
+    */
     public void increaseStats(int dmg, int h, int attkSpd)
     {
         //if (photonView.isMine) {
