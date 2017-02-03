@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     // COMPONENTS
     GameObject PlayerManager;
     PlayerController opponent;
-    PhotonView photonView;
+    public PhotonView photonView;
     private Text healthTextBox;   
     Vector3 handZone; //< The empty game object for the position of the handzone
     Dictionary<int, Vector3> handPositions = new Dictionary<int, Vector3>();//< position of cards in hand by index
@@ -467,41 +467,14 @@ public class PlayerController : MonoBehaviour
     }
    
     //HANDLE DAMAGE OVER NETWORK
-    [PunRPC]
+    //[PunRPC]
     public void ChangeHealth(int amount)
     {
         //this should never happen, but if it does, return immediately
         if(amount == 0)
         { return; }
 
-        //HEALING
-        //if the amount is positive (if this is healing)
-        if(amount > 0)
-        {
-            //if this is the local player, add health
-            if(photonView.isMine)
-            {
-                health += amount;
-            }
-        }
-        //DAMAGE
-        //if the amount is negative (if this is damage)
-        else if(amount < 0)
-        {
-            //if this is the local player, add health
-            //since damage is negative, it will be subtracted
-            if (photonView.isMine)
-            {
-                health += amount;
-            }
-            //if this is the network opponent
-            else if(!photonView.isMine)
-            {
-                //call the damage rpc on the opponent's local player
-                photonView.RPC("ChangeHealth",PhotonTargets.Others,amount);
-            }
-        }
-      
+        health += amount;
     }
 
     
@@ -634,7 +607,7 @@ public class PlayerController : MonoBehaviour
             if (attackerScript.cardType == "Spell")
             {
                 //this is += because opponent health change uses negatives for damage
-                targetCreature.health += attackerScript.opponentHealthChange;
+                targetCreature.health += attackerScript.targetHealthChange;
             }
         }
     }
@@ -678,11 +651,11 @@ public class PlayerController : MonoBehaviour
                 }
                 else if(attackCardScript.cardType == "Spell")
                 {
-                    Debug.Log(attackingCard+ " is a spell and is dealing" + attackCardScript.opponentHealthChange + " damage to opponent");
+                    Debug.Log(attackingCard+ " is a spell and is dealing" + attackCardScript.targetHealthChange + " damage to opponent");
                     //damage/healing to deal to owner (calls change health in this script)
                     ChangeHealth(attackCardScript.ownerHealthChange);
                     //damage/healing to deal to opponent (playerid is 2 for opponent)
-                    opponent.ChangeHealth(attackCardScript.opponentHealthChange);
+                    opponent.ChangeHealth(attackCardScript.targetHealthChange);
                 }
                
             }

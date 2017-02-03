@@ -11,6 +11,7 @@ public abstract class BaseCard : MonoBehaviour
 {
     //PHOTON COMPONENTS
     public PhotonView photonView;
+    protected CardAbilityList cardAbilityList;
 
     //CARD COMPONENTS
     //contains all visible components on card
@@ -28,7 +29,7 @@ public abstract class BaseCard : MonoBehaviour
     LineRenderer targetLine;
     GameObject targetReticle;
 
-    protected GameObject targetObject = null;
+    public GameObject targetObject = null;
 
     //Scaling variables and sorting layer
     protected Vector3 startingScale, zoomScale;
@@ -66,8 +67,11 @@ public abstract class BaseCard : MonoBehaviour
     public string target;
     //The faction that the card belongs to. Neutral means it is available to all factions
     public string faction = "Neutral";
-    
-   
+    // abilities that trigger on cast
+    protected List<string> castAbilities = new List<string>();
+
+
+
     /// <summary>
     ///  All of these only apply to specific types of cards (creature, spell, etc)
     ///  TODO should be moved to proper script
@@ -79,7 +83,7 @@ public abstract class BaseCard : MonoBehaviour
     //the defense power of this card (if its a creature)
     public int defensePower;
     //the amount to change the opponents health (can be direct damage or healing)
-    public int opponentHealthChange;
+    public int targetHealthChange;
     //the amount to change the owners health (can be direct damage or healing)
     public int ownerHealthChange;
     //the list of standard abilities a creature has (Rush, Elusive, etc.)
@@ -111,8 +115,8 @@ public abstract class BaseCard : MonoBehaviour
 
     public GameObject localPlayer;
     public GameObject networkOpponent;
-    protected PlayerController localPlayerController;
-    protected PlayerController opponentPlayerController;
+    public PlayerController localPlayerController;
+    public PlayerController opponentPlayerController;
 
     protected SpriteRenderer spriteRender;
 
@@ -138,6 +142,7 @@ public abstract class BaseCard : MonoBehaviour
     {
         //get photon view component of this card
         photonView = GetComponent<PhotonView>();
+        cardAbilityList = GetComponent<CardAbilityList>();
         localPlayer = GameObject.Find("LocalPlayer");
         networkOpponent = GameObject.Find("NetworkOpponent");
         targetReticle = transform.FindChild("TargetReticle").gameObject;
@@ -161,6 +166,7 @@ public abstract class BaseCard : MonoBehaviour
 
             cardCanvasScript = cardLayoutCanvas.GetComponent<Canvas>();
         }
+        
         startingScale = transform.localScale;
         zoomScale = startingScale * 2;
         //audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
@@ -194,12 +200,14 @@ public abstract class BaseCard : MonoBehaviour
             }
         }
 
+        /*
          //If the card is in the graveyard and manager code hasn't been executed yet
         if (inGraveyard && doneAddingToGraveyard == false)
         {
             photonView.RPC("SendToGraveyard", PhotonTargets.All);
             //SendToGraveyard();
         }
+        */
     }
 
     /// <summary>
@@ -354,7 +362,15 @@ public abstract class BaseCard : MonoBehaviour
         currentCardState = cardState.InPlay;
         inactiveFilter.enabled = false;
         targetReticle.SetActive(false);
+        //OnPlay();
         //other cards will call important code in override
+    }
+
+
+    //used to hold a card's effect upon being put into play (if it has any)
+    protected virtual void OnPlay()
+    {
+        //cast effect goes here
     }
 
     [PunRPC]
@@ -479,15 +495,17 @@ public abstract class BaseCard : MonoBehaviour
                 case "DefensePower":
                     defensePower = int.Parse(nextString);
                     break;
-                case "OpponentHealthChange":
-                    opponentHealthChange = int.Parse(nextString);
+                case "TargetHealthChange":
+                    targetHealthChange = int.Parse(nextString);
                     break;
                 case "OwnerHealthChange":
                     ownerHealthChange = int.Parse(nextString);
                     break;
+                case "CastAbility":
+                    castAbilities.Add(nextString); //= int.Parse(nextString);
+                    break;
                 case "CreatureAbility":
-                    string ability = nextString;
-                    creatureAbilities.Add(ability); //= int.Parse(nextString);
+                    creatureAbilities.Add(nextString); //= int.Parse(nextString);
                     break;
                
                 default:
@@ -603,12 +621,7 @@ public abstract class BaseCard : MonoBehaviour
     }
 
 
-    //used to hold a card's effect upon being put into play (if it has any)
-    public virtual void OnCast()
-    {
-        //cast effect goes here
-    }
-
+   
     //used to hold a card's effect upon being sent to graveyard (if it has any)
     public virtual void OnGraveyard()
     {

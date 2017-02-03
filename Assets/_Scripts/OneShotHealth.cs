@@ -96,7 +96,7 @@ public class OneShotHealth : BaseCard
 
     
     //handles card's function upon casting
-    public override void OnCast()
+    protected override void OnPlay()
     {
         //Debug.Log(photonView.owner + " cast "+ cardTitle + " on " + currentTarget.name +" successfully!");
 
@@ -132,7 +132,7 @@ public class OneShotHealth : BaseCard
 
             //DAMAGE
             //if this card changes either player's health, run damage code
-            if (ownerHealthChange != 0 || opponentHealthChange != 0)
+            if (ownerHealthChange != 0 || targetHealthChange != 0)
             {
                 Debug.Log("Dealing damage to : " + currentTarget);
                 localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);

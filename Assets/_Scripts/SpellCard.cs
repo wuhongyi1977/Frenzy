@@ -107,62 +107,20 @@ public class SpellCard : BaseCard
     protected override void PutIntoPlay()
     {
         base.PutIntoPlay();
+        OnPlay();
     }
 
     //handles card's function upon casting
-    public override void OnCast()
+    protected override void OnPlay()
     {
-        /*
-        //Debug.Log(photonView.owner + " cast "+ cardTitle + " on " + currentTarget.name +" successfully!");
-
-        //disable targetting line
-        targetLine.enabled = false;
-        //if this card belongs to the local player, run casting code
-        if (photonView.isMine && currentTarget != null)
+        foreach(string ability in castAbilities)
         {
-
-            //CREATURE TARGET FUNCTIONS
-            if (currentTarget.tag == "CreatureCard")
-            {
-                CreatureCard targetCreatureScript = currentTarget.GetComponent<CreatureCard>();
-
-                if (cardEffects.Contains("ReturnCreature"))
-                {
-                    targetCreatureScript.ReturnToHand();
-                }
-
-            }
-
-            //SELF TARGET FUNCTIONS
-            if (currentTarget.tag == "Player1")
-            {
-
-            }
-            //OPPONENT TARGET FUNCTIONS
-            if (currentTarget.tag == "Player2")
-            {
-
-            }
-
-
-            //DAMAGE
-            //if this card changes either player's health, run damage code
-            if (ownerHealthChange != 0 || opponentHealthChange != 0)
-            {
-                Debug.Log("Dealing damage to : " + currentTarget);
-                localPlayer.GetComponent<PlayerController>().CardTargetDamage(gameObject, cardHandPos, currentTarget);
-            }
-
+            cardAbilityList.UseCardAbility(ability);
         }
-        */
+
+        //photonView.RPC("SendToGraveyard", PhotonTargets.All);
     }
 
-   
-    
-
-   
-
-    
     [PunRPC]
     public void DrawTargetLine(int viewId, string targetTag)
     {
@@ -227,4 +185,5 @@ public class SpellCard : BaseCard
         */
 
     }
+
 }
