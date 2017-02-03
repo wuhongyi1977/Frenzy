@@ -56,4 +56,6 @@ MonoBehaviour:
   - SendToGraveyard
   - RequestForPickupItems
   - DrawTargetLine
+  - AddCardToHand
+  - Cast
   DisableAutoOpenWizard: 1

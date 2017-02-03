@@ -9,6 +9,9 @@ using UnityEngine.UI;
 /// </summary>
 public abstract class BaseCard : MonoBehaviour
 {
+    //PHOTON COMPONENTS
+    public PhotonView photonView;
+
     //CARD COMPONENTS
     //contains all visible components on card
     protected Transform cardLayoutCanvas;
@@ -21,6 +24,7 @@ public abstract class BaseCard : MonoBehaviour
     protected Text cardTitleTextBox;
     protected Text castTimeTextBox;
     protected Image inactiveFilter; // makes card grayed out when inactive (e.g. casting)
+    protected Image cardBack; // blocks card info when in opponents hand
     LineRenderer targetLine;
     GameObject targetReticle;
 
@@ -114,8 +118,7 @@ public abstract class BaseCard : MonoBehaviour
 
    
 
-    //PHOTON COMPONENTS
-    protected PhotonView photonView;
+   
 
     //SOUND VARIABLES
     //The variable for the script attached to the AudioManager object
@@ -151,6 +154,8 @@ public abstract class BaseCard : MonoBehaviour
             cardArtImage = cardLayoutCanvas.FindChild("CardArtImage").GetComponent<Image>();
             inactiveFilter = cardLayoutCanvas.FindChild("InactiveFilter").GetComponent<Image>();
             inactiveFilter.enabled = false;
+            cardBack = cardLayoutCanvas.FindChild("CardBack").GetComponent<Image>();
+            cardBack.enabled = false;
             targetLine = GetComponent<LineRenderer>();
             targetLine.enabled = false;
 
@@ -175,6 +180,7 @@ public abstract class BaseCard : MonoBehaviour
     }
     public virtual void Update()                //Abstract method for Update
     {
+        //handle casting countdown
         if(casting)
         {
             castCountdown -= Time.deltaTime;
@@ -187,9 +193,8 @@ public abstract class BaseCard : MonoBehaviour
                 PutIntoPlay();               
             }
         }
-       
 
-        //If the card is in the graveyard and manager code hasn't been executed yet
+         //If the card is in the graveyard and manager code hasn't been executed yet
         if (inGraveyard && doneAddingToGraveyard == false)
         {
             photonView.RPC("SendToGraveyard", PhotonTargets.All);
@@ -214,10 +219,15 @@ public abstract class BaseCard : MonoBehaviour
     }
 
     //Draws card
+    [PunRPC]
     public void AddCardToHand(int indexToSet)
-    {
+    {   
         handIndex = indexToSet;
         currentCardState = cardState.InHand;
+        if (!photonView.isMine)
+        {
+            cardBack.enabled = true;
+        }
     }
  
    
@@ -251,14 +261,14 @@ public abstract class BaseCard : MonoBehaviour
             {
                 MoveReticle(potentialTarget.position);
                 targetObject = potentialTarget.gameObject;
-                Cast();
+                photonView.RPC("Cast", PhotonTargets.All);
                 return;
             }
             else if (castTarget == "Creature" && potentialTarget.GetComponent<CreatureCard>())
             {
                 MoveReticle(potentialTarget.position);
                 targetObject = potentialTarget.gameObject;
-                Cast();
+                photonView.RPC("Cast", PhotonTargets.All);
                 return;
             }
             else
@@ -316,17 +326,21 @@ public abstract class BaseCard : MonoBehaviour
         else
         {
             //cast the card
-            Cast();
+            photonView.RPC("Cast", PhotonTargets.All);
         }     
     }
 
     //runs casting countdown timer, plays card when timer reaches 0
-    protected virtual void Cast()
+    [PunRPC]
+    public void Cast()
     {
         Debug.Log("Casting card....");
         //if target != autocast
         // wait for target to be selected before casting
         currentCardState = cardState.Casting;
+     
+        cardBack.enabled = false;
+        
         castCountdown = castTime;
         //begins countdown in update
         casting = true;

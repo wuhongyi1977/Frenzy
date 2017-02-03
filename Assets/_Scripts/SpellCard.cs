@@ -96,11 +96,13 @@ public class SpellCard : BaseCard
         */
 
     }
-
-    protected override void Cast()
+    /*
+    [PunRPC]
+    public override void Cast()
     {
         base.Cast();
     }
+    */
 
     protected override void PutIntoPlay()
     {

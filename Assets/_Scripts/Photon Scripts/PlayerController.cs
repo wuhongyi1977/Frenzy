@@ -381,10 +381,10 @@ public class PlayerController : MonoBehaviour
             //add it to the player's hand
             //playerHand.Add(cardToAdd);
             BaseCard cardScript = cardToAdd.GetComponent<BaseCard>();
-            int handIndex = AddToHand(cardToAdd); //< returns index of card   
+            int handIndex = AddToHand(cardToAdd); //< returns index of card 
             cardToAdd.transform.position = handPositions[handIndex];//new Vector3(handZone.x + (currentHandSize * 5f), handZone.y, handZone.z);
             //set cards hand index and InHand state
-            cardScript.AddCardToHand(handIndex);  
+            cardScript.photonView.RPC("AddCardToHand", PhotonTargets.All, handIndex); 
             //increment the index of the deck (since a card has now been taken)
             currentCardIndex++;
         }
