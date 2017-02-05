@@ -54,9 +54,6 @@ public abstract class BaseCard : MonoBehaviour
     //all card stats are here, are assigned by custom data from Playfab
     //name of art asset to use for card art
     public string artName;
-    //name of art asset to use for border art
-    public string borderArt;
-
     //the type of card classification this card has (creature, spell, etc.)
     public string cardType;
     //The time it takes for the card to be casted
@@ -83,7 +80,7 @@ public abstract class BaseCard : MonoBehaviour
     //the defense power of this card (if its a creature)
     public int defensePower;
     //the amount to change the opponents health (can be direct damage or healing)
-    public int targetHealthChange;
+    public int targetHealthChange = 0;
     //the amount to change the owners health (can be direct damage or healing)
     public int ownerHealthChange;
     //the list of standard abilities a creature has (Rush, Elusive, etc.)
@@ -143,8 +140,7 @@ public abstract class BaseCard : MonoBehaviour
         //get photon view component of this card
         photonView = GetComponent<PhotonView>();
         cardAbilityList = GetComponent<CardAbilityList>();
-        localPlayer = GameObject.Find("LocalPlayer");
-        networkOpponent = GameObject.Find("NetworkOpponent");
+       
         targetReticle = transform.FindChild("TargetReticle").gameObject;
         targetReticle.SetActive(false);
         
@@ -177,15 +173,14 @@ public abstract class BaseCard : MonoBehaviour
     {
         doneAddingToGraveyard = false;
         inSummonZone = false;
-
-        //get references to player objects if not assigned
-        GetPlayers();
         cardTitleTextBox.text = cardTitle;
 
 
     }
     public virtual void Update()                //Abstract method for Update
     {
+        GetPlayers();
+        
         //handle casting countdown
         if(casting)
         {
@@ -348,13 +343,14 @@ public abstract class BaseCard : MonoBehaviour
         currentCardState = cardState.Casting;
      
         cardBack.enabled = false;
-        
+        inactiveFilter.enabled = true;
         castCountdown = castTime;
         //begins countdown in update
         casting = true;
     }
 
     //called when casting finishes successfully
+    [PunRPC]
     protected virtual void PutIntoPlay()
     {
 
@@ -468,9 +464,6 @@ public abstract class BaseCard : MonoBehaviour
                 case "ArtName":
                     artName = nextString;
                     break;
-                case "BorderArt":
-                    borderArt = nextString;
-                    break;
                 case "Faction":
                     faction = nextString;
                     break;
@@ -495,19 +488,24 @@ public abstract class BaseCard : MonoBehaviour
                 case "DefensePower":
                     defensePower = int.Parse(nextString);
                     break;
-                case "TargetHealthChange":
-                    targetHealthChange = int.Parse(nextString);
-                    break;
                 case "OwnerHealthChange":
                     ownerHealthChange = int.Parse(nextString);
-                    break;
-                case "CastAbility":
-                    castAbilities.Add(nextString); //= int.Parse(nextString);
                     break;
                 case "CreatureAbility":
                     creatureAbilities.Add(nextString); //= int.Parse(nextString);
                     break;
-               
+                    ///Card abilities
+                case "TargetHealthChange":
+                    castAbilities.Add(currentString);
+                    targetHealthChange = int.Parse(nextString);
+                    break;
+                case "DiscardOnCast":
+                    if(nextString == "True" || nextString == "true")
+                    {
+                        castAbilities.Add(currentString);
+                    }                  
+                    break;
+
                 default:
                     break;
             }
@@ -541,27 +539,14 @@ public abstract class BaseCard : MonoBehaviour
     //store all data for player objects
     public void GetPlayers()
     {
-        //if network opponent object has not been assigned
-        if (networkOpponent == null)
+        if (localPlayerController == null && GameObject.Find("LocalPlayer"))
         {
-            //find and assign network opponent object
-            networkOpponent = GameObject.Find("NetworkOpponent");
+           localPlayerController = GameObject.Find("LocalPlayer").GetComponent<PlayerController>();
         }
-        else
+    
+        if (opponentPlayerController == null && GameObject.Find("NetworkOpponent"))
         {
-            //if network opponent has been assigned, store reference to PlayerController script
-            opponentPlayerController = networkOpponent.GetComponent<PlayerController>();
-        }
-        //if local player has not been assigned
-        if (localPlayer == null)
-        {
-            //find and assign local player object
-            localPlayer = GameObject.Find("LocalPlayer");
-        }
-        else
-        {
-            //if local player has been assigned, store reference to PlayerController script
-            localPlayerController = localPlayer.GetComponent<PlayerController>();
+            opponentPlayerController = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();
         }
     }
     

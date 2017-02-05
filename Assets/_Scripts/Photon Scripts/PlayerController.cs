@@ -467,14 +467,15 @@ public class PlayerController : MonoBehaviour
     }
    
     //HANDLE DAMAGE OVER NETWORK
-    //[PunRPC]
+    [PunRPC]
     public void ChangeHealth(int amount)
     {
         //this should never happen, but if it does, return immediately
         if(amount == 0)
         { return; }
-
+        
         health += amount;
+  
     }
 
     

@@ -36,89 +36,27 @@ public class SpellCard : BaseCard
     public override void Update()               //Abstract method for Update
     {
         base.Update();
-        /*
-        //get references to player objects if not assigned
-        GetPlayers();
-
-        //If the card is Not in the graveyard and is in the summon zone
-        if (!inGraveyard && inSummonZone)
-        {
-            if (summonZoneTextBox == null)
-            {
-                //GetSummonZoneText();
-            }
-            if (castTimeTextBox != null)
-            {
-                castTimeTextBox.text = castTime.ToString();
-            }
-            //IF the current time is larger than or equal to the cast time
-            isDraggable = false;
-            //allow player to choose target
-            canTarget = true;
-            //assign this cards target based on CustomData
-            SetTarget();
-
-            if (!playedCardInSpellSlotSound)
-            {
-                playedCardInSpellSlotSound = true;
-                audioManager.playCardInSpellSlot();
-            }
-
-
-            //if the target has been selected, begin countdown
-            if (targetSelected == true)
-            {
-
-                //Decrement the current Time
-                currentTime -= Time.deltaTime;
-
-                //set summon zone text to current time
-                summonZoneTextBox.text = currentTime.ToString("F1");
-                //play card builduup sound when current time is near 0
-                if (currentTime <= 3.25f && !playedCardBuildupSound)
-                {
-                    playedCardBuildupSound = true;
-                    audioManager.playCardBuildUp();
-                }
-                //if the cast time completes
-                if (currentTime <= 0)
-                {
-                    //run this card's OnCast function
-                    OnCast();
-
-                    //send to graveyard
-                    SendToGraveyard();
-
-                }
-            }
-
-        }
-        */
-
+        
     }
-    /*
+    
     [PunRPC]
-    public override void Cast()
-    {
-        base.Cast();
-    }
-    */
-
     protected override void PutIntoPlay()
     {
         base.PutIntoPlay();
-        OnPlay();
+        if(photonView.isMine)
+        {
+            OnPlay();
+        }
+       
     }
 
     //handles card's function upon casting
     protected override void OnPlay()
     {
-        foreach(string ability in castAbilities)
+        foreach (string ability in castAbilities)
         {
             cardAbilityList.UseCardAbility(ability);
         }
-
-        //photonView.RPC("SendToGraveyard", PhotonTargets.All);
     }
 
     [PunRPC]

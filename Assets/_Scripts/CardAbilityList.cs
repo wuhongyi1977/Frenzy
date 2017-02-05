@@ -20,7 +20,7 @@ public class CardAbilityList : MonoBehaviour
     }
 
     // damages or heals a player (positive values for healing, negative for damage)
-    private void ChangeTargetHealth()
+    private void TargetHealthChange()
     {
         GameObject targetObj = cardScript.targetObject;
         if(targetObj.tag == "Creature")
@@ -33,7 +33,13 @@ public class CardAbilityList : MonoBehaviour
         }
         else if (targetObj.tag == "Player2") //< opponent
         {
-            cardScript.opponentPlayerController.ChangeHealth(cardScript.targetHealthChange);          
+            cardScript.opponentPlayerController.photonView.RPC("ChangeHealth", PhotonTargets.Others, cardScript.targetHealthChange);
         }
+    }
+
+    // discards the card
+    private void DiscardOnCast()
+    {
+        cardScript.photonView.RPC("SendToGraveyard", PhotonTargets.All);
     }
 }
