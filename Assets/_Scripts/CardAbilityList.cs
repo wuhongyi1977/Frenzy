@@ -23,17 +23,19 @@ public class CardAbilityList : MonoBehaviour
     private void TargetHealthChange()
     {
         GameObject targetObj = cardScript.targetObject;
-        if(targetObj.tag == "Creature")
+        int healthChange = int.Parse(cardScript.abilityValues["TargetHealthChange"]);
+
+        if (targetObj.tag == "Creature")
         {
             //creature health change
         }
         else if (targetObj.tag == "Player1") //< local player
         {
-            cardScript.localPlayerController.ChangeHealth(cardScript.targetHealthChange);
+            cardScript.localPlayerController.ChangeHealth(healthChange);
         }
         else if (targetObj.tag == "Player2") //< opponent
         {
-            cardScript.opponentPlayerController.photonView.RPC("ChangeHealth", PhotonTargets.Others, cardScript.targetHealthChange);
+            cardScript.opponentPlayerController.photonView.RPC("ChangeHealth", PhotonTargets.Others, healthChange);
         }
     }
 

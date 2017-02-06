@@ -66,6 +66,8 @@ public abstract class BaseCard : MonoBehaviour
     public string faction = "Neutral";
     // abilities that trigger on cast
     protected List<string> castAbilities = new List<string>();
+    // holds values associated with abilities
+    public Dictionary<string, string> abilityValues = new Dictionary<string, string>();
 
 
 
@@ -174,8 +176,6 @@ public abstract class BaseCard : MonoBehaviour
         doneAddingToGraveyard = false;
         inSummonZone = false;
         cardTitleTextBox.text = cardTitle;
-
-
     }
     public virtual void Update()                //Abstract method for Update
     {
@@ -260,18 +260,27 @@ public abstract class BaseCard : MonoBehaviour
         if (currentCardState == cardState.WaitForCastTarget)
         {
             //check against cast target list
+            if (castTarget == "All")
+            {
+                if(potentialTarget.tag == "Player1" || potentialTarget.tag == "Player2")
+                {
+                    AcceptTargetAndCast(potentialTarget);
+                    return;
+                }
+                else if(potentialTarget.GetComponent<CreatureCard>())
+                {
+                    AcceptTargetAndCast(potentialTarget);
+                    return;
+                }
+            }            
             if(castTarget == "Player" && (potentialTarget.tag == "Player1" || potentialTarget.tag == "Player2"))
             {
-                MoveReticle(potentialTarget.position);
-                targetObject = potentialTarget.gameObject;
-                photonView.RPC("Cast", PhotonTargets.All);
+                AcceptTargetAndCast(potentialTarget);
                 return;
             }
             else if (castTarget == "Creature" && potentialTarget.GetComponent<CreatureCard>())
             {
-                MoveReticle(potentialTarget.position);
-                targetObject = potentialTarget.gameObject;
-                photonView.RPC("Cast", PhotonTargets.All);
+                AcceptTargetAndCast(potentialTarget);
                 return;
             }
             else
@@ -284,6 +293,13 @@ public abstract class BaseCard : MonoBehaviour
         {
             // check against normal target list
         }
+    }
+
+    void AcceptTargetAndCast(Transform target)
+    {
+        MoveReticle(target.position);
+        targetObject = target.gameObject;
+        photonView.RPC("Cast", PhotonTargets.All);
     }
 
 
@@ -497,7 +513,7 @@ public abstract class BaseCard : MonoBehaviour
                     ///Card abilities
                 case "TargetHealthChange":
                     castAbilities.Add(currentString);
-                    targetHealthChange = int.Parse(nextString);
+                    abilityValues.Add(currentString, nextString);
                     break;
                 case "DiscardOnCast":
                     if(nextString == "True" || nextString == "true")
