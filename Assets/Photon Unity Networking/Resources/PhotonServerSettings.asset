@@ -59,4 +59,5 @@ MonoBehaviour:
   - AddCardToHand
   - Cast
   - PutIntoPlay
+  - AddClassAndInitialize
   DisableAutoOpenWizard: 1

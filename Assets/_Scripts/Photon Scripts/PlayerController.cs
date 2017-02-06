@@ -205,8 +205,8 @@ public class PlayerController : MonoBehaviour
             GameObject cardToAdd = PhotonNetwork.Instantiate(("BaseCardPrefab"), cardPool, Quaternion.identity, 0);
             //get the card's view Id to reference the same card
             int viewId = cardToAdd.GetComponent<PhotonView>().viewID;
-            //INITIALIZE CARD
-            cardToAdd.GetComponent<BaseCard>().InitializeCard(playerID, itemId);
+            //INITIALIZE CARD 
+            cardToAdd.GetComponent<CardTypeSelector>().SetCardType(playerID, itemId);          
             //add that card to the deck
             cardDeck.Add(viewId);
         }

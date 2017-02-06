@@ -299,6 +299,11 @@ public abstract class BaseCard : MonoBehaviour
     {
         MoveReticle(target.position);
         targetObject = target.gameObject;
+        if(target.tag == "Card")
+        {
+            int id = target.GetComponent<PhotonView>().viewID;
+            photonView.RPC("DrawTargetLine", PhotonTargets.All, id);
+        }             
         photonView.RPC("Cast", PhotonTargets.All);
     }
 
@@ -394,7 +399,7 @@ public abstract class BaseCard : MonoBehaviour
             //Set state of card to being in the graveyard
             currentCardState = cardState.InGraveyard;
             summonZoneTextBox.text = "";
-
+            targetLine.enabled = false;
             if (!playedCardReleaseSound && audioManager != null)
             {
                 playedCardReleaseSound = true;
@@ -521,7 +526,6 @@ public abstract class BaseCard : MonoBehaviour
                         castAbilities.Add(currentString);
                     }                  
                     break;
-
                 default:
                     break;
             }
@@ -629,6 +633,27 @@ public abstract class BaseCard : MonoBehaviour
         //Graveyard effect goes here
     }
 
+    [PunRPC]
+    public void DrawTargetLine(int viewId)
+    {
+        targetLine.enabled = true;
+        if(photonView.isMine)
+        {
+            targetLine.startColor = Color.blue;
+            targetLine.endColor = Color.green;
+        }
+        else
+        {
+            targetLine.startColor = Color.red;
+            targetLine.endColor = Color.magenta;
+        }
+           
+        //set the first component of the line renderer to the position of the card
+        targetLine.SetPosition(0, transform.position);
+
+        //set the second component of the line renderer to the position of the target
+        targetLine.SetPosition(1, PhotonView.Find(viewId).transform.position);       
+    }
 
 
     //Photon Serialize View

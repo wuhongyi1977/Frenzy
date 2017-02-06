@@ -4,28 +4,44 @@ using UnityEngine;
 
 public class CardTypeSelector : MonoBehaviour
 {
-    // TODO remove this later
-    public void Awake()
-    {    
-        gameObject.AddComponent<SpellCard>();
-
+    // finds the card type in the custom data, then calls AddClassAndInitialize
+    public void SetCardType(int ownerId, string id)
+    {
+        string[] data = PlayFabDataStore.cardCustomData[id];
+        string cardType = null;
+        for (int j = 0; j < data.Length - 1; j++)//splitResultTest.Length -1; j++)
+        {
+            if (data[j] == "CardType")
+            {
+                cardType = data[j + 1];
+                if (cardType == "Spell" || cardType == "Creature")
+                {
+                    GetComponent<PhotonView>().RPC("AddClassAndInitialize", PhotonTargets.All, cardType, ownerId, id);
+                    return;
+                }
+                else
+                { Debug.LogError(id + " does not have a recognized card type"); }
+                return;
+            }
+        }
     }
 
-    public void SetCardType(string cardType)
+    // adds the proper card component to this card, then call initialize on the local copy
+    [PunRPC]
+    public void AddClassAndInitialize(string cardType, int ownerId, string id)
     {
-        switch (cardType)
+        if (cardType == "Spell")
         {
-            case "Creature":
-                gameObject.AddComponent<CreatureCard>();
-                break;
-            case "Spell":
-                gameObject.AddComponent<SpellCard>();
-                break;
-            default:
-                Debug.LogError("Card type does not exist!");
-                break;
+            gameObject.AddComponent<SpellCard>();
         }
-       
+        else if (cardType == "Creature")
+        {
+            gameObject.AddComponent<CreatureCard>();
+        }
+        if (GetComponent<PhotonView>().isMine)
+        {
+            GetComponent<BaseCard>().InitializeCard(ownerId, id);
+        }
     }
 	
 }
