@@ -3,6 +3,12 @@ using System.Collections;
 using UnityEngine.UI;
 public class CreatureCard : BaseCard
 {
+    //the time it takes for this card to recharge after a use (ex: time it takes a creature before it can attack again)
+    public float rechargeTime;
+    //the attack power of this card (if its a creature)
+    public int attackPower;
+    //the defense power of this card (if its a creature)
+    public int defensePower;
     /*
     //STATS
     public int health;

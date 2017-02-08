@@ -39,6 +39,13 @@ public class CardAbilityList : MonoBehaviour
         }
     }
 
+    // damages or heals the local player (positive values for healing, negative for damage)
+    private void OwnerHealthChange()
+    {     
+        int healthChange = int.Parse(cardScript.abilityValues["OwnerHealthChange"]);
+        cardScript.localPlayerController.ChangeHealth(healthChange);  
+    }
+
     // discards the card
     private void DiscardOnCast()
     {

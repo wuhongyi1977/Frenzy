@@ -13,19 +13,20 @@ public abstract class BaseCard : MonoBehaviour
     public PhotonView photonView;
     protected CardAbilityList cardAbilityList;
 
+    //Card State
+    public enum cardState { OutOfPlay, InHand, Held, WaitForCastTarget, Casting, InPlay, InGraveyard };
+    public cardState currentCardState = cardState.OutOfPlay;
+
     //CARD COMPONENTS
     //contains all visible components on card
     protected Transform cardLayoutCanvas;
-    protected Canvas cardCanvasScript;
-    //the image to display for the card art
-    protected Image cardArtImage;
-    //the text displayed to the player listing the card's abilities
-    protected Text descriptionText;
-    protected Text summonZoneTextBox;
-    protected Text cardTitleTextBox;
-    protected Text castTimeTextBox;
-    protected Image inactiveFilter; // makes card grayed out when inactive (e.g. casting)
-    protected Image cardBack; // blocks card info when in opponents hand
+    protected Canvas cardCanvasScript;//< script for canvas that contains all card elements 
+    protected Image cardArtImage;//< the image to display for the card art
+    protected Text descriptionText;//< the text displayed to the player listing the card's abilities
+    protected Text summonZoneTextBox;//< shows the casting timer
+    protected Text cardTitleTextBox; //< displays the card title
+    protected Image inactiveFilter; //< makes card grayed out when inactive (e.g. casting)
+    protected Image cardBack; //< blocks card info when in opponents hand
     LineRenderer targetLine;
     GameObject targetReticle;
 
@@ -33,14 +34,7 @@ public abstract class BaseCard : MonoBehaviour
 
     //Scaling variables and sorting layer
     protected Vector3 startingScale, zoomScale;
-
-    //Card State
-    public enum cardState { OutOfPlay, InHand, Held, WaitForCastTarget, Casting, InPlay, InGraveyard };
-    public cardState currentCardState = cardState.OutOfPlay;
-
-    //reference to zone this card is occupying
-    public int zoneIndex;
-     
+  
     //The position that the card was at when the player picks up the card. 
     //This is used for when a player makes an invalid placement the card is placed back in it's original hand position
     public Vector3 cardHandPos;
@@ -48,6 +42,9 @@ public abstract class BaseCard : MonoBehaviour
 
     bool casting = false;
     float castCountdown;
+
+    //reference to zone this card is occupying
+    public int zoneIndex;
 
 
     //STATS 
@@ -64,36 +61,16 @@ public abstract class BaseCard : MonoBehaviour
     public string target;
     //The faction that the card belongs to. Neutral means it is available to all factions
     public string faction = "Neutral";
+
     // abilities that trigger on cast
     protected List<string> castAbilities = new List<string>();
     // holds values associated with abilities
     public Dictionary<string, string> abilityValues = new Dictionary<string, string>();
-
-
-
-    /// <summary>
-    ///  All of these only apply to specific types of cards (creature, spell, etc)
-    ///  TODO should be moved to proper script
-    /// </summary>
-    //the time it takes for this card to recharge after a use (ex: time it takes a creature before it can attack again)
-    public float rechargeTime;
-    //the attack power of this card (if its a creature)
-    public int attackPower;
-    //the defense power of this card (if its a creature)
-    public int defensePower;
-    //the amount to change the opponents health (can be direct damage or healing)
-    public int targetHealthChange = 0;
-    //the amount to change the owners health (can be direct damage or healing)
-    public int ownerHealthChange;
+    // holds values associated with creature stats
+    public Dictionary<string, string> creatureStatValues = new Dictionary<string, string>();
     //the list of standard abilities a creature has (Rush, Elusive, etc.)
     //to handle abilities, have each possible occurence check if hashset contains ability
     public HashSet<string> creatureAbilities = new HashSet<string>();
-    //the list of effects a card has
-    //have each possible occurence check if hashset contains effect
-    public HashSet<string> cardEffects = new HashSet<string>();
-
-
-    //END STATS
 
     //The itemId of the Card (not unique, used to reference custom data)
     public string cardId;
@@ -101,27 +78,17 @@ public abstract class BaseCard : MonoBehaviour
     private string customData;
     //The name of the card
     public string cardTitle;
-    //Used to prevent staying step out of a chunk of code in derived Card Update methods
-    public bool doneAddingToGraveyard = false;
-    //If the card is in the graveyard or not
-    public bool inGraveyard;
-    //If the card is in the summon zone
-    public bool inSummonZone;
+
     //The ID of the player that this card belongs to
     public int playerID;
-    //The card number. Used to correctly delete from the player's hand
-    public int cardNumber; 
 
     public GameObject localPlayer;
     public GameObject networkOpponent;
     public PlayerController localPlayerController;
     public PlayerController opponentPlayerController;
 
-    protected SpriteRenderer spriteRender;
-
    
 
-   
 
     //SOUND VARIABLES
     //The variable for the script attached to the AudioManager object
@@ -153,7 +120,6 @@ public abstract class BaseCard : MonoBehaviour
             descriptionText = cardLayoutCanvas.FindChild("DescriptionText").GetComponent<Text>();
             summonZoneTextBox = cardLayoutCanvas.FindChild("Counter").GetComponent<Text>(); 
             cardTitleTextBox = cardLayoutCanvas.FindChild("CardTitle").GetComponent<Text>(); 
-            castTimeTextBox = cardLayoutCanvas.FindChild("CastTime").GetComponent<Text>();
             cardArtImage = cardLayoutCanvas.FindChild("CardArtImage").GetComponent<Image>();
             inactiveFilter = cardLayoutCanvas.FindChild("InactiveFilter").GetComponent<Image>();
             inactiveFilter.enabled = false;
@@ -167,15 +133,14 @@ public abstract class BaseCard : MonoBehaviour
         
         startingScale = transform.localScale;
         zoomScale = startingScale * 2;
+        cardTitleTextBox.text = cardTitle;
         //audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
-       
 
     }
     public virtual void Start()             //Abstract method for start
     {
-        doneAddingToGraveyard = false;
-        inSummonZone = false;
-        cardTitleTextBox.text = cardTitle;
+     
+        
     }
     public virtual void Update()                //Abstract method for Update
     {
@@ -242,7 +207,7 @@ public abstract class BaseCard : MonoBehaviour
         cardHandPos = gameObject.transform.position;
         //audioManager.playCardPickup();    
     }
-
+    
     public void MoveReticle(Vector3 pos)
     {
         targetReticle.transform.position = new Vector3(pos.x, pos.y, targetReticle.transform.position.z);
@@ -492,16 +457,17 @@ public abstract class BaseCard : MonoBehaviour
                     castTime = float.Parse(nextString);
                     break;
                 case "RechargeTime":
-                    rechargeTime = float.Parse(nextString);
+                    creatureStatValues.Add(currentString, nextString);
                     break;
                 case "AttackPower":
-                    attackPower = int.Parse(nextString);
+                    creatureStatValues.Add(currentString, nextString);
                     break;
                 case "DefensePower":
-                    defensePower = int.Parse(nextString);
+                    creatureStatValues.Add(currentString, nextString);
                     break;
                 case "OwnerHealthChange":
-                    ownerHealthChange = int.Parse(nextString);
+                    castAbilities.Add(currentString);
+                    abilityValues.Add(currentString, nextString);
                     break;
                 case "CreatureAbility":
                     creatureAbilities.Add(nextString); //= int.Parse(nextString);
