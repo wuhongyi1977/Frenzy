@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     public static event LoseEvent OnLose;
 
     // COMPONENTS
+    GameObject PlayerAvatar;
     GameObject PlayerManager;
     PlayerController opponent;
     public PhotonView photonView;
@@ -78,13 +79,32 @@ public class PlayerController : MonoBehaviour
   
     void Awake()
     {
+        //get this object's photon view component
+        photonView = GetComponent<PhotonView>();
+        //spawn avatar
+        PlayerAvatar = Instantiate(Resources.Load("PlayerAvatar"), transform.position, Quaternion.identity) as GameObject;
+        Text playerName = PlayerAvatar.transform.GetComponentInChildren<Text>();
+        if (photonView.isMine)
+        {
+            PlayerAvatar.name = "LocalPlayerAvatar";
+            PlayerAvatar.tag = "Player1";
+            PlayerAvatar.transform.position = Camera.main.ViewportToWorldPoint(new Vector3(0.2f, 0.1f, 5));
+            playerName.text = PlayFabDataStore.userName;
+            
+        }
+        else
+        {
+            PlayerAvatar.name = "OpponentAvatar";
+            PlayerAvatar.tag = "Player2";
+            PlayerAvatar.transform.position = Camera.main.ViewportToWorldPoint(new Vector3(0.2f, 0.9f, 5));
+            playerName.text = PlayFabDataStore.opponentUserName;
+        } 
+
         //initialize containers to proper sizes
         SummonZones = new GameObject[numberOfSummonZones];
         playerHand = new GameObject[maxHandSize];
         // TODO put back commented section, hard coded for testing only
-        cardDeck = new List<int>(20);//(deckSize);
-        //get this object's photon view component
-        photonView = GetComponent<PhotonView>();
+        cardDeck = new List<int>(20);//(deckSize);      
         //get a reference to the game manager
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         //Check if the local player or network opponent owns this controller
@@ -143,7 +163,6 @@ public class PlayerController : MonoBehaviour
         //get the position of the card pool
         cardPool = PlayerManager.transform.FindChild("CardPool").position;
         // get summon zones
-        //int index = 0;
         for(int index = 0; index < numberOfSummonZones; index++ )
         {
 
@@ -151,29 +170,7 @@ public class PlayerController : MonoBehaviour
             SummonZones[index] = zone.gameObject;
             OccupiedZones.Add(index, false);
 
-        }
-        /*
-        foreach (Transform t in PlayerManager.transform)
-        {
-            if(photonView.isMine)
-            {
-                if (t.tag == "Player1SummonZone")
-                {
-                    SummonZones[index] = t.gameObject;
-                    OccupiedZones.Add(index++, false);
-                }
-            }
-            else
-            {
-                if (t.tag == "Player2SummonZone")
-                {
-                    SummonZones[index] = t.gameObject;
-                    OccupiedZones.Add(index++, false);
-                }
-            }
- 
-        }
-        */
+        }   
         //set initial text for health text box
         healthTextBox.text = "Life: " + startingHealth;
     }
@@ -261,7 +258,7 @@ public class PlayerController : MonoBehaviour
     void CheckClickDown()
     {
         Transform hit = GetTransformUnderMouse();
-        if (currentClickState == clickState.Empty)
+        if (hit != null && currentClickState == clickState.Empty)
         {
             Debug.Log("Hit: " + hit.name);
             BaseCard cardScript;

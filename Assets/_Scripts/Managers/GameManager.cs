@@ -16,9 +16,7 @@ public class GameManager : MonoBehaviour
     public bool versusAi;
     //stored name for AI player
     string computerAiName = "Jarvis";
-    //The text box to display the player's name
-    public Text player1Username;
-    public Text player2Username;
+ 
 	//The text box that the enemie's health is placed
 	private Text player2HealthTextBox;
 	private Text player1HealthTextBox;
@@ -31,13 +29,6 @@ public class GameManager : MonoBehaviour
     public Text gameEndText;
 
 
-    private void Awake()
-    {
-        
-
-   
-
-}
     // Use this for initialization
     void Start ()
     {
@@ -49,24 +40,18 @@ public class GameManager : MonoBehaviour
         //get this manager's photon view
         //photonView = GetComponent<PhotonView>();
         StartCoroutine("TimedCall");
-       
-
-        //set your username to the stored username on playfabdatastore
-        player1Username.text = PlayFabDataStore.userName;
+ 
         //if there is another player in the room
         if (PhotonNetwork.room != null && PhotonNetwork.room.maxPlayers == 2)
         {
             //set bool to indicate real player
             versusAi = false;
-            //set username to opponents username           
-           player2Username.text = PlayFabDataStore.opponentUserName;
+          
         }
         else // if the opponent is a computer controlled player
         {
             //set bool to indicate computer player
             versusAi = true;
-            //set username to AI username
-            player2Username.text = computerAiName;
         }
     }
 	
