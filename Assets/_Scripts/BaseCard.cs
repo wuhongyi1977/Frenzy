@@ -299,11 +299,10 @@ public abstract class BaseCard : MonoBehaviour
     {
         MoveReticle(target.position);
         targetObject = target.gameObject;
-        if(target.tag == "Card")
-        {
-            int id = target.GetComponent<PhotonView>().viewID;
-            photonView.RPC("DrawTargetLine", PhotonTargets.All, id);
-        }             
+        ///Draw Target Line
+        int id = target.GetComponent<PhotonView>().viewID;
+        photonView.RPC("DrawTargetLine", PhotonTargets.All, id);
+        //cast card      
         photonView.RPC("Cast", PhotonTargets.All);
     }
 

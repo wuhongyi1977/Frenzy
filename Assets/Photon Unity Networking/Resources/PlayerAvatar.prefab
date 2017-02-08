@@ -58,6 +58,7 @@ GameObject:
   - component: {fileID: 50474802551133350}
   - component: {fileID: 58275982053344068}
   - component: {fileID: 114043074631912198}
+  - component: {fileID: 114519877863479918}
   m_Layer: 0
   m_Name: PlayerAvatar
   m_TagString: Untagged
@@ -175,6 +176,17 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &114519877863479918
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1719601782145906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 584de2205c8d0bd4b89eca225c5babdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114881681406139690
 MonoBehaviour:
   m_ObjectHideFlags: 1

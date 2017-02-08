@@ -82,23 +82,7 @@ public class PlayerController : MonoBehaviour
         //get this object's photon view component
         photonView = GetComponent<PhotonView>();
         //spawn avatar
-        PlayerAvatar = Instantiate(Resources.Load("PlayerAvatar"), transform.position, Quaternion.identity) as GameObject;
-        Text playerName = PlayerAvatar.transform.GetComponentInChildren<Text>();
-        if (photonView.isMine)
-        {
-            PlayerAvatar.name = "LocalPlayerAvatar";
-            PlayerAvatar.tag = "Player1";
-            PlayerAvatar.transform.position = Camera.main.ViewportToWorldPoint(new Vector3(0.2f, 0.1f, 5));
-            playerName.text = PlayFabDataStore.userName;
-            
-        }
-        else
-        {
-            PlayerAvatar.name = "OpponentAvatar";
-            PlayerAvatar.tag = "Player2";
-            PlayerAvatar.transform.position = Camera.main.ViewportToWorldPoint(new Vector3(0.2f, 0.9f, 5));
-            playerName.text = PlayFabDataStore.opponentUserName;
-        } 
+        PlayerAvatar = PhotonNetwork.Instantiate(("PlayerAvatar"), transform.position, Quaternion.identity,0);
 
         //initialize containers to proper sizes
         SummonZones = new GameObject[numberOfSummonZones];
