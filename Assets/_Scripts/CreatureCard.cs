@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 public class CreatureCard : BaseCard
 {
+    /*
     //STATS
     public int health;
     public float attackSpeed;
@@ -53,19 +54,7 @@ public class CreatureCard : BaseCard
         }
 		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
 		playedCardSelectedSound = false;
-        /*
-        //get card stats from stat variables in parent script
-        startingDamage = attackPower;
-        startingHealth = defensePower;
-        startingAttackSpeed = rechargeTime;
-        //end assignment
-        creatureAttackSpeedTimer = attackSpeed;
-        cardTitleTextBox.text = cardTitle;
-        creatureStatsTextBox.text = damageToDeal + "/" + health + "/" + attackSpeed;
-        //startingDamage = damageToDeal;
-        //startingAttackSpeed = attackSpeed;
-        //startingHealth = health;
-        */
+       
         isSelectable = true;
         isFrozen = false;
         isAttackable = true;
@@ -175,141 +164,7 @@ public class CreatureCard : BaseCard
             
         }
     }
-    /*
-    protected override void OnMouseDown()
-    {
-        if (photonView.isMine  && isSelectable == true)
-        {
-            cardHandPos = gameObject.transform.position;
-            //screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-            //offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
-			if (!playedCardPickupSound) 
-			{
-				audioManager.playCardPickup ();
-				playedCardPickupSound = true;
-			}
-        }
-    }
-    protected override void OnMouseUp()
-    {
-		//reset the bool to allow the Pickup sound to play again when the player picks up another card
-		playedCardPickupSound = false;
-
-        if (photonView.isMine && isSelectable == true)
-        {
-            localPlayerController.makeLineInvisible();
-            localPlayerController.drawLineOff();
-
-            
-            //if this is the local card object
-            if (photonView.isMine)
-            {
-
-                if (creatureCanAttack)
-                {
-
-                    //GameObject currentTarget = localPlayerController.CardIsTargetted();//gameObject, cardHandPos);
-                    targetObject = localPlayerController.CardIsTargetted();
-                    //check if target is a possible target for this card
-                    if (VerifyTarget())
-                    {
-                        localPlayerController.CardTargetDamage(gameObject, cardHandPos, targetObject);//currentTarget);
-                        audioManager.playCardRelease();   
-                    }
-                    
-                    //networkOpponent.GetComponent<PlayerController>().ChangeHealth(damageToDeal * -1);
-                    //Debug.Log("HERE");
-                    //localPlayer.GetComponent<PlayerController>().creatureCardIsDropped(gameObject, cardHandPos);
-                }
-                else
-                {
-                    //localPlayerController.cardIsDropped(gameObject, cardHandPos);
-                }
-            }
-            else
-            {
-                if (creatureCanAttack)
-                {
-
-                    //opponentPlayerController.creatureCardIsDropped(gameObject, cardHandPos);
-                }
-                else
-                {
-                    //opponentPlayerController.cardIsDropped(gameObject, cardHandPos);
-                }
-            }
-            
-        }
-
-    }
-    protected override void OnMouseOver()
-    {
-        if(photonView.isMine && localPlayerController != null)
-        {
-
-            //localPlayerController.setMousedOverCard(gameObject);
-			if (!playedCardSelectedSound) 
-			{
-				audioManager.playCardSelect ();
-				playedCardSelectedSound = true;
-			}
-            if (creatureCanAttack)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    localPlayerController.drawLineOn();
-                }
-
-            }
-        }
-        else if(opponentPlayerController != null)
-        {
-            //opponentPlayerController.setMousedOverCard(gameObject);
-
-        }
-
-       
-    }
-    */
-    //verify that the proper type of target is being selected
-    /*
-    public override bool VerifyTarget()
-    {
-        Debug.Log("Verifying target");
-        //copy this block into all cards, cards cannot target nothing or themselves
-        if (targetObject == null || targetObject == this.gameObject)
-        {
-            if (targetObject == null)
-            {
-                Debug.Log("Target is null");
-            }
-            else
-            {
-                Debug.Log("Target is self");
-            }
-           
-            return false;
-        }
-
-        else if (targetObject.tag == "Player2")
-        {
-            Debug.Log("Target is opponent");
-            return true;
-        }
-        //test if target is proper
-        else if (targetObject.tag == "CreatureCard" && targetObject.GetComponent<CreatureCard>().inBattlefield == true)
-        {
-            Debug.Log("Target is "+targetObject.GetComponent<CreatureCard>().cardTitle);
-            return true;
-        }
-        else
-        {
-            Debug.Log("No target found");
-            return false;
-        }
-
-    }
-    */
+   
     public void increaseStats(int dmg, int h, int attkSpd)
     {
         //if (photonView.isMine) {
@@ -339,6 +194,7 @@ public class CreatureCard : BaseCard
         
     }
 
+    
     public override void UpdateInternalVariables()
     {
         //get card stats from stat variables in parent script
@@ -367,4 +223,5 @@ public class CreatureCard : BaseCard
 
 
     }
+    */
 }

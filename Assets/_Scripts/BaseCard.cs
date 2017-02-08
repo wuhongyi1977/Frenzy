@@ -379,8 +379,10 @@ public abstract class BaseCard : MonoBehaviour
         currentCardState = cardState.InPlay;
         inactiveFilter.enabled = false;
         targetReticle.SetActive(false);
-        //OnPlay();
-        //other cards will call important code in override
+        if (photonView.isMine)
+        {
+            OnPlay();
+        }
     }
 
 
@@ -433,19 +435,20 @@ public abstract class BaseCard : MonoBehaviour
        
     }
 
-    
+    /*
     public void setGraveyardVariables()
     {
         inSummonZone = false;
         inGraveyard = true;
         doneAddingToGraveyard = true;
     }
-
+    */
     public void InitializeCard(int ownerID, string id)
     {
         playerID = ownerID;
         photonView.RPC("SetCustomData", PhotonTargets.All, id);
     }
+    
 
     //takes a string of custom data and stores it
     [PunRPC]
@@ -457,31 +460,20 @@ public abstract class BaseCard : MonoBehaviour
         cardTitle = PlayFabDataStore.cardNameList[id];
         //set cards description
         descriptionText.text = PlayFabDataStore.cardDescriptions[id];
-
+        // Retrieve the custom data for this card type
         string[] data = PlayFabDataStore.cardCustomData[id];
-        /*
-        //store custom data for this card
-        customData = data;
-        //define where to split the custom data to retrive variables
-        string[] stringSeparators = new string[] { "{\"", "\":\"", "\",\"", "\"}" };
-        //split custom data using seperators
-        string[] splitResultTest = customData.Split(stringSeparators, System.StringSplitOptions.None);
-        */
         //iterate through each string in the split data
         //goes to 1 less than total length because the last variable doesnt need to be checked and nextString will fail
         for (int j = 0; j < data.Length - 1; j++)//splitResultTest.Length -1; j++)
         {
             //stores the current string being viewed
-            string currentString = data[j];//splitResultTest[j];
+            string currentString = data[j];
             //store the next string in the list
-            string nextString = data[j + 1];//splitResultTest[j+1];
-
-            //Debug.Log(currentString);
-
+            string nextString = data[j + 1];
+            
             //Assign variables
             switch (currentString)
-            {
-               
+            {        
                 case "ArtName":
                     artName = nextString;
                     break;
@@ -533,9 +525,6 @@ public abstract class BaseCard : MonoBehaviour
         Debug.Log("Finished setting variables");
         //Set the proper art for the card
         SetArt();
-        //set all internal variables on a card using this function
-        UpdateInternalVariables();
-
     }
 
     public void SetArt()
@@ -544,18 +533,8 @@ public abstract class BaseCard : MonoBehaviour
         {
             cardArtImage.overrideSprite = Resources.Load<Sprite>("CardArt/" + artName);
         }
-
-    }
-    //this function should be overridden in child script to update any
-    //internal variables that should be set on card initialization
-    public virtual void UpdateInternalVariables()
-    {
-        //variables go here
     }
 
-
-    
-    
     //store all data for player objects
     public void GetPlayers()
     {
@@ -569,44 +548,15 @@ public abstract class BaseCard : MonoBehaviour
             opponentPlayerController = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();
         }
     }
-    
-
-   
 
     //handles the functions for returning a card to a player's hand
     public void ReturnToHand()
     {
         if (photonView.isMine)
         {
-            Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");
-
-
-
-            //RESET VARIABLES
-            if (cardType == "Creature")
-            {
-                //get creature script
-                CreatureCard creatureScript = GetComponent<CreatureCard>();
-                //reset creature variables
-                creatureScript.isSelectable = true;
-                creatureScript.isFrozen = false;
-                creatureScript.isAttackable = true;
-                //remove this card from the list of creatures in play
-                localPlayerController.creatureCardsInPlay.Remove(gameObject);
-            }
-
-          
-            //Set state of card to being in the graveyard
-            inGraveyard = false;
-            //Set state of card to not being in the summon zone
-            inSummonZone = false;
-            //set graveyard variable to false
-            doneAddingToGraveyard = false;
+            Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");    
             //clear summon zone text box
             summonZoneTextBox = null;
-          
-
-
             //play card return sound
             /*
             if (!playedCardReleaseSound)
@@ -615,7 +565,6 @@ public abstract class BaseCard : MonoBehaviour
                 audioManager.playCardRelease();
             }
             */
-
             //RETURN TO HAND
 
             //Put the card into proper place

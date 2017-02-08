@@ -10,12 +10,17 @@ public class PlayerController : MonoBehaviour
     public enum clickState { Empty,  HoldingCard, Targetting};
     public clickState currentClickState = clickState.Empty;
 
-    private Transform selectedCard = null;
-    private BaseCard selectedCardScript = null;
-
-    //PLAYER SETTINGS
+    //PLAYER SETTINGS (TODO assign from playfab)
     //the number of cards in a player's deck
     const int deckSize = 40;
+    int startingHealth = 40; //< Players initial health
+    //the maximum number of cards a player can hold
+    int maxHandSize = 7;
+    //the number of cards to draw at the start of the game
+    int startingHandSize = 5;
+    //The speed in seconds in which the player draws a card from the deck
+    int libraryDrawSpeed = 7;
+    int numberOfSummonZones = 3;
 
     public delegate void LoseEvent();
     public static event LoseEvent OnLose;
@@ -30,35 +35,24 @@ public class PlayerController : MonoBehaviour
     float cardSpacing = 5.0f;
     Vector3 graveyardPos; //< The position of the graveyard. (off screen) 
     Vector3 cardPool; //< The position of the card pool (off screen)
-    private GameObject line; 
+    private GameObject line;
 
+
+    //references to currently selected card
+    private Transform selectedCard = null;
+    private BaseCard selectedCardScript = null;
 
     //PLAYER STATS
-    int startingHealth = 20; //< Players initial health
     int health;  //< Player's current health
-
-    //The number of times the deck is shuffled before game starts
-    private int numbShuffles;
     //The player ID (1 is local player, 2 is opponent)
     private int playerID = 1; // TODO change to Enum (Unassigned, Local, Opponent)
-    
-    //the maximum number of cards a player can hold
-    int maxHandSize = 7;
-    //the number of cards to draw at the start of the game
-    int startingHandSize = 5;
-    //The speed in seconds in which the player draws a card from the deck
-    int libraryDrawSpeed = 7;
-    
-    
+
     //The list of summoning zones
-    public GameObject[] SummonZones = new GameObject[3];
+    public GameObject[] SummonZones;
     public Dictionary<int, bool> OccupiedZones = new Dictionary<int, bool>();//< stores whether a zone is occupied
 
-
     //The list that represents the player's hand
-    //public Dictionary<int, GameObject> playerHand = new Dictionary<int, GameObject>();//< stores a card at an index
-    public GameObject[] playerHand = new GameObject[7];
-    //public List<GameObject> playerHand = new List<GameObject>(7);
+    public GameObject[] playerHand;
 
     public List<int> cardDeck;
 
@@ -81,24 +75,12 @@ public class PlayerController : MonoBehaviour
     //The game manager object
     GameManager gameManager;
 
-    //TODO check if the following variables are necessary
-   
-    private GameObject enemyObjectUnderMouse;
-
-
-	public delegate void CreatureDied();
-	public static event CreatureDied creatureHasDied;
-
-	public delegate void CreatureEnteredBattlefield();
-	public static event CreatureEnteredBattlefield creatureHasEntered;
-
-	public int increaseDamageAmount, increaseAttackSpeedAmount, increaseHealthAmount;
-	public List<GameObject> creatureCardsInPlay = new List<GameObject>(3);
-	private GameObject creatureThatJustEntered;
-
   
     void Awake()
     {
+        //initialize containers to proper sizes
+        SummonZones = new GameObject[numberOfSummonZones];
+        playerHand = new GameObject[maxHandSize];
         // TODO put back commented section, hard coded for testing only
         cardDeck = new List<int>(20);//(deckSize);
         //get this object's photon view component
@@ -161,7 +143,16 @@ public class PlayerController : MonoBehaviour
         //get the position of the card pool
         cardPool = PlayerManager.transform.FindChild("CardPool").position;
         // get summon zones
-        int index = 0;
+        //int index = 0;
+        for(int index = 0; index < numberOfSummonZones; index++ )
+        {
+
+            Transform zone = PlayerManager.transform.Find("SummonZone"+index);
+            SummonZones[index] = zone.gameObject;
+            OccupiedZones.Add(index, false);
+
+        }
+        /*
         foreach (Transform t in PlayerManager.transform)
         {
             if(photonView.isMine)
@@ -182,6 +173,7 @@ public class PlayerController : MonoBehaviour
             }
  
         }
+        */
         //set initial text for health text box
         healthTextBox.text = "Life: " + startingHealth;
     }
@@ -509,6 +501,7 @@ public class PlayerController : MonoBehaviour
     [PunRPC]
     public void PlayCard(int cardId, int zoneIndex)
     {
+        Debug.Log("Card played in index "+ zoneIndex);
         //find the spawned card
         GameObject card = PhotonView.Find(cardId).gameObject;
         //find the proper summon zone
@@ -524,7 +517,7 @@ public class PlayerController : MonoBehaviour
         RemoveFromHand(card.GetComponent<BaseCard>().handIndex);
         
     }
-   
+   /*
 	[PunRPC]
 	public void ResolveCreatureDamage(GameObject attacker, GameObject defender)
 	{
@@ -543,6 +536,7 @@ public class PlayerController : MonoBehaviour
             defenderScript.health -= attackerScript.damageToDeal;
         }
     }
+    */
     
 
     //function for determining target when a card is dragged to a target
@@ -563,7 +557,7 @@ public class PlayerController : MonoBehaviour
             return null;
         }
     }
-
+    /*
     //NEW VERSION FOR NEW CARDS
     //Resolves damage when it involves creatures (creature to creature or spell to creature)
     [PunRPC]
@@ -718,7 +712,7 @@ public class PlayerController : MonoBehaviour
 				//If the creature card is in the battlefield
 				if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().inBattlefield) 
 				{
-                    /*
+                    
 					//Find an open summoning slot
 					for (int i = 0; i < SummonZones.Length; i++) 
 					{
@@ -740,27 +734,28 @@ public class PlayerController : MonoBehaviour
 						card.GetComponent<CreatureTargetSpellCard>().setGraveyardVariables();
 						sendToGraveyard (card, card.GetComponent<BaseCard>().zoneIndex);
 					}
-                    */
+                    
 				}
 			}
 		}
 	}
-   
+   */
 
     //This method is called when the card is done casting
     public void sendToGraveyard(GameObject card, int zoneIndex)
     {
         // set occupied zone as empty
         OccupiedZones[zoneIndex] = false;
-
         //Add card to graveyard
         graveyard.Add(card);
-
         //Moves card to the graveyard
         card.transform.position = graveyardPos;
+
+        /*
 		//If the card being sent to the graveyard is a creature card, remove it from the list of creature cards in play
 		if (card.GetComponent<CreatureCard>() != null)
 			creatureCardsInPlay.Remove (card);
+            */
     }
    
 
@@ -790,7 +785,7 @@ public class PlayerController : MonoBehaviour
         line.GetComponent<DrawLine>().makeLineInvisible();
     }
 
-
+/*
 	public void creatureDied()
 	{
 		if (photonView.isMine) {
@@ -805,7 +800,7 @@ public class PlayerController : MonoBehaviour
 				creatureHasEntered ();
 		}
 	}
- 
+ */
     
     /// <summary>
     /// PHOTON SERIALZE VIEW
@@ -829,7 +824,7 @@ public class PlayerController : MonoBehaviour
         }
        
 	}
-
+    /*
 	//When called it will increase the stats of all the creatures by the amount passed
 	public void increaseCreatureStats(int dmg, int attkSpd, int h)
 	{
@@ -863,6 +858,7 @@ public class PlayerController : MonoBehaviour
 	{
 		return creatureThatJustEntered;
 	}
+    */
 
     
 }
