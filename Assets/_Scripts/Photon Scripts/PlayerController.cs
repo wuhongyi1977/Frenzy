@@ -263,6 +263,12 @@ public class PlayerController : MonoBehaviour
                         //handle target selection before casting
                         SetSelectedCard(hit);
                         break;
+                    case (BaseCard.cardState.WaitForTarget):
+                        Debug.Log("Cardstate is: " + cardScript.GetCardState());
+                        currentClickState = clickState.Targetting;
+                        //handle target selection before casting
+                        SetSelectedCard(hit);
+                        break;
                     case (BaseCard.cardState.InPlay):
                         //handle click abilities (targetting, attacking, etc.)
                         break;

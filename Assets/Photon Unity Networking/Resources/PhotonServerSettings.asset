@@ -60,4 +60,5 @@ MonoBehaviour:
   - Cast
   - PutIntoPlay
   - AddClassAndInitialize
+  - StartRecharging
   DisableAutoOpenWizard: 1

@@ -14,7 +14,8 @@ public abstract class BaseCard : MonoBehaviour
     protected CardAbilityList cardAbilityList;
 
     //Card State
-    public enum cardState { OutOfPlay, InHand, Held, WaitForCastTarget, Casting, InPlay, InGraveyard };
+    public enum cardState { OutOfPlay, InHand, Held, WaitForCastTarget,
+                            WaitForTarget, Casting, InPlay, InGraveyard };
     public cardState currentCardState = cardState.OutOfPlay;
 
     //CARD COMPONENTS
@@ -27,8 +28,8 @@ public abstract class BaseCard : MonoBehaviour
     protected Text cardTitleTextBox; //< displays the card title
     protected Image inactiveFilter; //< makes card grayed out when inactive (e.g. casting)
     protected Image cardBack; //< blocks card info when in opponents hand
-    LineRenderer targetLine;
-    GameObject targetReticle;
+    protected LineRenderer targetLine;
+    protected GameObject targetReticle;
 
     public GameObject targetObject = null;
 
@@ -251,6 +252,19 @@ public abstract class BaseCard : MonoBehaviour
             else
             {
                 MoveReticle(transform.position);
+                return;
+            }
+        }
+        else if (currentCardState == cardState.WaitForTarget)
+        {
+            if (potentialTarget.tag == "Player1" || potentialTarget.tag == "Player2")
+            {
+                targetObject = potentialTarget.gameObject;
+                return;
+            }
+            else if (potentialTarget.GetComponent<CreatureCard>())
+            {
+                targetObject = potentialTarget.gameObject;
                 return;
             }
         }
@@ -490,6 +504,12 @@ public abstract class BaseCard : MonoBehaviour
         Debug.Log("Finished setting variables");
         //Set the proper art for the card
         SetArt();
+        InitializeStats();
+    }
+
+    protected virtual void InitializeStats()
+    {
+        // overridden in child class to update internal stats retrieved from custom data
     }
 
     public void SetArt()
@@ -521,7 +541,7 @@ public abstract class BaseCard : MonoBehaviour
         {
             Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");    
             //clear summon zone text box
-            summonZoneTextBox = null;
+            summonZoneTextBox.text = "";
             //play card return sound
             /*
             if (!playedCardReleaseSound)

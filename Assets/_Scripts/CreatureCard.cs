@@ -3,12 +3,143 @@ using System.Collections;
 using UnityEngine.UI;
 public class CreatureCard : BaseCard
 {
+    public enum creatureState
+    { 
+       Recharging, Idle
+    };
+    public creatureState currentCreatureState = creatureState.Idle;
+
     //the time it takes for this card to recharge after a use (ex: time it takes a creature before it can attack again)
     public float rechargeTime;
     //the attack power of this card (if its a creature)
     public int attackPower;
     //the defense power of this card (if its a creature)
     public int defensePower;
+
+    private float rechargeCountdown = 0;
+
+    // creature stats are AttackPower, DefensePower, RechargeTime
+
+    // called right after retrieving custom data in base card class
+    protected override void InitializeStats()
+    {
+        rechargeTime = float.Parse(creatureStatValues["RechargeTime"]);
+        attackPower = int.Parse(creatureStatValues["AttackPower"]);
+        defensePower = int.Parse(creatureStatValues["DefensePower"]);
+    }
+
+    public override void Update()                //Abstract method for Update
+    {
+        base.Update();
+        //handle recharge countdown
+        if (currentCreatureState == creatureState.Recharging)
+        {
+            rechargeCountdown -= Time.deltaTime;
+            summonZoneTextBox.text = rechargeCountdown.ToString("F1");
+            if (rechargeCountdown <= 0)
+            {
+                currentCreatureState = creatureState.Idle;
+                currentCardState = cardState.InPlay;
+                //clear summon zone text
+                summonZoneTextBox.text = "";
+                if(photonView.isMine)
+                {
+                    PrepareToAttack();
+                }               
+            }
+        }
+        if(currentCardState == cardState.WaitForTarget)
+        {
+            if(targetObject != null)
+            {
+                currentCardState = cardState.InPlay;
+                Attack();
+                photonView.RPC("StartRecharging", PhotonTargets.All);
+            }
+        }
+    }
+
+    //handles card's function upon casting
+    protected override void OnPlay()
+    {      
+        foreach (string ability in castAbilities)
+        {
+            cardAbilityList.UseCardAbility(ability);
+        }
+
+        if(!creatureAbilities.Contains("Rush"))
+        {
+            photonView.RPC("StartRecharging", PhotonTargets.All);
+        }
+        else
+        {
+            PrepareToAttack();
+        }
+    }
+
+    [PunRPC]
+    void StartRecharging()
+    {
+        rechargeCountdown = rechargeTime;
+        summonZoneTextBox.color = Color.red;
+        currentCreatureState = creatureState.Recharging;
+    }
+
+    void PrepareToAttack()
+    {
+        //handle target selection
+        targetReticle.SetActive(true);
+        MoveReticle(transform.position);
+        currentCardState = cardState.WaitForTarget;
+    }
+
+    void Attack()
+    {
+        //StartCoroutine(AttackAnimation(targetObject));
+        if (targetObject.tag == "Creature")
+        {
+            //creature health change
+        }
+        else if (targetObject.tag == "Player1") //< local player
+        {
+            localPlayerController.ChangeHealth(-attackPower);
+        }
+        else if (targetObject.tag == "Player2") //< opponent
+        {
+            opponentPlayerController.photonView.RPC("ChangeHealth", PhotonTargets.Others, -attackPower);
+        }
+        targetObject = null;
+        targetReticle.SetActive(false);
+    }
+
+    // moves card to target and back (UNTESTED)
+    IEnumerator AttackAnimation(GameObject targetObj)
+    {
+        Vector3 startPos = transform.position;
+        Vector3 endPos = targetObj.transform.position;
+        float i = 0.0f;
+        float time = 3.0f;
+        float rate = 1.0f / time;
+        while (i < 1.0)
+        {
+            i += Time.deltaTime * rate;
+            transform.position = Vector3.Lerp(startPos, endPos, i);
+        }
+        while (i > 0.0)
+        {
+            i -= Time.deltaTime * rate;
+            transform.position = Vector3.Lerp(endPos, startPos, i);
+        }
+        transform.position = startPos;
+        yield return null;
+    }
+
+    //Photon Serialize View
+    public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        base.OnPhotonSerializeView(stream, info);
+    }
+
     /*
     //STATS
     public int health;
