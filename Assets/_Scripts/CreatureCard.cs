@@ -26,6 +26,8 @@ public class CreatureCard : BaseCard
         rechargeTime = float.Parse(creatureStatValues["RechargeTime"]);
         attackPower = int.Parse(creatureStatValues["AttackPower"]);
         defensePower = int.Parse(creatureStatValues["DefensePower"]);
+        attackPowerTextBox.text = attackPower.ToString(); 
+        defensePowerTextBox.text = defensePower.ToString();
     }
 
     public override void Update()                //Abstract method for Update
@@ -96,11 +98,7 @@ public class CreatureCard : BaseCard
     void Attack()
     {
         //StartCoroutine(AttackAnimation(targetObject));
-        if (targetObject.tag == "Creature")
-        {
-            //creature health change
-        }
-        else if (targetObject.tag == "Player1") //< local player
+        if (targetObject.tag == "Player1") //< local player
         {
             localPlayerController.ChangeHealth(-attackPower);
         }
@@ -108,6 +106,18 @@ public class CreatureCard : BaseCard
         {
             opponentPlayerController.photonView.RPC("ChangeHealth", PhotonTargets.Others, -attackPower);
         }
+        
+        else if (targetObject.GetComponent<CreatureCard>() != null)
+        {
+            //get damage dealt by defending creature
+            int damageToTake = targetObject.GetComponent<CreatureCard>().attackPower;
+            // deal damage to defending creature
+            targetObject.GetPhotonView().RPC("TakeDamage", PhotonTargets.Others, attackPower);
+            // take damage from defending creature
+            TakeDamage(damageToTake);
+
+        }
+        
         targetObject = null;
         targetReticle.SetActive(false);
     }
@@ -133,6 +143,30 @@ public class CreatureCard : BaseCard
         transform.position = startPos;
         yield return null;
     }
+
+
+    [PunRPC]
+    void TakeDamage(int damageAmount)
+    {
+        defensePower -= damageAmount;
+        if(defensePower <= 0)
+        {
+            photonView.RPC("SendToGraveyard", PhotonTargets.All);
+        }
+        photonView.RPC("UpdateCreatureStats", PhotonTargets.All, attackPower, defensePower);
+    }
+
+    [PunRPC]
+    void UpdateCreatureStats(int newAttackPower, int newDefensePower)
+    {
+        attackPower = newAttackPower;
+        defensePower = newDefensePower;
+        //update text objects 
+        attackPowerTextBox.text = attackPower.ToString();
+        defensePowerTextBox.text = defensePower.ToString();
+    }
+
+   
 
     //Photon Serialize View
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

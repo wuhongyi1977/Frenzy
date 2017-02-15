@@ -26,8 +26,10 @@ public abstract class BaseCard : MonoBehaviour
     protected Text descriptionText;//< the text displayed to the player listing the card's abilities
     protected Text summonZoneTextBox;//< shows the casting timer
     protected Text cardTitleTextBox; //< displays the card title
+    protected Text attackPowerTextBox; //< shows the attack power (creature only)
+    protected Text defensePowerTextBox; //< shows the defense power (creature only)
     protected Image inactiveFilter; //< makes card grayed out when inactive (e.g. casting)
-    protected Image cardBack; //< blocks card info when in opponents hand
+    protected Image cardBack; //< blocks card info when in opponents hand   
     protected LineRenderer targetLine;
     protected GameObject targetReticle;
 
@@ -121,6 +123,8 @@ public abstract class BaseCard : MonoBehaviour
             descriptionText = cardLayoutCanvas.FindChild("DescriptionText").GetComponent<Text>();
             summonZoneTextBox = cardLayoutCanvas.FindChild("Counter").GetComponent<Text>(); 
             cardTitleTextBox = cardLayoutCanvas.FindChild("CardTitle").GetComponent<Text>(); 
+            attackPowerTextBox = cardLayoutCanvas.FindChild("AttackPower").GetComponent<Text>();
+            defensePowerTextBox = cardLayoutCanvas.FindChild("DefensePower").GetComponent<Text>();
             cardArtImage = cardLayoutCanvas.FindChild("CardArtImage").GetComponent<Image>();
             inactiveFilter = cardLayoutCanvas.FindChild("InactiveFilter").GetComponent<Image>();
             inactiveFilter.enabled = false;

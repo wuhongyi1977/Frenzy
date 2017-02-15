@@ -61,4 +61,6 @@ MonoBehaviour:
   - PutIntoPlay
   - AddClassAndInitialize
   - StartRecharging
+  - TakeDamage
+  - UpdateCreatureStats
   DisableAutoOpenWizard: 1
