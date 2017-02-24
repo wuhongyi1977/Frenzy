@@ -164,15 +164,6 @@ public abstract class BaseCard : MonoBehaviour
                 PutIntoPlay();               
             }
         }
-
-        /*
-         //If the card is in the graveyard and manager code hasn't been executed yet
-        if (inGraveyard && doneAddingToGraveyard == false)
-        {
-            photonView.RPC("SendToGraveyard", PhotonTargets.All);
-            //SendToGraveyard();
-        }
-        */
     }
 
     /// <summary>
@@ -221,7 +212,7 @@ public abstract class BaseCard : MonoBehaviour
     public void SetTarget(Transform potentialTarget)
     {
         //copy this block into all cards, cards cannot target nothing or themselves
-        if (potentialTarget == null || potentialTarget == this.gameObject)
+        if (potentialTarget == null || potentialTarget == this.transform)
         {
             MoveReticle(transform.position);
             return;
@@ -440,6 +431,7 @@ public abstract class BaseCard : MonoBehaviour
         cardId = id;
         //set cards name 
         cardTitle = PlayFabDataStore.cardNameList[id];
+        cardTitleTextBox.text = cardTitle;
         //set cards description
         descriptionText.text = PlayFabDataStore.cardDescriptions[id];
         // Retrieve the custom data for this card type
@@ -467,10 +459,7 @@ public abstract class BaseCard : MonoBehaviour
                     break;
                 case "CastTarget":
                     castTarget = nextString;
-                    break;
-                case "Target":
-                    target = nextString;
-                    break;
+                    break;   
                 case "CastTime":
                     castTime = float.Parse(nextString);
                     break;
@@ -483,24 +472,27 @@ public abstract class BaseCard : MonoBehaviour
                 case "DefensePower":
                     creatureStatValues.Add(currentString, nextString);
                     break;
-                case "OwnerHealthChange":
-                    castAbilities.Add(currentString);
-                    abilityValues.Add(currentString, nextString);
+                
+               //creature abilities
+                case "Rush":
+                case "Elusive":
+                    creatureAbilities.Add(currentString);
                     break;
-                case "CreatureAbility":
-                    creatureAbilities.Add(nextString); //= int.Parse(nextString);
-                    break;
-                    ///Card abilities
+                ///Card abilities w/ values
                 case "TargetHealthChange":
+                case "OwnerHealthChange":
+                case "GrantCreatureAbility":
+                case "FreezeCreature":
+                case "ChangeCreatureAttackPower":
                     castAbilities.Add(currentString);
                     abilityValues.Add(currentString, nextString);
                     break;
+                ///card abilities without values
+                case "ReturnCardToHand":
                 case "DiscardOnCast":
-                    if(nextString == "True" || nextString == "true")
-                    {
-                        castAbilities.Add(currentString);
-                    }                  
+                    castAbilities.Add(currentString);                                  
                     break;
+               
                 default:
                     break;
             }
@@ -538,6 +530,7 @@ public abstract class BaseCard : MonoBehaviour
         }
     }
 
+    [PunRPC]
     //handles the functions for returning a card to a player's hand
     public void ReturnToHand()
     {
@@ -557,7 +550,7 @@ public abstract class BaseCard : MonoBehaviour
             //RETURN TO HAND
 
             //Put the card into proper place
-            photonView.RPC("DrawCard", PhotonTargets.All, photonView.viewID);
+            localPlayerController.photonView.RPC("DrawCard", PhotonTargets.All, photonView.viewID);
         }
 
 

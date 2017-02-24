@@ -85,18 +85,11 @@ public class GameManager : MonoBehaviour
 		{
 			//Subtract the health of player 2
 			player2Health -= damage;
-			Debug.Log ("Player 2 Health: " + player2Health);
-            //COMMENTED OUT TEMPORARILY
-			//Update the text box
-			//player2HealthTextBox.text = "Enemy Life: " + player2Health;
 		} 
 		//If the card belongs to player 2
 		else 
 		{
 			player1Health -= damage;
-			Debug.Log ("Player 1 Health: " + player1Health);
-            //COMMENTED OUT TEMPORARILY
-           // player1HealthTextBox.text = "Life: " + player1Health;
 		}
 	}
 
@@ -105,14 +98,10 @@ public class GameManager : MonoBehaviour
 		if (playerID == 1) 
 		{
 			player1Health += healAmount;
-			//COMMENTED OUT TEMPORARILY
-			//player1HealthTextBox.text = "Life: " + player1Health;
 		} 
 		else 
 		{
 			player2Health += healAmount;
-			//COMMENTED OUT TEMPORARILY
-			//player2HealthTextBox.text = "Enemy Life: " + player2Health;
 		}
 
 	}

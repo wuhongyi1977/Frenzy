@@ -87,8 +87,8 @@ public class PlayerController : MonoBehaviour
         //initialize containers to proper sizes
         SummonZones = new GameObject[numberOfSummonZones];
         playerHand = new GameObject[maxHandSize];
-        // TODO put back commented section, hard coded for testing only
-        cardDeck = new List<int>(20);//(deckSize);      
+        // set card deck equal to deck size
+        cardDeck = new List<int>(deckSize);      
         //get a reference to the game manager
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         //Check if the local player or network opponent owns this controller
@@ -504,26 +504,6 @@ public class PlayerController : MonoBehaviour
         RemoveFromHand(card.GetComponent<BaseCard>().handIndex);
         
     }
-   /*
-	[PunRPC]
-	public void ResolveCreatureDamage(GameObject attacker, GameObject defender)
-	{
-        //get CreatureCard component of both attacker and defender
-        CreatureCard attackerScript = attacker.GetComponent<CreatureCard>();
-        CreatureCard defenderScript = defender.GetComponent<CreatureCard>();
-
-        //if the attacker is not elusive, handle damage to attacker
-        if(!attackerScript.creatureAbilities.Contains("Elusive"))
-        {
-           attackerScript.health -= defenderScript.damageToDeal;
-        }
-        //if the defender is not elusive, handle damage to defender
-        if (!defenderScript.creatureAbilities.Contains("Elusive"))
-        {
-            defenderScript.health -= attackerScript.damageToDeal;
-        }
-    }
-    */
     
 
     //function for determining target when a card is dragged to a target
@@ -544,189 +524,7 @@ public class PlayerController : MonoBehaviour
             return null;
         }
     }
-    /*
-    //NEW VERSION FOR NEW CARDS
-    //Resolves damage when it involves creatures (creature to creature or spell to creature)
-    [PunRPC]
-    public void ResolveDamage(int targetId, int attackerId)
-    {
-        //target is always a creature, attacker could be creature or spell
 
-        GameObject attacker = PhotonView.Find(attackerId).gameObject;
-        GameObject target = PhotonView.Find(targetId).gameObject;
-        BaseCard attackerScript = attacker.GetComponent<BaseCard>();
-        BaseCard targetScript = target.GetComponent<BaseCard>();
-
-        Debug.Log("Resolving damage from "+attacker.name+" to "+target.name);
-        CreatureCard targetCreature = target.GetComponent<CreatureCard>();
-        //if the creature can be attacked
-        if (targetCreature.inBattlefield && targetCreature.isAttackable)
-        {
-            //if the target of the damage is a creature and the damage dealer is a creature
-            if (attackerScript.cardType == "Creature")
-            {
-
-                //store attacking creature's script
-                CreatureCard attackerCreature = attacker.GetComponent<CreatureCard>();
-
-
-                attackerCreature.creatureCanAttack = false;
-                //if the attacking creature doesnt have elusive, deal it damage
-                //Elusive prevents damage from other creatures
-                if (!attackerCreature.creatureAbilities.Contains("Elusive"))
-                {
-                    attackerCreature.health -= targetScript.attackPower;
-                }
-                //if the defending creature doesnt have elusive, deal it damage    
-                if (!targetCreature.creatureAbilities.Contains("Elusive"))
-                {
-                    targetCreature.health -= attackerScript.attackPower;
-                }
-                   
-                
-            }
-
-            if (attackerScript.cardType == "Spell")
-            {
-                //this is += because opponent health change uses negatives for damage
-                targetCreature.health += attackerScript.targetHealthChange;
-            }
-        }
-    }
-
-    //Function for dragged targeting (creature / spell damage)
-    public void CardTargetDamage(GameObject attackingCard, Vector3 cardHandPos, GameObject currentTarget)
-    {
-        //if the damaging card has a target
-        if (photonView.isMine && currentTarget != null)
-        {
-            Debug.Log(attackingCard + " dealing damage to " + currentTarget);
-
-            //get the card component of the dragged card
-            BaseCard attackCardScript = attackingCard.GetComponent<BaseCard>();
-           
-            //if the target is a card
-            if(currentTarget.GetComponent<BaseCard>() != null)
-            {
-                //if the hit object is a creature card
-                if (currentTarget.tag == "CreatureCard")
-                {
-                    //RESOLVE DAMAGE
-                    photonView.RPC("ResolveDamage", PhotonTargets.All, currentTarget.GetPhotonView().viewID, attackingCard.GetPhotonView().viewID);      
-                }
-                else
-                {
-                    Debug.Log("Cannot damage non-creature card");
-                }
-            }
-           //if the object is the player
-            else if (currentTarget.tag == "Player2")
-            {
-                Debug.Log("Target verified as opposing player");
-                if(attackCardScript.cardType == "Creature")
-                {
-                    Debug.Log("Attacking card verified as creature");
-                    attackingCard.GetComponent<CreatureCard>().creatureCanAttack = false;
-                    //damage/healing to deal to opponent (playerid is 2 for opponent)
-                    opponent.ChangeHealth(-1* attackCardScript.attackPower);
-                    Debug.Log("opponent change health: "+ attackCardScript.attackPower);
-                }
-                else if(attackCardScript.cardType == "Spell")
-                {
-                    Debug.Log(attackingCard+ " is a spell and is dealing" + attackCardScript.targetHealthChange + " damage to opponent");
-                    //damage/healing to deal to owner (calls change health in this script)
-                    ChangeHealth(attackCardScript.ownerHealthChange);
-                    //damage/healing to deal to opponent (playerid is 2 for opponent)
-                    opponent.ChangeHealth(attackCardScript.targetHealthChange);
-                }
-               
-            }
-        }
-    }
-    //Standard creature card dropped function
-    public void creatureCardIsDropped(GameObject card, Vector3 cardHandPos)
-    {
-        //card.transform.position = cardHandPos;
-
-        Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
-        RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
-
-        if (hit)
-        {
-            enemyObjectUnderMouse = hit.transform.gameObject;
-
-            if (enemyObjectUnderMouse.tag == "CreatureCard")
-            {
-                if (enemyObjectUnderMouse.GetComponent<CreatureCard>().inBattlefield)
-                {
-					if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().isAttackable) {
-						card.GetComponent<CreatureCard> ().creatureCanAttack = false;
-						//if your creature doesn't have elusive then deal damage
-						if(!card.GetComponent<CreatureCard>().elusive)
-							card.GetComponent<CreatureCard> ().health -= enemyObjectUnderMouse.GetComponent<CreatureCard> ().damageToDeal;
-						//if the enemy creature doesn't have elusive then deal damage
-						if(!enemyObjectUnderMouse.GetComponent<CreatureCard>().elusive)
-							enemyObjectUnderMouse.GetComponent<CreatureCard> ().health -= card.GetComponent<CreatureCard> ().damageToDeal;
-						Debug.Log ("Your creature's health: " + card.GetComponent<CreatureCard> ().health);
-						Debug.Log ("Enemy creature's health: " + enemyObjectUnderMouse.GetComponent<CreatureCard> ().health);
-						photonView.RPC ("ResolveCreatureDamage", PhotonTargets.Others, card, enemyObjectUnderMouse);
-					} 
-					else
-						Debug.Log ("NOT ATTACKABLE");
-                }
-            }
-            else if (enemyObjectUnderMouse.tag == "Player2")
-            {
-                card.GetComponent<CreatureCard>().creatureCanAttack = false;
-                //gameManager.dealDamage(card.GetComponent<DamageCard>().damageToDeal, playerID);
-            }
-        }
-    }
-	public void creatureTargetCardIsDropped(GameObject card, Vector3 cardHandPos)
-	{
-		Debug.Log ("IN FUNCTION");
-		card.transform.position = cardHandPos;
-		Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
-		RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
-
-		if (hit) {
-			Debug.Log ("HIT");
-			enemyObjectUnderMouse = hit.transform.gameObject;
-			Debug.Log (enemyObjectUnderMouse.name);
-			//If the object is a creature card
-			if (enemyObjectUnderMouse.tag == "CreatureCard") {
-				Debug.Log ("A CREATURE");
-				//If the creature card is in the battlefield
-				if (enemyObjectUnderMouse.GetComponent<CreatureCard> ().inBattlefield) 
-				{
-                    
-					//Find an open summoning slot
-					for (int i = 0; i < SummonZones.Length; i++) 
-					{
-						if (!SummonZones [i].GetComponent<SummonZone> ().isOccupied) 
-						{
-							//Get's the position of the zone
-							Vector3 zonePosition = SummonZones[i].transform.position;
-							//Play card, pass the card, the position of the zone, and the index of the zone
-							//card.GetComponent<CreatureTargetSpellCard>().setSummonZoneTextBox(SummonZones[i].GetComponent<SummonZone>().textBox);
-							card.GetComponent<CreatureTargetSpellCard>().setValidCreatureToDebuff(enemyObjectUnderMouse);
-                            //PlayCard(card, zonePosition, i);
-                            //photonView.RPC("PlayCardNetwork", PhotonTargets.Others, card.GetComponent<Card>().handIndex,  i);
-                            photonView.RPC("PlayCard", PhotonTargets.All, card.GetComponent<PhotonView>().viewID, SummonZones[i].transform.position, i);
-                        }
-					}
-					if (card.GetComponent<CreatureTargetSpellCard> ().hasTextBox() == false) 
-					{
-						Debug.Log ("INVALID PLAY, SEND TO GY");
-						card.GetComponent<CreatureTargetSpellCard>().setGraveyardVariables();
-						sendToGraveyard (card, card.GetComponent<BaseCard>().zoneIndex);
-					}
-                    
-				}
-			}
-		}
-	}
-   */
 
     //This method is called when the card is done casting
     public void sendToGraveyard(GameObject card, int zoneIndex)
@@ -771,23 +569,6 @@ public class PlayerController : MonoBehaviour
     {
         line.GetComponent<DrawLine>().makeLineInvisible();
     }
-
-/*
-	public void creatureDied()
-	{
-		if (photonView.isMine) {
-			if (creatureHasDied != null)
-				creatureHasDied ();
-		}
-	}
-	public void creatureEntered()
-	{
-		if (photonView.isMine) {
-			if (creatureHasEntered != null)
-				creatureHasEntered ();
-		}
-	}
- */
     
     /// <summary>
     /// PHOTON SERIALZE VIEW
@@ -811,41 +592,5 @@ public class PlayerController : MonoBehaviour
         }
        
 	}
-    /*
-	//When called it will increase the stats of all the creatures by the amount passed
-	public void increaseCreatureStats(int dmg, int attkSpd, int h)
-	{
-		if(photonView.isMine)
-		{
-			Debug.Log ("INCREASING CREATURE STATS");
-			increaseDamageAmount += dmg;
-			increaseAttackSpeedAmount += attkSpd;
-			increaseHealthAmount += h;
-			//increase the stats of creatures currently in play
-			for (int i = 0; i < creatureCardsInPlay.Count; i++) {
-				if(creatureCardsInPlay[i].GetComponent<CreatureCard>().playerID == 1)
-					creatureCardsInPlay [i].GetComponent<CreatureCard> ().increaseStats (dmg, attkSpd, h);
-				}
-		}
-	}
-	//When called it will decrease the stats of all the creatures by the amount passed
-	public void decreaseCreatureStats(int dmg, int attkSpd, int h)
-	{
-		if (photonView.isMine) {
-			increaseDamageAmount -= dmg;
-			increaseAttackSpeedAmount -= attkSpd;
-			increaseHealthAmount -= h;
-			for (int i = 0; i < creatureCardsInPlay.Count; i++) {
-				creatureCardsInPlay [i].GetComponent<CreatureCard> ().decreaseStats (dmg, attkSpd, h);
-			}
-		}
-	}
-	//Passes the card object of the creature that just entered
-	public GameObject getCreatureThatJustEntered()
-	{
-		return creatureThatJustEntered;
-	}
-    */
-
-    
+ 
 }

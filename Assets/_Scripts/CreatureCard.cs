@@ -18,6 +18,9 @@ public class CreatureCard : BaseCard
 
     private float rechargeCountdown = 0;
 
+    private float frozenCountdown = 0;
+    private Color defaultInactiveFilterColor;
+
     // creature stats are AttackPower, DefensePower, RechargeTime
 
     // called right after retrieving custom data in base card class
@@ -33,8 +36,19 @@ public class CreatureCard : BaseCard
     public override void Update()                //Abstract method for Update
     {
         base.Update();
+
+        // if frozen, handle frozen countdown but dont allow other code to run
+        if(frozenCountdown > 0)
+        {
+            frozenCountdown -= Time.deltaTime;
+            summonZoneTextBox.text = frozenCountdown.ToString("F1");
+            if(photonView.isMine && frozenCountdown <= 0)
+            {
+                photonView.RPC("EndFreeze", PhotonTargets.All);      
+            }
+        }
         //handle recharge countdown
-        if (currentCreatureState == creatureState.Recharging)
+        else if (currentCreatureState == creatureState.Recharging)
         {
             rechargeCountdown -= Time.deltaTime;
             summonZoneTextBox.text = rechargeCountdown.ToString("F1");
@@ -50,7 +64,7 @@ public class CreatureCard : BaseCard
                 }               
             }
         }
-        if(currentCardState == cardState.WaitForTarget)
+        else if(currentCardState == cardState.WaitForTarget)
         {
             if(targetObject != null)
             {
@@ -90,6 +104,7 @@ public class CreatureCard : BaseCard
     void PrepareToAttack()
     {
         //handle target selection
+        targetObject = null;
         targetReticle.SetActive(true);
         MoveReticle(transform.position);
         currentCardState = cardState.WaitForTarget;
@@ -97,6 +112,9 @@ public class CreatureCard : BaseCard
 
     void Attack()
     {
+        if(targetObject == this.gameObject)
+        {return;}
+
         //StartCoroutine(AttackAnimation(targetObject));
         if (targetObject.tag == "Player1") //< local player
         {
@@ -112,9 +130,15 @@ public class CreatureCard : BaseCard
             //get damage dealt by defending creature
             int damageToTake = targetObject.GetComponent<CreatureCard>().attackPower;
             // deal damage to defending creature
-            targetObject.GetPhotonView().RPC("TakeDamage", PhotonTargets.Others, attackPower);
+            if(!targetObject.GetComponent<CreatureCard>().creatureAbilities.Contains("Elusive"))
+            {
+                targetObject.GetPhotonView().RPC("TakeDamage", PhotonTargets.Others, attackPower);
+            }          
             // take damage from defending creature
-            TakeDamage(damageToTake);
+            if (!creatureAbilities.Contains("Elusive"))
+            {
+                TakeDamage(damageToTake);
+            }
 
         }
         
@@ -153,246 +177,75 @@ public class CreatureCard : BaseCard
         {
             photonView.RPC("SendToGraveyard", PhotonTargets.All);
         }
-        photonView.RPC("UpdateCreatureStats", PhotonTargets.All, attackPower, defensePower);
+        photonView.RPC("UpdateCreatureStatsIndicators", PhotonTargets.All);
     }
 
     [PunRPC]
-    void UpdateCreatureStats(int newAttackPower, int newDefensePower)
+    void UpdateCreatureStatsIndicators()
     {
-        attackPower = newAttackPower;
-        defensePower = newDefensePower;
         //update text objects 
         attackPowerTextBox.text = attackPower.ToString();
         defensePowerTextBox.text = defensePower.ToString();
     }
 
-   
+    [PunRPC]
+    void ModifyCreatureStats(int changeToAttack, int changeToDefense)
+    {
+        attackPower += changeToAttack;
+        defensePower += changeToDefense;
+        //update text objects 
+        attackPowerTextBox.text = attackPower.ToString();
+        defensePowerTextBox.text = defensePower.ToString();
+        //kill creature if either stat is 0 or below
+        if (attackPower <= 0  || defensePower <= 0)
+        {
+            photonView.RPC("SendToGraveyard", PhotonTargets.All);
+        }
+        
+    }
+
+    [PunRPC]
+    void GrantAbility(string ability)
+    {
+        creatureAbilities.Add(ability);
+    }
+
+    [PunRPC]
+    void Freeze(float duration)
+    {
+        inactiveFilter.enabled = true;
+        defaultInactiveFilterColor = inactiveFilter.color;
+        inactiveFilter.color = new Color(0,211,200,189);
+        frozenCountdown = duration;       
+    }
+
+    [PunRPC]
+    void EndFreeze()
+    {
+        summonZoneTextBox.text = "";
+        inactiveFilter.color = defaultInactiveFilterColor;
+        inactiveFilter.enabled = false;
+        frozenCountdown = 0;
+    }
 
     //Photon Serialize View
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         base.OnPhotonSerializeView(stream, info);
-    }
 
-    /*
-    //STATS
-    public int health;
-    public float attackSpeed;
-    //The damage that this card will deal
-    public int damageToDeal;
-    //END STATS
-    //IF the card is a creature card
-    public bool isCreature = true;
-    //The bool variable that turns off the summoning timer after the creature has been summoned
-    protected bool stopCastingTimer = false;
-    public bool creatureCanAttack = false;
-    protected float creatureAttackSpeedTimer;
-    public Text[] textBoxes;
-    private Text creatureStatsTextBox;
-    public bool inBattlefield = false;
-
-    public int increaseDamageAmount, increaseAttackSpeedAmount, increaseHealthAmount;
-    private int startingDamage, startingHealth;
-    private float startingAttackSpeed;
-
-    public bool isFrozen;
-    public bool isSelectable;
-    public bool isAttackable;
-    public bool rush;
-    public bool elusive;
-	//After the first time the sound CardBuildup was used(when currentTime < 0) it was only played once. 
-	//After this the sound needed to play again so this variable is used instead of playedCardBuildup to make sure everything works correctly
-	private bool playedCardBuildUpOnce;
-    public override void Start()
-    {
-        localPlayer = GameObject.Find("LocalPlayer");
-        networkOpponent = GameObject.Find("NetworkOpponent");
-        
-        doneAddingToGraveyard = false;
-      
-        inSummonZone = false;
-        summonZoneTextBox = null;
-       
-        textBoxes = gameObject.GetComponentsInChildren<Text>();
-        for (int i = 0; i < textBoxes.Length; i++)
+        if (stream.isWriting)
         {
-            if (textBoxes[i].name == "CardTitle")
-                cardTitleTextBox = textBoxes[i];
-            if (textBoxes[i].name == "Stats")
-                creatureStatsTextBox = textBoxes[i];
-            if (textBoxes[i].name == "CastTime")
-                castTimeTextBox = textBoxes[i];
+            //We own this player: send the others our data
+            stream.SendNext(attackPower);
+            stream.SendNext(defensePower);
+
+
         }
-		audioManager = GameObject.Find ("AudioManager").GetComponent<AudioManager>();
-		playedCardSelectedSound = false;
-       
-        isSelectable = true;
-        isFrozen = false;
-        isAttackable = true;
-    }
-    public override void Update()
-    {
-        if (cardTitleTextBox != null)
+        else
         {
-            cardTitleTextBox.text = cardTitle;
-        }
-        if (castTimeTextBox != null)
-        {
-            castTimeTextBox.text = castTime.ToString();
-        }
-        //get references to player objects if not assigned
-        GetPlayers();
-
-
-        creatureStatsTextBox.text = damageToDeal + "/" + health + "/" + attackSpeed;
-       
-        
-        //If the card is Not in the graveyard and is in the summon zone
-       if (!inGraveyard && inSummonZone)
-        {
-			if (!playedCardInSpellSlotSound) 
-			{
-				playedCardInSpellSlotSound = true;
-				audioManager.playCardInSpellSlot ();
-			}
-            if (!stopCastingTimer)
-            {
-                
-
-            }
-            //IF the current time is larger than or equal to the cast time
-            if (!isAttackable)
-            {
-               
-            }
-			if (!playedCardBuildUpOnce) 
-			{
-				playedCardBuildUpOnce = true;
-				audioManager.playCardBuildUp ();
-			}
-            
-                if (!stopCastingTimer)
-                {
-                    stopCastingTimer = true;
-                    summonZoneTextBox.text = "";
-                    if (creatureAbilities.Contains("Rush"))
-                    {
-                        creatureCanAttack = true;
-                    }                      
-                    inBattlefield = true;
-                    //call the event that a creature has entered the battlefield
-                    localPlayer.GetComponent<PlayerController>().creatureEntered();
-					//reset the bool to allow the Pickup sound to play again when the player picks up another card
-					playedCardPickupSound = false;
-					audioManager.playCardRelease ();
-                }
-
-                if (creatureCanAttack == false)
-                {
-						
-                    creatureAttackSpeedTimer -= Time.deltaTime;
-                    summonZoneTextBox.text = creatureAttackSpeedTimer.ToString("F1");
-					if (creatureAttackSpeedTimer <= 3.25f && !playedCardBuildupSound) 
-					{
-						audioManager.playCardBuildUp ();
-						playedCardBuildupSound = true;
-					}
-                    if (creatureAttackSpeedTimer < 0)
-                    {
-                        summonZoneTextBox.text = "";
-                        creatureCanAttack = true;
-						playedCardBuildupSound = false;
-                        creatureAttackSpeedTimer = attackSpeed;
-                    }
-                }
-
-                //Add code here to deal damage to creature or player
-                if (health <= 0 && !inGraveyard)
-                {
-                    summonZoneTextBox.text = "";
-                    inGraveyard = true;
-                    inSummonZone = false;
-                    inBattlefield = false;
-                    creatureCanAttack = false;
-                    //reset creature's stats to default
-                    damageToDeal = startingDamage;
-                    attackSpeed = startingAttackSpeed;
-                    health = startingHealth;
-                    //if this is the local card object
-                    if (photonView.isMine)
-                    {
-                        localPlayer.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
-                        localPlayer.GetComponent<PlayerController>().creatureDied();
-
-                    }
-                    else
-                    {
-                        networkOpponent.GetComponent<PlayerController>().sendToGraveyard(gameObject, -1);
-                        networkOpponent.GetComponent<PlayerController>().creatureDied();
-
-                    }
-                }
-            
+            //Network player, receive data   
+            attackPower = (int)stream.ReceiveNext();
+            defensePower = (int)stream.ReceiveNext();
         }
     }
-   
-    public void increaseStats(int dmg, int h, int attkSpd)
-    {
-        //if (photonView.isMine) {
-        damageToDeal += dmg;
-        attackSpeed -= attkSpd;
-        health += h;
-        //}
-    }
-    public void decreaseStats(int dmg, int h, int attkSpd)
-    {
-        //if (photonView.isMine) {
-        damageToDeal -= dmg;
-        attackSpeed += attkSpd;
-        health -= h;
-        //}
-    }
-    public void freezeCreature(int numbSecs)
-    {
-        isFrozen = true;
-        isSelectable = false;
-        creatureCanAttack = false;
-        
-    }
-    public void makeUnattackable(int numbSecs)
-    {
-        isAttackable = false;
-        
-    }
-
-    
-    public override void UpdateInternalVariables()
-    {
-        //get card stats from stat variables in parent script
-        startingDamage = attackPower;
-        startingHealth = defensePower;
-        startingAttackSpeed = rechargeTime;
-        damageToDeal = startingDamage;
-        attackSpeed = startingAttackSpeed;
-        health = startingHealth;
-
-        //end assignment
-        creatureAttackSpeedTimer = attackSpeed;
-        //cardTitleTextBox.text = cardTitle;
-        if (creatureStatsTextBox != null)
-        {
-            creatureStatsTextBox.text = damageToDeal + "/" + health + "/" + attackSpeed;
-        }
-        if(cardTitleTextBox != null)
-        {
-            cardTitleTextBox.text = cardTitle;
-        }
-        if (castTimeTextBox != null)
-        {
-            castTimeTextBox.text = castTime.ToString();
-        }
-
-
-    }
-    */
 }
