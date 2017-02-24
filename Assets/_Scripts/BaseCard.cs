@@ -550,7 +550,7 @@ public abstract class BaseCard : MonoBehaviour
             //RETURN TO HAND
 
             //Put the card into proper place
-            localPlayerController.photonView.RPC("DrawCard", PhotonTargets.All, photonView.viewID);
+            localPlayerController.ReturnToHand(this.gameObject, photonView.viewID);
         }
 
 

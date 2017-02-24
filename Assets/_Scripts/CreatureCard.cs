@@ -82,8 +82,8 @@ public class CreatureCard : BaseCard
         {
             cardAbilityList.UseCardAbility(ability);
         }
-
-        if(!creatureAbilities.Contains("Rush"))
+        targetLine.enabled = false;
+        if (!creatureAbilities.Contains("Rush"))
         {
             photonView.RPC("StartRecharging", PhotonTargets.All);
         }
@@ -104,8 +104,8 @@ public class CreatureCard : BaseCard
     void PrepareToAttack()
     {
         //handle target selection
-        targetObject = null;
         targetReticle.SetActive(true);
+        targetObject = null;        
         MoveReticle(transform.position);
         currentCardState = cardState.WaitForTarget;
     }
@@ -172,21 +172,9 @@ public class CreatureCard : BaseCard
     [PunRPC]
     void TakeDamage(int damageAmount)
     {
-        defensePower -= damageAmount;
-        if(defensePower <= 0)
-        {
-            photonView.RPC("SendToGraveyard", PhotonTargets.All);
-        }
-        photonView.RPC("UpdateCreatureStatsIndicators", PhotonTargets.All);
+        photonView.RPC("ModifyCreatureStats", PhotonTargets.All, 0, -damageAmount);
     }
 
-    [PunRPC]
-    void UpdateCreatureStatsIndicators()
-    {
-        //update text objects 
-        attackPowerTextBox.text = attackPower.ToString();
-        defensePowerTextBox.text = defensePower.ToString();
-    }
 
     [PunRPC]
     void ModifyCreatureStats(int changeToAttack, int changeToDefense)
@@ -215,7 +203,8 @@ public class CreatureCard : BaseCard
     {
         inactiveFilter.enabled = true;
         defaultInactiveFilterColor = inactiveFilter.color;
-        inactiveFilter.color = new Color(0,211,200,189);
+        Color freezeColor = new Color(0, 211, 200, 189);
+        inactiveFilter.color = freezeColor;
         frozenCountdown = duration;       
     }
 
@@ -232,7 +221,7 @@ public class CreatureCard : BaseCard
     public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         base.OnPhotonSerializeView(stream, info);
-
+        /*
         if (stream.isWriting)
         {
             //We own this player: send the others our data
@@ -247,5 +236,6 @@ public class CreatureCard : BaseCard
             attackPower = (int)stream.ReceiveNext();
             defensePower = (int)stream.ReceiveNext();
         }
+        */
     }
 }

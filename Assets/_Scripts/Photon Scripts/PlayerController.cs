@@ -413,12 +413,18 @@ public class PlayerController : MonoBehaviour
         else { Debug.Log("Unable to remove card from hand, no card at index");}
     }
 
-    public void ReturnToHand(GameObject card)
+    public void ReturnToHand(GameObject card, int viewId)
     {
         BaseCard cardScript = card.GetComponent<BaseCard>();
         if (cardScript.currentCardState == BaseCard.cardState.InPlay) //< if the card is returned to hand from play
         {
-            // TODO handle return to hand from play
+            //check if hand has room
+            if (currentHandSize < maxHandSize)
+            {
+                 //reset variables
+                GetComponent<BaseCard>().InitializeCard(playerID, cardScript.cardId);
+                photonView.RPC("DrawCard", PhotonTargets.All, viewId);
+            }
         }
         else//< if card is dropped in an invalid place
         { card.transform.position = cardScript.cardHandPos; }   
