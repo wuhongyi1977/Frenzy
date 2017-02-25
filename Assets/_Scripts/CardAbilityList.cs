@@ -28,7 +28,7 @@ public class CardAbilityList : MonoBehaviour
     // discards the card
     private void DiscardOnCast()
     {
-        cardScript.photonView.RPC("SendToGraveyard", PhotonTargets.All);
+        cardScript.NotifyFieldManagerExit();//photonView.RPC("SendToGraveyard", PhotonTargets.All);
     }
 
     // damages or heals a player (positive values for healing, negative for damage)
@@ -86,7 +86,10 @@ public class CardAbilityList : MonoBehaviour
         { targetObj.GetPhotonView().RPC("ModifyCreatureStats", PhotonTargets.All, amountToChangeAttack, 0); }
     }
 
-   
+    /// <summary>
+    /// All Enter/Exit abilities below
+    /// These abilities trigger from other cards entering or leaving field
+    /// </summary>  
 
 
 }

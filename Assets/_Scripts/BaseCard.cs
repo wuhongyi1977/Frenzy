@@ -9,6 +9,12 @@ using UnityEngine.UI;
 /// </summary>
 public abstract class BaseCard : MonoBehaviour
 {
+    // Event for field handler
+    public delegate void FieldHandlerCheck(int viewId, int zoneIndex); //< receives the success of the call
+    public static event FieldHandlerCheck NotifyEnter;
+    public static event FieldHandlerCheck NotifyExit;
+
+
     //PHOTON COMPONENTS
     public PhotonView photonView;
     protected CardAbilityList cardAbilityList;
@@ -106,6 +112,18 @@ public abstract class BaseCard : MonoBehaviour
 
 
 
+    protected void OnEnable()
+    {
+        FieldManager.OnEnter += EnterSuccess;
+        FieldManager.OnExit += ExitSuccess;
+    }
+
+    protected void OnDisable()
+    {
+        FieldManager.OnEnter -= EnterSuccess;
+        FieldManager.OnExit -= ExitSuccess;
+    }
+
     //This can be used for initialization code that is identical on ALL cards
     protected virtual void Awake()
     {
@@ -169,6 +187,52 @@ public abstract class BaseCard : MonoBehaviour
     /// <summary>
     /// Standard functions for all cards
     /// </summary>
+
+    protected void EnterSuccess(int viewId, bool success)
+    {
+        //if this was the card that just entered and it entered successfully
+        if(viewId == photonView.viewID && success && photonView.isMine)
+        {       
+            if(success) //< if successful, activate OnPlay
+            {
+                OnPlay();
+            } 
+            else //< if not successful, destroy
+            {
+                //call exit event for field manager
+                NotifyFieldManagerExit();
+            }  
+                
+        }
+        else //< if this is not the owned card, handle any events due to a card entering play
+        {
+
+        }
+    }
+
+    protected void ExitSuccess(int viewId, bool success)
+    {
+        //if this was the card that just left and it left successfully
+        if (viewId == photonView.viewID && success && photonView.isMine)
+        {
+            if (success) //< if successful, send to graveyard
+            {
+                photonView.RPC("SendToGraveyard", PhotonTargets.All);
+            }
+            // if leaving play was unsuccessful, do nothing (card remains in play)
+
+        }
+        else //< if this is not the owned card, handle any events due to a card leaving play
+        {
+
+        }
+    }
+
+    public void NotifyFieldManagerEntrance() //< call exit event for field manager
+    { NotifyEnter(photonView.viewID, zoneIndex);}
+
+    public void NotifyFieldManagerExit() //< call exit event for field manager
+    { NotifyExit(photonView.viewID, zoneIndex);}
 
     //returns the cards state to calling script
     public cardState GetCardState()
@@ -352,10 +416,10 @@ public abstract class BaseCard : MonoBehaviour
         currentCardState = cardState.InPlay;
         inactiveFilter.enabled = false;
         targetReticle.SetActive(false);
-        if (photonView.isMine)
-        {
-            OnPlay();
-        }
+        //call entrance event for field manager
+        NotifyEnter(photonView.viewID, zoneIndex);
+
+        
     }
 
 
@@ -369,7 +433,8 @@ public abstract class BaseCard : MonoBehaviour
     public void SendToGraveyard()
     {
         if (currentCardState != cardState.InGraveyard)
-        {
+        {          
+
             Debug.Log(cardTitle + "sent to graveyard");
             //Set state of card to being in the graveyard
             currentCardState = cardState.InGraveyard;

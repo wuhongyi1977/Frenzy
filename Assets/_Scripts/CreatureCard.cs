@@ -187,7 +187,7 @@ public class CreatureCard : BaseCard
         //kill creature if either stat is 0 or below
         if (attackPower <= 0  || defensePower <= 0)
         {
-            photonView.RPC("SendToGraveyard", PhotonTargets.All);
+            NotifyFieldManagerExit();
         }
         
     }
