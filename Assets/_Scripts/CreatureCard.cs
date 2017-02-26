@@ -75,6 +75,26 @@ public class CreatureCard : BaseCard
         }
     }
 
+    protected override void CardEntersPlayTrigger(int viewId)
+    {
+        //override in sub class for proper behavior
+    }
+    protected override void CardLeavesPlayTrigger(int viewId)
+    {
+        if(photonView.isMine)
+        {
+            //if this creature has consume and the creature that left play belonged to this player
+            if (creatureAbilities.Contains("Consume") && PhotonView.Find(viewId).isMine)
+            {
+                //get value of consume
+                int consumeAmount = int.Parse(abilityValues["Consume"]);
+                //increase attack and defense by consume amount
+                photonView.RPC("ModifyCreatureStats", PhotonTargets.All, consumeAmount, consumeAmount);
+            }
+        }
+        
+    }
+
     //handles card's function upon casting
     protected override void OnPlay()
     {      

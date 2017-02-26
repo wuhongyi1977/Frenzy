@@ -182,6 +182,20 @@ public abstract class BaseCard : MonoBehaviour
                 PutIntoPlay();               
             }
         }
+
+        //remove targeting indication if no target
+        if(currentCardState != cardState.WaitForCastTarget 
+            && currentCardState != cardState.WaitForTarget && targetObject == null)
+        {
+            if(targetLine.enabled == true)
+            {
+                targetLine.enabled = false;
+            }
+            if(targetReticle.activeSelf == true)
+            {
+                targetReticle.SetActive(false);
+            }
+        }
     }
 
     /// <summary>
@@ -213,19 +227,27 @@ public abstract class BaseCard : MonoBehaviour
     protected void ExitSuccess(int viewId, bool success)
     {
         //if this was the card that just left and it left successfully
-        if (viewId == photonView.viewID && success && photonView.isMine)
+        if (viewId == photonView.viewID && photonView.isMine)
         {
             if (success) //< if successful, send to graveyard
             {
                 photonView.RPC("SendToGraveyard", PhotonTargets.All);
             }
             // if leaving play was unsuccessful, do nothing (card remains in play)
-
         }
         else //< if this is not the owned card, handle any events due to a card leaving play
         {
-
+            CardLeavesPlayTrigger(viewId);
         }
+    }
+
+    protected virtual void CardEntersPlayTrigger(int viewId)
+    {
+        //override in sub class for proper behavior
+    }
+    protected virtual void CardLeavesPlayTrigger(int viewId)
+    {
+        //override in sub class for proper behavior
     }
 
     public void NotifyFieldManagerEntrance() //< call exit event for field manager
@@ -542,6 +564,10 @@ public abstract class BaseCard : MonoBehaviour
                 case "Rush":
                 case "Elusive":
                     creatureAbilities.Add(currentString);
+                    break;
+                case "Consume":
+                    creatureAbilities.Add(currentString);
+                    abilityValues.Add(currentString, nextString);
                     break;
                 ///Card abilities w/ values
                 case "TargetHealthChange":
