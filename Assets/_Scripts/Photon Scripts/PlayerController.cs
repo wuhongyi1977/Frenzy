@@ -75,8 +75,9 @@ public class PlayerController : MonoBehaviour
 
     //The game manager object
     GameManager gameManager;
+    
 
-  
+
     void Awake()
     {
         //get this object's photon view component

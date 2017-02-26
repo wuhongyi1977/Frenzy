@@ -8,10 +8,12 @@ using UnityEngine;
 public class CardAbilityList : MonoBehaviour
 {
     BaseCard cardScript;
+    public FieldManager fieldManager;
 
     private void Start()
     {
         cardScript = GetComponent<BaseCard>();
+        fieldManager = GameObject.Find("FieldManager").GetComponent<FieldManager>();
     }
 
     public void UseCardAbility(string abilityToCall)
@@ -83,13 +85,18 @@ public class CardAbilityList : MonoBehaviour
         int amountToChangeAttack = int.Parse(cardScript.abilityValues["ChangeCreatureAttackPower"]);
         //creature health change (must be negative because creature damage expects a positive value for damage)
         if (targetObj.GetComponent<CreatureCard>() != null)
-        { targetObj.GetPhotonView().RPC("ModifyCreatureStats", PhotonTargets.All, amountToChangeAttack, 0); }
+        { targetObj.GetPhotonView().RPC("ModifyCreatureStats", PhotonTargets.All, amountToChangeAttack, 0, 0.0f); }
     }
 
-    /// <summary>
-    /// All Enter/Exit abilities below
-    /// These abilities trigger from other cards entering or leaving field
-    /// </summary>  
+    private void ChangeAllOwnCreatureRecharge()
+    {
+        List<GameObject> allOwnedCreatures =  fieldManager.GetOwnCreatures();
+        float amountToChangeRecharge = float.Parse(cardScript.abilityValues["ChangeAllOwnCreatureRecharge"]);
+        foreach (GameObject creatureCard in allOwnedCreatures)
+        {
+            creatureCard.GetPhotonView().RPC("ModifyCreatureStats", PhotonTargets.All, 0, 0, amountToChangeRecharge);
+        }
+    } 
 
 
 }

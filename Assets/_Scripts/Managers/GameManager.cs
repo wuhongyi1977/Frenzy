@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     //child of GameManager, assigned in inspector
     public Canvas FieldUICanvas; 
 
+
     //STORE STATIC REFERENCES TO BOTH PLAYERS?
 
 

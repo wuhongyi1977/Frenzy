@@ -34,6 +34,7 @@ public abstract class BaseCard : MonoBehaviour
     protected Text cardTitleTextBox; //< displays the card title
     protected Text attackPowerTextBox; //< shows the attack power (creature only)
     protected Text defensePowerTextBox; //< shows the defense power (creature only)
+    protected Text rechargeTimeTextBox; //< shows the recharge time (creature only)
     protected Image inactiveFilter; //< makes card grayed out when inactive (e.g. casting)
     protected Image cardBack; //< blocks card info when in opponents hand   
     protected LineRenderer targetLine;
@@ -143,6 +144,7 @@ public abstract class BaseCard : MonoBehaviour
             cardTitleTextBox = cardLayoutCanvas.FindChild("CardTitle").GetComponent<Text>(); 
             attackPowerTextBox = cardLayoutCanvas.FindChild("AttackPower").GetComponent<Text>();
             defensePowerTextBox = cardLayoutCanvas.FindChild("DefensePower").GetComponent<Text>();
+            rechargeTimeTextBox = cardLayoutCanvas.FindChild("RechargeTime").GetComponent<Text>();
             cardArtImage = cardLayoutCanvas.FindChild("CardArtImage").GetComponent<Image>();
             inactiveFilter = cardLayoutCanvas.FindChild("InactiveFilter").GetComponent<Image>();
             inactiveFilter.enabled = false;
@@ -183,19 +185,6 @@ public abstract class BaseCard : MonoBehaviour
             }
         }
 
-        //remove targeting indication if no target
-        if(currentCardState != cardState.WaitForCastTarget 
-            && currentCardState != cardState.WaitForTarget && targetObject == null)
-        {
-            if(targetLine.enabled == true)
-            {
-                targetLine.enabled = false;
-            }
-            if(targetReticle.activeSelf == true)
-            {
-                targetReticle.SetActive(false);
-            }
-        }
     }
 
     /// <summary>
@@ -355,7 +344,7 @@ public abstract class BaseCard : MonoBehaviour
         }
     }
 
-    void AcceptTargetAndCast(Transform target)
+    protected void AcceptTargetAndCast(Transform target)
     {
         MoveReticle(target.position);
         targetObject = target.gameObject;
@@ -531,10 +520,10 @@ public abstract class BaseCard : MonoBehaviour
             string currentString = data[j];
             //store the next string in the list
             string nextString = data[j + 1];
-            
+
             //Assign variables
             switch (currentString)
-            {        
+            {
                 case "ArtName":
                     artName = nextString;
                     break;
@@ -546,7 +535,7 @@ public abstract class BaseCard : MonoBehaviour
                     break;
                 case "CastTarget":
                     castTarget = nextString;
-                    break;   
+                    break;
                 case "CastTime":
                     castTime = float.Parse(nextString);
                     break;
@@ -559,8 +548,8 @@ public abstract class BaseCard : MonoBehaviour
                 case "DefensePower":
                     creatureStatValues.Add(currentString, nextString);
                     break;
-                
-               //creature abilities
+
+                //creature abilities
                 case "Rush":
                 case "Elusive":
                     creatureAbilities.Add(currentString);
@@ -575,20 +564,20 @@ public abstract class BaseCard : MonoBehaviour
                 case "GrantCreatureAbility":
                 case "FreezeCreature":
                 case "ChangeCreatureAttackPower":
+                case "ChangeAllOwnCreatureRecharge":
                     castAbilities.Add(currentString);
                     abilityValues.Add(currentString, nextString);
                     break;
                 ///card abilities without values
                 case "ReturnCardToHand":
                 case "DiscardOnCast":
-                    castAbilities.Add(currentString);                                  
+                    castAbilities.Add(currentString);
                     break;
-               
+
                 default:
                     break;
             }
         }
-        Debug.Log("Finished setting variables");
         //Set the proper art for the card
         SetArt();
         InitializeStats();

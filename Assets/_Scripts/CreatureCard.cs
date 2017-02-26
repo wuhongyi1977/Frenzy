@@ -31,6 +31,7 @@ public class CreatureCard : BaseCard
         defensePower = int.Parse(creatureStatValues["DefensePower"]);
         attackPowerTextBox.text = attackPower.ToString(); 
         defensePowerTextBox.text = defensePower.ToString();
+        rechargeTimeTextBox.text = rechargeTime.ToString();
     }
 
     public override void Update()                //Abstract method for Update
@@ -84,12 +85,13 @@ public class CreatureCard : BaseCard
         if(photonView.isMine)
         {
             //if this creature has consume and the creature that left play belonged to this player
-            if (creatureAbilities.Contains("Consume") && PhotonView.Find(viewId).isMine)
+            if ((currentCardState == cardState.InPlay || currentCardState == cardState.WaitForTarget) 
+                && creatureAbilities.Contains("Consume") && PhotonView.Find(viewId).isMine)
             {
                 //get value of consume
                 int consumeAmount = int.Parse(abilityValues["Consume"]);
                 //increase attack and defense by consume amount
-                photonView.RPC("ModifyCreatureStats", PhotonTargets.All, consumeAmount, consumeAmount);
+                photonView.RPC("ModifyCreatureStats", PhotonTargets.All, consumeAmount, consumeAmount, 0.0f);
             }
         }
         
@@ -192,18 +194,22 @@ public class CreatureCard : BaseCard
     [PunRPC]
     void TakeDamage(int damageAmount)
     {
-        photonView.RPC("ModifyCreatureStats", PhotonTargets.All, 0, -damageAmount);
+        photonView.RPC("ModifyCreatureStats", PhotonTargets.All, 0, -damageAmount, 0.0f);
     }
 
 
     [PunRPC]
-    void ModifyCreatureStats(int changeToAttack, int changeToDefense)
+    public void ModifyCreatureStats(int changeToAttack, int changeToDefense, float changeToRecharge)
     {
         attackPower += changeToAttack;
         defensePower += changeToDefense;
+        rechargeTime += changeToRecharge;
+        if(rechargeTime < 0)
+        { rechargeTime = 0; }
         //update text objects 
         attackPowerTextBox.text = attackPower.ToString();
         defensePowerTextBox.text = defensePower.ToString();
+        rechargeTimeTextBox.text = rechargeTime.ToString();
         //kill creature if either stat is 0 or below
         if (attackPower <= 0  || defensePower <= 0)
         {

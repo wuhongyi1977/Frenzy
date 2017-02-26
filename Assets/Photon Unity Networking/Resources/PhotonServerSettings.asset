@@ -69,4 +69,5 @@ MonoBehaviour:
   - ModifyCreatureStats
   - UpdateCreatureStatsIndicators
   - EndFreeze
+  - TargetLost
   DisableAutoOpenWizard: 1

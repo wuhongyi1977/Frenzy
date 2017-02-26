@@ -9,7 +9,7 @@ TagManager:
   - Card
   - Player2
   - Player1
-  - CreatureCard
+  - FieldManager
   layers:
   - Default
   - TransparentFX

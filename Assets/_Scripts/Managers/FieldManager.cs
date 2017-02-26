@@ -14,14 +14,18 @@ public class FieldManager : MonoBehaviour
     
 
     private int numberOfSummonZones = 3;
-    GameObject[] localSummonZones;
-    GameObject[] opponentSummonZones; 
+    int[] localSummonZonesIds;
+    GameObject[] localSummonZonesCards;
+    int[] opponentSummonZonesIds;  
+    GameObject[] opponentSummonZonesCards;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
-        localSummonZones = new GameObject[3];
-        opponentSummonZones = new GameObject[3];
+        localSummonZonesIds = new int[numberOfSummonZones];
+        opponentSummonZonesIds = new int[numberOfSummonZones];
+        localSummonZonesCards = new GameObject[numberOfSummonZones];
+        opponentSummonZonesCards = new GameObject[numberOfSummonZones];
     }
 
     void OnEnable()
@@ -43,12 +47,9 @@ public class FieldManager : MonoBehaviour
 	}
 
     void CardEnteredField(int viewId, int zoneIndex)
-    {       
+    {
         GameObject card = PhotonView.Find(viewId).gameObject;
-        if(card.GetPhotonView().isMine)
-        {
-            Debug.Log("Photon view id " + viewId + " entered field");
-        }
+       
         bool success = true;
         // check if this card was cancelled by something else
         if(cancelEntrance)
@@ -58,8 +59,18 @@ public class FieldManager : MonoBehaviour
         }
         else 
         {
-            //add to zone index
-            localSummonZones[zoneIndex] = card;
+            if (card.gameObject.GetPhotonView().isMine)
+            {
+                //add to zone index
+                localSummonZonesIds[zoneIndex] = viewId;
+                localSummonZonesCards[zoneIndex] = card;
+            }
+            else
+            {
+                //add to zone index
+                opponentSummonZonesIds[zoneIndex] = viewId;
+                opponentSummonZonesCards[zoneIndex] = card;
+            }
            
         }
         OnEnter(viewId, success);
@@ -69,10 +80,6 @@ public class FieldManager : MonoBehaviour
     void CardLeftField(int viewId, int zoneIndex)
     {
         GameObject card = PhotonView.Find(viewId).gameObject;
-        if (card.GetPhotonView().isMine)
-        {
-            Debug.Log("Photon view id " + viewId + " left field");
-        }
         bool success = true;
         if(cancelExit)
         {
@@ -81,8 +88,18 @@ public class FieldManager : MonoBehaviour
         }
         else
         {
-            //add to zone index
-            localSummonZones[zoneIndex] = null;
+            if (card.gameObject.GetPhotonView().isMine)
+            {
+                //add to zone index
+                localSummonZonesIds[zoneIndex] = -1;
+                localSummonZonesCards[zoneIndex] = null;
+            }
+            else
+            {
+                //add to zone index
+                opponentSummonZonesIds[zoneIndex] = -1;
+                opponentSummonZonesCards[zoneIndex] = null;
+            }
         }
         OnExit(viewId, success);
     }
@@ -95,5 +112,69 @@ public class FieldManager : MonoBehaviour
     void CancelNextExit()
     {
         cancelExit = true;
+    }
+
+    //returns all cards in play
+    public List<int> GetAllCards()
+    {
+        List<int> allCardViewIds = new List<int>();
+        for(int i = 0; i < numberOfSummonZones; i++)
+        {
+            if(localSummonZonesIds[i] != -1)
+            {
+                allCardViewIds.Add(localSummonZonesIds[i]);
+            }
+            if (opponentSummonZonesIds[i] != -1)
+            {
+                allCardViewIds.Add(localSummonZonesIds[i]);
+            }
+        }
+        return allCardViewIds;
+    }
+
+    //returns all creature cards in play
+    public List<int> GetAllCreatures()
+    {
+        List<int> allCardViewIds = new List<int>();
+        for (int i = 0; i < numberOfSummonZones; i++)
+        {
+            if (localSummonZonesIds[i] != -1 && localSummonZonesCards[i].GetComponent<CreatureCard>() != null)
+            {
+                allCardViewIds.Add(localSummonZonesIds[i]);
+            }
+            if (opponentSummonZonesIds[i] != -1 && opponentSummonZonesCards[i].GetComponent<CreatureCard>() != null)
+            {
+                allCardViewIds.Add(localSummonZonesIds[i]);
+            }
+        }
+        return allCardViewIds;
+    }
+
+    //returns all creature cards in play, owned by local player
+    public List<GameObject> GetOwnCreatures()
+    {
+        List<GameObject> allCardGameObjects = new List<GameObject>();
+        for (int i = 0; i < numberOfSummonZones; i++)
+        {
+            if (localSummonZonesCards[i].GetComponent<CreatureCard>() != null)
+            {
+                allCardGameObjects.Add(localSummonZonesCards[i]);
+            }
+        }
+        return allCardGameObjects;
+    }
+
+    //returns all creature cards in play, owned by opponent
+    public List<int> GetOpponentCreatures()
+    {
+        List<int> allCardViewIds = new List<int>();
+        for (int i = 0; i < numberOfSummonZones; i++)
+        {
+            if (opponentSummonZonesIds[i] != -1 && opponentSummonZonesCards[i].GetComponent<CreatureCard>() != null)
+            {
+                allCardViewIds.Add(localSummonZonesIds[i]);
+            }
+        }
+        return allCardViewIds;
     }
 }
