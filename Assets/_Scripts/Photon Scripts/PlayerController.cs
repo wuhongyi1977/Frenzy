@@ -422,8 +422,8 @@ public class PlayerController : MonoBehaviour
             //check if hand has room
             if (currentHandSize < maxHandSize)
             {
-                 //reset variables
-                GetComponent<BaseCard>().InitializeCard(playerID, cardScript.cardId);
+                //reset variables
+                cardScript.photonView.RPC("Reset", PhotonTargets.All);
                 photonView.RPC("DrawCard", PhotonTargets.All, viewId);
             }
         }

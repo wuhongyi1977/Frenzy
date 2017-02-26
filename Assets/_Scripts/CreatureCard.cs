@@ -34,6 +34,14 @@ public class CreatureCard : BaseCard
         rechargeTimeTextBox.text = rechargeTime.ToString();
     }
 
+    //resets variables if card is returned to hand
+    [PunRPC]
+    public override void Reset()
+    {
+        base.Reset();
+        InitializeStats();
+    }
+
     public override void Update()                //Abstract method for Update
     {
         base.Update();

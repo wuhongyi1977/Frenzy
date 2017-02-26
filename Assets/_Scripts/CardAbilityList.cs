@@ -67,7 +67,7 @@ public class CardAbilityList : MonoBehaviour
     private void ReturnCardToHand()
     {
         GameObject targetObj = cardScript.targetObject;
-        targetObj.GetPhotonView().RPC("ReturnToHand", PhotonTargets.All);
+        targetObj.GetComponent<BaseCard>().ReturnToHand();
     }
 
     private void FreezeCreature()

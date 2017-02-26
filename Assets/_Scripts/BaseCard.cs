@@ -32,6 +32,7 @@ public abstract class BaseCard : MonoBehaviour
     protected Text descriptionText;//< the text displayed to the player listing the card's abilities
     protected Text summonZoneTextBox;//< shows the casting timer
     protected Text cardTitleTextBox; //< displays the card title
+    protected Text castTimeTextBox; //< displays the cast time
     protected Text attackPowerTextBox; //< shows the attack power (creature only)
     protected Text defensePowerTextBox; //< shows the defense power (creature only)
     protected Text rechargeTimeTextBox; //< shows the recharge time (creature only)
@@ -141,7 +142,8 @@ public abstract class BaseCard : MonoBehaviour
             //Get all components
             descriptionText = cardLayoutCanvas.FindChild("DescriptionText").GetComponent<Text>();
             summonZoneTextBox = cardLayoutCanvas.FindChild("Counter").GetComponent<Text>(); 
-            cardTitleTextBox = cardLayoutCanvas.FindChild("CardTitle").GetComponent<Text>(); 
+            cardTitleTextBox = cardLayoutCanvas.FindChild("CardTitle").GetComponent<Text>();
+            castTimeTextBox = cardLayoutCanvas.FindChild("CastTime").GetComponent<Text>(); 
             attackPowerTextBox = cardLayoutCanvas.FindChild("AttackPower").GetComponent<Text>();
             defensePowerTextBox = cardLayoutCanvas.FindChild("DefensePower").GetComponent<Text>();
             rechargeTimeTextBox = cardLayoutCanvas.FindChild("RechargeTime").GetComponent<Text>();
@@ -162,6 +164,19 @@ public abstract class BaseCard : MonoBehaviour
         //audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
 
     }
+
+    //resets variables if card is returned to hand
+    [PunRPC]
+    public virtual void Reset()
+    {
+        currentCardState = cardState.InHand;
+        targetReticle.SetActive(false);
+        inactiveFilter.enabled = false;
+        cardBack.enabled = false;
+        targetLine.enabled = false;
+        summonZoneTextBox.text = "";
+    }
+
     public virtual void Start()             //Abstract method for start
     {
      
@@ -538,6 +553,7 @@ public abstract class BaseCard : MonoBehaviour
                     break;
                 case "CastTime":
                     castTime = float.Parse(nextString);
+                    castTimeTextBox.text = castTime.ToString();
                     break;
                 case "RechargeTime":
                     creatureStatValues.Add(currentString, nextString);
@@ -578,6 +594,7 @@ public abstract class BaseCard : MonoBehaviour
                     break;
             }
         }
+        
         //Set the proper art for the card
         SetArt();
         InitializeStats();
@@ -610,15 +627,11 @@ public abstract class BaseCard : MonoBehaviour
         }
     }
 
-    [PunRPC]
     //handles the functions for returning a card to a player's hand
     public void ReturnToHand()
     {
-        if (photonView.isMine)
-        {
+       
             Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");    
-            //clear summon zone text box
-            summonZoneTextBox.text = "";
             //play card return sound
             /*
             if (!playedCardReleaseSound)
@@ -631,9 +644,6 @@ public abstract class BaseCard : MonoBehaviour
 
             //Put the card into proper place
             localPlayerController.ReturnToHand(this.gameObject, photonView.viewID);
-        }
-
-
     }
 
 
