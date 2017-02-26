@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     public enum clickState { Empty,  HoldingCard, Targetting};
     public clickState currentClickState = clickState.Empty;
 
+    bool isDrawing = false;
+    Queue<IEnumerator> drawActions = new Queue<IEnumerator>();
+
     //PLAYER SETTINGS (TODO assign from playfab)
     //the number of cards in a player's deck
     const int deckSize = 40;
@@ -96,6 +99,8 @@ public class PlayerController : MonoBehaviour
         CheckOwnerAndGetComponents();
         //set your current health to the starting health value
         health = startingHealth;
+        //start loop for drawing queue
+        StartCoroutine(DrawProcess());
     }
 
     /**
@@ -350,25 +355,77 @@ public class PlayerController : MonoBehaviour
     }
 
     //NEW CARD DRAWING FUNCTION
-    //Sets up card variables and position of card in hand
     [PunRPC]
     public void DrawCard(int viewId)
     {
+        drawActions.Enqueue(DrawAndAdjustHand(viewId));
+        //increment the index of the deck (since a card has now been taken)
+        currentCardIndex++;
+    }
+
+    [PunRPC]
+    public void RemoveFromHand(int index)
+    {
+        Debug.Log("Trying to remove index: " + index);
+        if (playerHand[index] != null)
+        {
+            playerHand[index] = null;
+            //decrement hand size
+            currentHandSize--;
+            drawActions.Enqueue(RemoveAndAdjustHand(index));
+        }
+        else { Debug.Log("Unable to remove card from hand, no card at index"); }
+    }
+
+    private IEnumerator DrawProcess()
+    {
+        while (true)
+        {
+            if (drawActions.Count > 0)
+            {
+                Debug.Log("Draw action found!");
+                yield return StartCoroutine(drawActions.Dequeue());
+            }              
+            else
+            {
+                yield return null;
+            }
+              
+        }
+    }
+
+    IEnumerator DrawAndAdjustHand(int viewId)
+    {
+        Debug.Log("attempting to draw a card... Id is "+ viewId);
         GameObject cardToAdd = null;
         //find the spawned card, Set cards position
         if (cardToAdd = PhotonView.Find(viewId).gameObject)
-        {           
+        {
             //add it to the player's hand
             //playerHand.Add(cardToAdd);
             BaseCard cardScript = cardToAdd.GetComponent<BaseCard>();
-            int handIndex = AddToHand(cardToAdd); //< returns index of card 
+            int handIndex = 0; //< returns index of card 
+
+            for (int i = 0; i < maxHandSize; i++)
+            {
+                //if no card is stored at this index
+                if (playerHand[i] == null)
+                {
+                    playerHand[i] = cardToAdd;
+                    handIndex = i;
+                    //increment hand size
+                    currentHandSize++;
+                    break;
+                }
+            }
             cardToAdd.transform.position = handPositions[handIndex];//new Vector3(handZone.x + (currentHandSize * 5f), handZone.y, handZone.z);
             //set cards hand index and InHand state
-            cardScript.photonView.RPC("AddCardToHand", PhotonTargets.All, handIndex); 
-            //increment the index of the deck (since a card has now been taken)
-            currentCardIndex++;
+            cardScript.photonView.RPC("AddCardToHand", PhotonTargets.All, handIndex);
+   
         }
+        yield return new WaitForSeconds(0.5f);//null;
     }
+
 
     //places card into proper slot in hand
     int AddToHand(GameObject cardToAdd)
@@ -390,28 +447,23 @@ public class PlayerController : MonoBehaviour
 
     //removes card from specific index in hand
     //shifts cards down to fill empty slot
-    void RemoveFromHand(int index)
+    IEnumerator RemoveAndAdjustHand(int index)
     {
-        Debug.Log("Trying to remove index: " + index);
-        if (playerHand[index] != null)
-        {
-            playerHand[index] = null;
-            //decrement hand size
-            currentHandSize--;
 
-            for (int i = index+1; i < playerHand.Length; i++)
+        for (int i = index+1; i < playerHand.Length; i++)
+        {
+            if (playerHand[i] != null)
             {
-                if (playerHand[i] != null)
-                {
-                    //set card's hand index
-                    int cardHandindex = (playerHand[i].GetComponent<BaseCard>().handIndex -= 1);
-                    playerHand[i].transform.position = handPositions[cardHandindex];
-                    playerHand[i - 1] = playerHand[i];
-                    playerHand[i] = null;
-                }
+                //set card's hand index
+                int cardHandindex = (playerHand[i].GetComponent<BaseCard>().handIndex -= 1);
+                playerHand[i].transform.position = handPositions[cardHandindex];
+                playerHand[i - 1] = playerHand[i];
+                playerHand[i] = null;
             }
         }
-        else { Debug.Log("Unable to remove card from hand, no card at index");}
+        
+        
+        yield return null;
     }
 
     public void ReturnToHand(GameObject card, int viewId)
@@ -425,6 +477,8 @@ public class PlayerController : MonoBehaviour
                 //reset variables
                 cardScript.photonView.RPC("Reset", PhotonTargets.All);
                 photonView.RPC("DrawCard", PhotonTargets.All, viewId);
+                //subtract one since we just added a card to the deck, cancels the added one in drawcard
+                currentCardIndex--;
             }
         }
         else//< if card is dropped in an invalid place

@@ -73,7 +73,17 @@ public class FieldManager : MonoBehaviour
     [PunRPC]
     public void CounterHasCast()
     {
-        counterQueue.Dequeue().NotifyFieldManagerExit();
+        BaseCard successfulCounter = null;
+        foreach(BaseCard counterCard in counterQueue)
+        {
+            successfulCounter = counterQueue.Dequeue();
+            if (successfulCounter.currentCardState == BaseCard.cardState.InPlay)
+            {
+                successfulCounter.NotifyFieldManagerExit();
+                return;
+            }
+        }
+        
     }
 
     void CardEnteredField(int viewId, int zoneIndex)

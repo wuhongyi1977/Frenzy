@@ -73,4 +73,5 @@ MonoBehaviour:
   - Reset
   - IncreaseCounter
   - CounterHasCast
+  - RemoveFromHand
   DisableAutoOpenWizard: 1
