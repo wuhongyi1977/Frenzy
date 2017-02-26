@@ -7,6 +7,10 @@ using UnityEngine;
 /// </summary>
 public class CardAbilityList : MonoBehaviour
 {
+    public delegate void FieldHandlerCounter(BaseCard counterCard); 
+    public static event FieldHandlerCounter NotifyCounter;
+    
+
     BaseCard cardScript;
     public FieldManager fieldManager;
 
@@ -97,6 +101,11 @@ public class CardAbilityList : MonoBehaviour
             creatureCard.GetPhotonView().RPC("ModifyCreatureStats", PhotonTargets.All, 0, 0, amountToChangeRecharge);
         }
     } 
+
+    private void Counter()
+    {
+        NotifyCounter(GetComponent<BaseCard>());
+    }
 
 
 }

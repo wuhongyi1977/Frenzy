@@ -4,14 +4,21 @@ using UnityEngine;
 
 public class FieldManager : MonoBehaviour
 {
+
+    PhotonView photonView;
+
     // Event for field handler
     public delegate void FieldEvent(int viewId, bool success); //< receives the photon view from the event callback
     public static event FieldEvent OnEnter;
     public static event FieldEvent OnExit;
 
-    bool cancelEntrance = false;
-    bool cancelExit = false;
-    
+    /*
+    public delegate void CounterEvent(int viewId, bool success); 
+    public static event CounterEvent OnCounter;
+    */
+
+    private int opponentCounters = 0;
+    private Queue<BaseCard> counterQueue = new Queue<BaseCard>();
 
     private int numberOfSummonZones = 3;
     int[] localSummonZonesIds;
@@ -22,6 +29,7 @@ public class FieldManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        photonView = GetComponent<PhotonView>();
         localSummonZonesIds = new int[numberOfSummonZones];
         opponentSummonZonesIds = new int[numberOfSummonZones];
         localSummonZonesCards = new GameObject[numberOfSummonZones];
@@ -32,12 +40,15 @@ public class FieldManager : MonoBehaviour
     {
         BaseCard.NotifyEnter += CardEnteredField;
         BaseCard.NotifyExit += CardLeftField;
+        CardAbilityList.NotifyCounter += CounterCardPlayed;
+
     }
 
     void OnDisable()
     {
         BaseCard.NotifyEnter -= CardEnteredField;
         BaseCard.NotifyExit -= CardLeftField;
+        CardAbilityList.NotifyCounter -= CounterCardPlayed;
     }
 	
 	// Update is called once per frame
@@ -45,17 +56,35 @@ public class FieldManager : MonoBehaviour
     {
 		
 	}
+    
+    public void CounterCardPlayed(BaseCard counterCard)
+    {
+        //adds current counter to queue
+        counterQueue.Enqueue(counterCard);
+        photonView.RPC("IncreaseCounter", PhotonTargets.Others);
+    }
+
+    [PunRPC]
+    public void IncreaseCounter()
+    {
+        opponentCounters += 1;
+    }
+
+    [PunRPC]
+    public void CounterHasCast()
+    {
+        counterQueue.Dequeue().NotifyFieldManagerExit();
+    }
 
     void CardEnteredField(int viewId, int zoneIndex)
     {
         GameObject card = PhotonView.Find(viewId).gameObject;
-       
-        bool success = true;
         // check if this card was cancelled by something else
-        if(cancelEntrance)
+        if(card.gameObject.GetPhotonView().isMine && opponentCounters > 0)
         {
-            cancelEntrance = false;
-            success = false;
+            opponentCounters -= 1;
+            photonView.RPC("CounterHasCast", PhotonTargets.Others);
+            OnEnter(viewId, false);
         }
         else 
         {
@@ -71,9 +100,10 @@ public class FieldManager : MonoBehaviour
                 opponentSummonZonesIds[zoneIndex] = viewId;
                 opponentSummonZonesCards[zoneIndex] = card;
             }
-           
+            OnEnter(viewId, true);
+
         }
-        OnEnter(viewId, success);
+       
 
     }
 
@@ -81,38 +111,24 @@ public class FieldManager : MonoBehaviour
     {
         GameObject card = PhotonView.Find(viewId).gameObject;
         bool success = true;
-        if(cancelExit)
+       
+        if (card.gameObject.GetPhotonView().isMine)
         {
-            cancelExit = false;
-            success = false;
+            //add to zone index
+            localSummonZonesIds[zoneIndex] = -1;
+            localSummonZonesCards[zoneIndex] = null;
         }
         else
         {
-            if (card.gameObject.GetPhotonView().isMine)
-            {
-                //add to zone index
-                localSummonZonesIds[zoneIndex] = -1;
-                localSummonZonesCards[zoneIndex] = null;
-            }
-            else
-            {
-                //add to zone index
-                opponentSummonZonesIds[zoneIndex] = -1;
-                opponentSummonZonesCards[zoneIndex] = null;
-            }
+            //add to zone index
+            opponentSummonZonesIds[zoneIndex] = -1;
+            opponentSummonZonesCards[zoneIndex] = null;
         }
+        
         OnExit(viewId, success);
     }
 
-    void CancelNextEntrance()
-    {
-        cancelEntrance = true;
-    }
-
-    void CancelNextExit()
-    {
-        cancelExit = true;
-    }
+    
 
     //returns all cards in play
     public List<int> GetAllCards()
@@ -176,5 +192,12 @@ public class FieldManager : MonoBehaviour
             }
         }
         return allCardViewIds;
+    }
+
+    //Photon Serialize View
+    public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+       
+
     }
 }

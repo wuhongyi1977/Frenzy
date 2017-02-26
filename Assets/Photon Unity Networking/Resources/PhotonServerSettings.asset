@@ -71,4 +71,6 @@ MonoBehaviour:
   - EndFreeze
   - TargetLost
   - Reset
+  - IncreaseCounter
+  - CounterHasCast
   DisableAutoOpenWizard: 1

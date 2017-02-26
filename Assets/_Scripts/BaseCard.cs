@@ -196,7 +196,8 @@ public abstract class BaseCard : MonoBehaviour
                 casting = false;
                 //clear summon zone text
                 summonZoneTextBox.text = "";
-                PutIntoPlay();               
+                //call entrance event for field manager
+                NotifyEnter(photonView.viewID, zoneIndex);
             }
         }
 
@@ -209,11 +210,11 @@ public abstract class BaseCard : MonoBehaviour
     protected void EnterSuccess(int viewId, bool success)
     {
         //if this was the card that just entered and it entered successfully
-        if(viewId == photonView.viewID && success && photonView.isMine)
-        {       
-            if(success) //< if successful, activate OnPlay
+        if(viewId == photonView.viewID && photonView.isMine)
+        {
+            if (success) //< if successful, activate OnPlay
             {
-                OnPlay();
+                photonView.RPC("PutIntoPlay", PhotonTargets.All);
             } 
             else //< if not successful, destroy
             {
@@ -224,7 +225,7 @@ public abstract class BaseCard : MonoBehaviour
         }
         else //< if this is not the owned card, handle any events due to a card entering play
         {
-
+            CardEntersPlayTrigger(viewId);
         }
     }
 
@@ -442,8 +443,7 @@ public abstract class BaseCard : MonoBehaviour
         currentCardState = cardState.InPlay;
         inactiveFilter.enabled = false;
         targetReticle.SetActive(false);
-        //call entrance event for field manager
-        NotifyEnter(photonView.viewID, zoneIndex);
+        OnPlay();
 
         
     }
@@ -461,7 +461,7 @@ public abstract class BaseCard : MonoBehaviour
         if (currentCardState != cardState.InGraveyard)
         {          
 
-            Debug.Log(cardTitle + "sent to graveyard");
+            Debug.Log(cardTitle + " sent to graveyard");
             //Set state of card to being in the graveyard
             currentCardState = cardState.InGraveyard;
             summonZoneTextBox.text = "";
@@ -581,6 +581,7 @@ public abstract class BaseCard : MonoBehaviour
                 case "FreezeCreature":
                 case "ChangeCreatureAttackPower":
                 case "ChangeAllOwnCreatureRecharge":
+                case "Counter":
                     castAbilities.Add(currentString);
                     abilityValues.Add(currentString, nextString);
                     break;
