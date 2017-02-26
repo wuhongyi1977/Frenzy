@@ -85,13 +85,16 @@ public class CreatureCard : BaseCard
         if(photonView.isMine)
         {
             //if this creature has consume and the creature that left play belonged to this player
-            if ((currentCardState == cardState.InPlay || currentCardState == cardState.WaitForTarget) 
-                && creatureAbilities.Contains("Consume") && PhotonView.Find(viewId).isMine)
+            if (creatureAbilities.Contains("Consume") && (currentCardState == cardState.InPlay || currentCardState == cardState.WaitForTarget))
             {
-                //get value of consume
-                int consumeAmount = int.Parse(abilityValues["Consume"]);
-                //increase attack and defense by consume amount
-                photonView.RPC("ModifyCreatureStats", PhotonTargets.All, consumeAmount, consumeAmount, 0.0f);
+                PhotonView view = PhotonView.Find(viewId);
+                if(view.isMine && view.GetComponent<CreatureCard>())
+                {
+                    //get value of consume
+                    int consumeAmount = int.Parse(abilityValues["Consume"]);
+                    //increase attack and defense by consume amount
+                    photonView.RPC("ModifyCreatureStats", PhotonTargets.All, consumeAmount, consumeAmount, 0.0f);
+                }
             }
         }
         
