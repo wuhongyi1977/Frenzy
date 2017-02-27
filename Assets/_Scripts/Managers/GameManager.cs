@@ -4,14 +4,11 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    //NEW STUFF
+    public delegate void GameNotification();
+    public static event GameNotification GameStart;
+    
     //child of GameManager, assigned in inspector
-    public Canvas FieldUICanvas; 
-
-
-    //STORE STATIC REFERENCES TO BOTH PLAYERS?
-
-
+    public Canvas FieldUICanvas;
 
     //bool tracks if player is a network opponent or AI opponent
     public bool versusAi;
@@ -26,8 +23,8 @@ public class GameManager : MonoBehaviour
 	int player2Health = 20;
 
     //The panel and text box for when a player wins or loses
-    public GameObject gameEndPanel;
-    public Text gameEndText;
+    public GameObject gameNotifyPanel;
+    public Text gameNotifyText;
 
 
     // Use this for initialization
@@ -35,8 +32,9 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Running start function!!!!");
         Debug.Log("Spawning player object");
-       
-       
+
+        gameNotifyPanel.SetActive(true);
+        gameNotifyText.text = "Preparing Field...";
 
         //get this manager's photon view
         //photonView = GetComponent<PhotonView>();
@@ -76,10 +74,22 @@ public class GameManager : MonoBehaviour
         {
             PhotonNetwork.Instantiate("AIController", Vector3.zero, Quaternion.identity, 0);
         }
+        StartCoroutine(BeginGame());
         
     }
-	//Method for when a damage card is done casting
-	public void dealDamage(int damage, int playerID)
+
+    IEnumerator BeginGame()
+    {
+        yield return new WaitForSeconds(3);
+        gameNotifyText.text = "Fight!";
+        yield return new WaitForSeconds(0.5f);
+        gameNotifyPanel.SetActive(false);
+        //display begin
+        GameStart();
+        yield return null;
+    }
+    //Method for when a damage card is done casting
+    public void dealDamage(int damage, int playerID)
 	{
 		//If the card belongs to player 1
 		if (playerID == 1) 
@@ -110,16 +120,16 @@ public class GameManager : MonoBehaviour
     public void Win()
     {
         Debug.Log("You Win!!");
-        gameEndPanel.SetActive(true);
-        gameEndText.text = "You Win! \n Returning To Menu";
+        gameNotifyPanel.SetActive(true);
+        gameNotifyText.text = "You Win! \n Returning To Menu";
         StartCoroutine("WaitForExit");
     }
 
     public void Lose()
     {
         Debug.Log("You Lost");
-        gameEndPanel.SetActive(true);
-        gameEndText.text = "You Lost \n Returning To Menu";
+        gameNotifyPanel.SetActive(true);
+        gameNotifyText.text = "You Lost \n Returning To Menu";
         StartCoroutine("WaitForExit");
       
     }

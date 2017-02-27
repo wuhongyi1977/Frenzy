@@ -759,8 +759,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FieldUICanvas: {fileID: 1405134319}
   versusAi: 0
-  gameEndPanel: {fileID: 621909171}
-  gameEndText: {fileID: 1476929838}
+  gameNotifyPanel: {fileID: 621909171}
+  gameNotifyText: {fileID: 1476929838}
 --- !u!114 &554367206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -783,7 +783,7 @@ GameObject:
   - component: {fileID: 621909174}
   - component: {fileID: 621909173}
   m_Layer: 5
-  m_Name: GameEndPanel
+  m_Name: GameNotifyPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2227,7 +2227,7 @@ GameObject:
   - component: {fileID: 1476929839}
   - component: {fileID: 1476929838}
   m_Layer: 5
-  m_Name: GameEndText
+  m_Name: GameNotifyText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

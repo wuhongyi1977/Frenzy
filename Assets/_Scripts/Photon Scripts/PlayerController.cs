@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
     bool isDrawing = false;
     Queue<IEnumerator> drawActions = new Queue<IEnumerator>();
 
+    bool allowInput = false;
+
     //PLAYER SETTINGS (TODO assign from playfab)
     //the number of cards in a player's deck
     const int deckSize = 40;
@@ -79,7 +81,19 @@ public class PlayerController : MonoBehaviour
     //The game manager object
     GameManager gameManager;
     
+    void OnEnable()
+    {
+        GameManager.GameStart += ActivateInput;
+    }
+    void OnDisable()
+    {
+        GameManager.GameStart -= ActivateInput;
+    }
 
+    void ActivateInput()
+    {
+        allowInput = true;
+    }
 
     void Awake()
     {
@@ -208,8 +222,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        //checks for mouse clicks and collisions
-        CheckInput();
+        //checks for mouse clicks and collisions (once field is set up)
+        if(allowInput)
+        {
+            CheckInput();
+        }       
         //if this controller belongs to the local player
         if(opponent == null && photonView.isMine && GameObject.Find("NetworkOpponent") != null)
         {opponent = GameObject.Find("NetworkOpponent").GetComponent<PlayerController>();}
