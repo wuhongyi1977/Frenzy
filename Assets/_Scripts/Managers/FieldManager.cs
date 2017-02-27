@@ -182,7 +182,7 @@ public class FieldManager : MonoBehaviour
         List<GameObject> allCardGameObjects = new List<GameObject>();
         for (int i = 0; i < numberOfSummonZones; i++)
         {
-            if (localSummonZonesCards[i].GetComponent<CreatureCard>() != null)
+            if (localSummonZonesCards[i] != null && !localSummonZonesCards[i].GetComponent<CreatureCard>().Equals(null))
             {
                 allCardGameObjects.Add(localSummonZonesCards[i]);
             }

@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
     private BaseCard selectedCardScript = null;
 
     //PLAYER STATS
-    int health;  //< Player's current health
+    int health = 200;  //< Player's current health, set to a high value so its over 0, sets to proper value at start
     //The player ID (1 is local player, 2 is opponent)
     private int playerID = 1; // TODO change to Enum (Unassigned, Local, Opponent)
 
@@ -233,7 +233,7 @@ public class PlayerController : MonoBehaviour
         //keep health text updated to current health
         healthTextBox.text = "Life: " + health;
         //TODO put this back
-        //CheckForLoss();
+        CheckForLoss();
         DrawTimer();
     }
 
