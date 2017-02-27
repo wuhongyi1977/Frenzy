@@ -443,8 +443,10 @@ public abstract class BaseCard : MonoBehaviour
         currentCardState = cardState.InPlay;
         inactiveFilter.enabled = false;
         targetReticle.SetActive(false);
-        OnPlay();
-
+        if(photonView.isMine)
+        {
+            OnPlay();
+        }
         
     }
 

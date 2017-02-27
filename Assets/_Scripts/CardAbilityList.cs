@@ -12,12 +12,12 @@ public class CardAbilityList : MonoBehaviour
     
 
     BaseCard cardScript;
-    public FieldManager fieldManager;
+    //public FieldManager fieldManager;
 
     private void Start()
     {
         cardScript = GetComponent<BaseCard>();
-        fieldManager = GameObject.Find("FieldManager").GetComponent<FieldManager>();
+       
     }
 
     public void UseCardAbility(string abilityToCall)
@@ -41,14 +41,14 @@ public class CardAbilityList : MonoBehaviour
     private void TargetHealthChange()
     {
         GameObject targetObj = cardScript.targetObject;
-        int healthChange = int.Parse(cardScript.abilityValues["TargetHealthChange"]);
-        //creature health change (must be negative because creature damage expects a positive value for damage)
-        if (targetObj.GetComponent<CreatureCard>() != null)
-        {targetObj.GetPhotonView().RPC("TakeDamage", PhotonTargets.Others, -healthChange);}
-        else if (targetObj.tag == "Player1") //< local player
+        int healthChange = int.Parse(cardScript.abilityValues["TargetHealthChange"]);             
+        if (targetObj.tag == "Player1") //< local player
         {cardScript.localPlayerController.ChangeHealth(healthChange);}
         else if (targetObj.tag == "Player2") //< opponent
         {cardScript.opponentPlayerController.photonView.RPC("ChangeHealth", PhotonTargets.Others, healthChange);}
+        //creature health change (must be negative because creature damage expects a positive value for damage) 
+        else if (targetObj.tag == "Card" && targetObj.GetComponent<CreatureCard>())
+        { targetObj.GetPhotonView().RPC("TakeDamage", PhotonTargets.Others, -healthChange); }
     }
 
     // damages or heals the local player (positive values for healing, negative for damage)
@@ -79,7 +79,7 @@ public class CardAbilityList : MonoBehaviour
         GameObject targetObj = cardScript.targetObject;
         float freezeDuration = float.Parse(cardScript.abilityValues["FreezeCreature"]);
         //creature health change (must be negative because creature damage expects a positive value for damage)
-        if (targetObj.GetComponent<CreatureCard>() != null)
+        if (targetObj.tag == "Card" && targetObj.GetComponent<CreatureCard>() != null)
         { targetObj.GetPhotonView().RPC("Freeze", PhotonTargets.All, freezeDuration); }
     }
 
@@ -88,13 +88,13 @@ public class CardAbilityList : MonoBehaviour
         GameObject targetObj = cardScript.targetObject;
         int amountToChangeAttack = int.Parse(cardScript.abilityValues["ChangeCreatureAttackPower"]);
         //creature health change (must be negative because creature damage expects a positive value for damage)
-        if (targetObj.GetComponent<CreatureCard>() != null)
+        if (targetObj.tag == "Card" && targetObj.GetComponent<CreatureCard>() != null)
         { targetObj.GetPhotonView().RPC("ModifyCreatureStats", PhotonTargets.All, amountToChangeAttack, 0, 0.0f); }
     }
 
     private void ChangeAllOwnCreatureRecharge()
     {
-        List<GameObject> allOwnedCreatures =  fieldManager.GetOwnCreatures();
+        List<GameObject> allOwnedCreatures = GameObject.FindGameObjectWithTag("FieldManager").GetComponent<FieldManager>().GetOwnCreatures();
         float amountToChangeRecharge = float.Parse(cardScript.abilityValues["ChangeAllOwnCreatureRecharge"]);
         foreach (GameObject creatureCard in allOwnedCreatures)
         {

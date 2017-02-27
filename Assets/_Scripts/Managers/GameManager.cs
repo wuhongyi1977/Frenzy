@@ -6,7 +6,11 @@ public class GameManager : MonoBehaviour
 {
     public delegate void GameNotification();
     public static event GameNotification GameStart;
-    
+
+    PhotonView photonView;
+
+    bool gameStarts = false;
+
     //child of GameManager, assigned in inspector
     public Canvas FieldUICanvas;
 
@@ -26,19 +30,24 @@ public class GameManager : MonoBehaviour
     public GameObject gameNotifyPanel;
     public Text gameNotifyText;
 
+    int playersInScene = 0;
 
     // Use this for initialization
     void Start ()
     {
+
+        photonView = GetComponent<PhotonView>();
+        if (PhotonNetwork.isMasterClient)
+        {
+            PhotonNetwork.InstantiateSceneObject("FieldManager", transform.position, Quaternion.identity, 0, null);
+        }
+
+
         Debug.Log("Running start function!!!!");
         Debug.Log("Spawning player object");
 
         gameNotifyPanel.SetActive(true);
         gameNotifyText.text = "Preparing Field...";
-
-        //get this manager's photon view
-        //photonView = GetComponent<PhotonView>();
-        StartCoroutine("TimedCall");
  
         //if there is another player in the room
         if (PhotonNetwork.room != null && PhotonNetwork.room.maxPlayers == 2)
@@ -52,30 +61,33 @@ public class GameManager : MonoBehaviour
             //set bool to indicate computer player
             versusAi = true;
         }
-    }
-	
-	
-    //TEMP CALL TO SPAWN PLAYERS
-    IEnumerator TimedCall()
-    {
-        
-        yield return new WaitForSeconds(5);
-        SpawnPlayers();
-      
-        yield return null;
-    }
-    ///////////////////////////
-    public void SpawnPlayers()
-    {
-     
-        PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
-        //Spawn AI if this is a single player game
-        if(PhotonNetwork.isMasterClient && PhotonNetwork.room.maxPlayers == 1)
+
+        //spawn player
+        if(!PhotonNetwork.isMasterClient)
         {
-            PhotonNetwork.Instantiate("AIController", Vector3.zero, Quaternion.identity, 0);
+            PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
+            photonView.RPC("SpawnPlayer", PhotonTargets.Others);
         }
-        StartCoroutine(BeginGame());
         
+        
+    }
+
+    private void Update()
+    {
+        
+        if( gameStarts == false && GameObject.Find("NetworkOpponent"))
+        {
+            gameStarts = true;
+            StartCoroutine(BeginGame());
+        }
+    }
+
+
+    // only master will call this
+    [PunRPC]
+    void SpawnPlayer()
+    {
+        PhotonNetwork.Instantiate("PlayerController", Vector3.zero, Quaternion.identity, 0);
     }
 
     IEnumerator BeginGame()
@@ -163,5 +175,19 @@ public class GameManager : MonoBehaviour
             PhotonNetwork.Disconnect();
         }
     }
-   
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            
+
+        }
+        else
+        {
+            
+        }
+
+    }
+
 }

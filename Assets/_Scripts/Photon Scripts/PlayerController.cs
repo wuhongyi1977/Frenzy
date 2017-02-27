@@ -108,7 +108,7 @@ public class PlayerController : MonoBehaviour
         // set card deck equal to deck size
         cardDeck = new List<int>(deckSize);      
         //get a reference to the game manager
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         //Check if the local player or network opponent owns this controller
         CheckOwnerAndGetComponents();
         //set your current health to the starting health value
