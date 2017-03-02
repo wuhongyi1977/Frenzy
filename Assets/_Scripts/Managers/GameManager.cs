@@ -37,10 +37,6 @@ public class GameManager : MonoBehaviour
     {
 
         photonView = GetComponent<PhotonView>();
-        if (PhotonNetwork.isMasterClient)
-        {
-            PhotonNetwork.InstantiateSceneObject("FieldManager", transform.position, Quaternion.identity, 0, null);
-        }
 
 
         Debug.Log("Running start function!!!!");
@@ -92,6 +88,12 @@ public class GameManager : MonoBehaviour
 
     IEnumerator BeginGame()
     {
+        //create field manager
+        if (PhotonNetwork.isMasterClient)
+        {
+            PhotonNetwork.InstantiateSceneObject("FieldManager", transform.position, Quaternion.identity, 0, null);
+        }
+        //start game
         yield return new WaitForSeconds(3);
         gameNotifyText.text = "Fight!";
         yield return new WaitForSeconds(0.5f);

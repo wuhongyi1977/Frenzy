@@ -9,10 +9,28 @@ public class CardAbilityList : MonoBehaviour
 {
     public delegate void FieldHandlerCounter(BaseCard counterCard); 
     public static event FieldHandlerCounter NotifyCounter;
-    
+
+    //TEST
+    public FieldManager fieldManager;
 
     BaseCard cardScript;
     //public FieldManager fieldManager;
+
+
+    private void OnEnable()
+    {
+        FieldManager.SendFieldManagerScript += GetFieldManager;
+    }
+
+    private void OnDisable()
+    {
+        FieldManager.SendFieldManagerScript -= GetFieldManager;
+    }
+
+    public void GetFieldManager(FieldManager managerScript)
+    {
+        fieldManager = managerScript;
+    }
 
     private void Start()
     {
@@ -24,6 +42,8 @@ public class CardAbilityList : MonoBehaviour
     {
         Invoke(abilityToCall, 0);
     }
+
+    
 
 
 
@@ -94,7 +114,7 @@ public class CardAbilityList : MonoBehaviour
 
     private void ChangeAllOwnCreatureRecharge()
     {
-        List<GameObject> allOwnedCreatures = GameObject.FindGameObjectWithTag("FieldManager").GetComponent<FieldManager>().GetOwnCreatures();
+        List<GameObject> allOwnedCreatures = fieldManager.GetOwnCreatures();
         float amountToChangeRecharge = float.Parse(cardScript.abilityValues["ChangeAllOwnCreatureRecharge"]);
         foreach (GameObject creatureCard in allOwnedCreatures)
         {

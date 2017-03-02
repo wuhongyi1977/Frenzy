@@ -8,9 +8,14 @@ public class FieldManager : MonoBehaviour
     PhotonView photonView;
 
     // Event for field handler
+    public delegate void SendReference(FieldManager script); //< receives the photon view from the event callback
+    public static event SendReference SendFieldManagerScript;
+
     public delegate void FieldEvent(int viewId, bool success); //< receives the photon view from the event callback
     public static event FieldEvent OnEnter;
     public static event FieldEvent OnExit;
+
+    
 
     /*
     public delegate void CounterEvent(int viewId, bool success); 
@@ -21,10 +26,10 @@ public class FieldManager : MonoBehaviour
     private Queue<BaseCard> counterQueue = new Queue<BaseCard>();
 
     private int numberOfSummonZones = 3;
-    int[] localSummonZonesIds;
-    GameObject[] localSummonZonesCards;
-    int[] opponentSummonZonesIds;  
-    GameObject[] opponentSummonZonesCards;
+    public int[] localSummonZonesIds;
+    public GameObject[] localSummonZonesCards;
+    public int[] opponentSummonZonesIds;  
+    public GameObject[] opponentSummonZonesCards;
 
     // Use this for initialization
     void Start ()
@@ -34,6 +39,20 @@ public class FieldManager : MonoBehaviour
         opponentSummonZonesIds = new int[numberOfSummonZones];
         localSummonZonesCards = new GameObject[numberOfSummonZones];
         opponentSummonZonesCards = new GameObject[numberOfSummonZones];
+
+        //initialize zones to empty
+        for(int i = 0; i < numberOfSummonZones; i++)
+        {
+            localSummonZonesIds[i] = -1;
+            opponentSummonZonesIds[i] = -1;
+            localSummonZonesCards[i] = null;
+            opponentSummonZonesCards[i] = null;
+        }
+        if(SendFieldManagerScript != null)
+        {
+            SendFieldManagerScript(this);
+        }
+        
     }
 
     void OnEnable()
@@ -182,7 +201,7 @@ public class FieldManager : MonoBehaviour
         List<GameObject> allCardGameObjects = new List<GameObject>();
         for (int i = 0; i < numberOfSummonZones; i++)
         {
-            if (localSummonZonesCards[i] != null && !localSummonZonesCards[i].GetComponent<CreatureCard>().Equals(null))
+            if (localSummonZonesCards[i].GetComponent<CreatureCard>())
             {
                 allCardGameObjects.Add(localSummonZonesCards[i]);
             }
