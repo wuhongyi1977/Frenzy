@@ -57,6 +57,8 @@ public abstract class BaseCard : MonoBehaviour
     //reference to zone this card is occupying
     public int zoneIndex;
 
+    private Color initialTextColor;
+
 
     //STATS 
     //all card stats are here, are assigned by custom data from Playfab
@@ -157,7 +159,7 @@ public abstract class BaseCard : MonoBehaviour
 
             cardCanvasScript = cardLayoutCanvas.GetComponent<Canvas>();
         }
-        
+        initialTextColor = summonZoneTextBox.color;
         startingScale = transform.localScale;
         zoomScale = startingScale * 2;
         cardTitleTextBox.text = cardTitle;
@@ -169,11 +171,15 @@ public abstract class BaseCard : MonoBehaviour
     [PunRPC]
     public virtual void Reset()
     {
-        currentCardState = cardState.InHand;
+        currentCardState = cardState.OutOfPlay;
+        castCountdown = castTime;
+        casting = false;
+        summonZoneTextBox.color = initialTextColor;
         targetReticle.SetActive(false);
         inactiveFilter.enabled = false;
         cardBack.enabled = false;
         targetLine.enabled = false;
+        targetObject = null;
         summonZoneTextBox.text = "";
     }
 
@@ -308,7 +314,7 @@ public abstract class BaseCard : MonoBehaviour
             MoveReticle(transform.position);
             return;
         }
-
+        CreatureCard targetCreatureScript;
         if (currentCardState == cardState.WaitForCastTarget)
         {
             //check against cast target list
@@ -319,10 +325,15 @@ public abstract class BaseCard : MonoBehaviour
                     AcceptTargetAndCast(potentialTarget);
                     return;
                 }
-                else if(potentialTarget.GetComponent<CreatureCard>())
+                else if(targetCreatureScript = potentialTarget.GetComponent<CreatureCard>())
                 {
-                    AcceptTargetAndCast(potentialTarget);
-                    return;
+                    if(targetCreatureScript.currentCardState == BaseCard.cardState.InPlay ||
+                        targetCreatureScript.currentCardState == BaseCard.cardState.WaitForTarget)
+                    {
+                        AcceptTargetAndCast(potentialTarget);
+                        return;
+                    }
+                   
                 }
             }            
             if(castTarget == "Player" && (potentialTarget.tag == "Player1" || potentialTarget.tag == "Player2"))
@@ -330,10 +341,14 @@ public abstract class BaseCard : MonoBehaviour
                 AcceptTargetAndCast(potentialTarget);
                 return;
             }
-            else if (castTarget == "Creature" && potentialTarget.GetComponent<CreatureCard>())
+            else if (castTarget == "Creature" && (targetCreatureScript = potentialTarget.GetComponent<CreatureCard>()))
             {
-                AcceptTargetAndCast(potentialTarget);
-                return;
+                if (targetCreatureScript.currentCardState == BaseCard.cardState.InPlay ||
+                        targetCreatureScript.currentCardState == BaseCard.cardState.WaitForTarget)
+                {
+                    AcceptTargetAndCast(potentialTarget);
+                    return;
+                }
             }
             else
             {
@@ -348,10 +363,15 @@ public abstract class BaseCard : MonoBehaviour
                 targetObject = potentialTarget.gameObject;
                 return;
             }
-            else if (potentialTarget.GetComponent<CreatureCard>())
+            else if (targetCreatureScript = potentialTarget.GetComponent<CreatureCard>())
             {
-                targetObject = potentialTarget.gameObject;
-                return;
+                if (targetCreatureScript.currentCardState == BaseCard.cardState.InPlay ||
+                        targetCreatureScript.currentCardState == BaseCard.cardState.WaitForTarget)
+                {
+                    targetObject = potentialTarget.gameObject;
+                    return;
+                }
+                
             }
         }
         else if (currentCardState == cardState.InPlay)
@@ -501,14 +521,7 @@ public abstract class BaseCard : MonoBehaviour
        
     }
 
-    /*
-    public void setGraveyardVariables()
-    {
-        inSummonZone = false;
-        inGraveyard = true;
-        doneAddingToGraveyard = true;
-    }
-    */
+  
     public void InitializeCard(int ownerID, string id)
     {
         playerID = ownerID;
@@ -646,7 +659,15 @@ public abstract class BaseCard : MonoBehaviour
             //RETURN TO HAND
 
             //Put the card into proper place
-            localPlayerController.ReturnToHand(this.gameObject, photonView.viewID);
+        if(photonView.isMine)
+        {
+            localPlayerController.ReturnToHand(this.gameObject, photonView.viewID, zoneIndex);
+        }
+        else
+        {
+            opponentPlayerController.ReturnToHand(this.gameObject, photonView.viewID, zoneIndex);
+        }
+           
     }
 
 

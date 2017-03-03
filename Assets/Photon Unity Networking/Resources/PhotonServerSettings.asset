@@ -77,4 +77,5 @@ MonoBehaviour:
   - PlayerLoadedScene
   - BeginSpawn
   - SpawnPlayer
+  - ReturnCardToHand
   DisableAutoOpenWizard: 1

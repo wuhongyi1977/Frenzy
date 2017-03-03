@@ -380,6 +380,8 @@ public class PlayerController : MonoBehaviour
         currentCardIndex++;
     }
 
+
+
     [PunRPC]
     public void RemoveFromHand(int index)
     {
@@ -483,23 +485,34 @@ public class PlayerController : MonoBehaviour
         yield return null;
     }
 
-    public void ReturnToHand(GameObject card, int viewId)
+    public void ReturnToHand(GameObject card, int viewId, int zoneIndex)
     {
         BaseCard cardScript = card.GetComponent<BaseCard>();
-        if (cardScript.currentCardState == BaseCard.cardState.InPlay) //< if the card is returned to hand from play
+        if (cardScript.currentCardState == BaseCard.cardState.InPlay
+            || cardScript.currentCardState == BaseCard.cardState.WaitForTarget) //< if the card is returned to hand from play
         {
             //check if hand has room
-            if (currentHandSize < maxHandSize)
-            {
-                //reset variables
-                cardScript.photonView.RPC("Reset", PhotonTargets.All);
-                photonView.RPC("DrawCard", PhotonTargets.All, viewId);
-                //subtract one since we just added a card to the deck, cancels the added one in drawcard
-                currentCardIndex--;
-            }
+           // if (currentHandSize < maxHandSize)
+           // {
+                photonView.RPC("ReturnCardToHand", PhotonTargets.All, viewId, zoneIndex);
+          //  }
         }
-        else//< if card is dropped in an invalid place
+        else if (cardScript.currentCardState == BaseCard.cardState.Held)//< if card is dropped in an invalid place
         { card.transform.position = cardScript.cardHandPos; }   
+    }
+
+    [PunRPC]
+    public void ReturnCardToHand(int viewId, int zoneIndex)
+    {
+        GameObject card = PhotonView.Find(viewId).gameObject;
+        BaseCard cardScript = card.GetComponent<BaseCard>();
+        // set occupied zone as empty
+        OccupiedZones[zoneIndex] = false;
+        card.transform.position = cardPool;
+        //reset variables
+        card.GetComponent<BaseCard>().Reset();
+        drawActions.Enqueue(DrawAndAdjustHand(viewId));
+        
     }
 
     // checks if a player's health has reached 0
