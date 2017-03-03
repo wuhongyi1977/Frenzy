@@ -41,7 +41,9 @@ public class CardCollectionScrollView : MonoBehaviour
         
     }
 
-    //Loads a list of all decks for this user
+    /*
+     * 
+     * //Loads a list of all decks for this user
     //creates a button for each deck in the scrollview
     public void LoadList()
     {
@@ -84,6 +86,62 @@ public class CardCollectionScrollView : MonoBehaviour
            
             //indicate that this card is already in deck
             CB.inDeck = false;
+            //set parent to scroll view
+            //second argument is worldPositionStays
+            //setting to false retain local orientation and scale rather than world orientation and scale
+            button.transform.SetParent(scrollContent.transform, false);
+
+        }
+        isLoaded = true;
+
+    }
+     */
+    //Loads a list of all decks for this user
+    //creates a button for each deck in the scrollview
+    public void LoadList()
+    {
+        isLoaded = false;
+        foreach (string itemId in PlayFabDataStore.fullGameCardList)
+        {
+
+            //instantiate a new button for this deck
+            GameObject button = Instantiate(Button_Template) as GameObject;
+            //set it active
+            button.SetActive(true);
+
+            /*
+            //store the button's script
+            //CardButtonScript CB = button.GetComponent<CardButtonScript>();
+            DraggableCard CB = button.GetComponent<DraggableCard>();
+            //set the cards scrollview variable to be this script
+            CB.SetCollectScrollView(this);
+           
+            //call the set id function for that button
+            //stores instance id for later use
+            CB.SetInstanceId(cardId);
+            
+            //sets item id based on instance id
+            string itemId = PlayFabDataStore.itemIdCollection[cardId];
+            CB.SetId(itemId);
+
+            //call the set name function for that button
+            //use the name associated with the id key in the dictionary
+            CB.SetName(PlayFabDataStore.cardNameList[itemId]);
+            //CB.SetId(cardId);
+
+            //if the card is already in the count list, increase the count
+            if (cardCount.ContainsKey(itemId))
+            {
+                cardCount[itemId] = (cardCount[itemId] + 1);
+            }
+            else //if the card isnt in the count list, add it and set to 1
+            {
+                cardCount.Add(itemId, 1);
+            }
+           
+            //indicate that this card is already in deck
+            CB.inDeck = false;
+            */
             //set parent to scroll view
             //second argument is worldPositionStays
             //setting to false retain local orientation and scale rather than world orientation and scale

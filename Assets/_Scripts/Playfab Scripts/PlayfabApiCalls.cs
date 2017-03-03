@@ -268,6 +268,7 @@ public class PlayfabApiCalls : MonoBehaviour
                 //only store info if this is a card
                 if(item.ItemClass == "Card")
                 {
+                    PlayFabDataStore.fullGameCardList.Add(item.ItemId);
                     Debug.Log("Item id of this is :" + item.ItemId);
                     //store custom data for this card
                     string customData = item.CustomData;

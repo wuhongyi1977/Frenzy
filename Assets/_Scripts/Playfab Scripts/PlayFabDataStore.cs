@@ -28,6 +28,9 @@ public class PlayFabDataStore : MonoBehaviour
     //all description text for all cards
     public static Dictionary<string, string> cardDescriptions = new Dictionary<string, string>();
 
+    //all cards in existance by item id 
+    public static List<string> fullGameCardList = new List<string>();
+
     //all cards owned by instance id (unique to every object)
     public static List<string> cardCollection = new List<string>();
     //all cards item id <itemInstanceId, itemId> (instance id is unique, can be duplicate item id's if it is the same type of card)
