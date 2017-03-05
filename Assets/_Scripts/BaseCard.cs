@@ -14,6 +14,11 @@ public abstract class BaseCard : MonoBehaviour
     public static event FieldHandlerCheck NotifyEnter;
     public static event FieldHandlerCheck NotifyExit;
 
+    //Events for Audio Handler
+    public delegate void SoundEffectEvent(string soundEffectName); 
+    public static event SoundEffectEvent PlaySound;
+
+
 
     //PHOTON COMPONENTS
     public PhotonView photonView;
@@ -100,21 +105,6 @@ public abstract class BaseCard : MonoBehaviour
     public PlayerController localPlayerController;
     public PlayerController opponentPlayerController;
 
-   
-
-
-    //SOUND VARIABLES
-    //The variable for the script attached to the AudioManager object
-    protected AudioManager audioManager;
-    //variables to prevent spamming of sounds
-    protected bool playedCardSelectedSound;
-    protected bool playedCardPickupSound;
-    protected bool playedCardBuildupSound;
-    protected bool playedCardReleaseSound;
-    protected bool playedCardInSpellSlotSound;
-    //END SOUND VARIABLES 
-
-
 
     protected void OnEnable()
     {
@@ -163,8 +153,6 @@ public abstract class BaseCard : MonoBehaviour
         startingScale = transform.localScale;
         zoomScale = startingScale * 2;
         cardTitleTextBox.text = cardTitle;
-        //audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
-
     }
 
     //resets variables if card is returned to hand
@@ -298,7 +286,10 @@ public abstract class BaseCard : MonoBehaviour
         transform.localScale = startingScale;
         currentCardState = cardState.Held;
         cardHandPos = gameObject.transform.position;
-        //audioManager.playCardPickup();    
+        if (PlaySound != null)
+        {
+            PlaySound("playCardPickup");
+        }
     }
     
     public void MoveReticle(Vector3 pos)
@@ -411,6 +402,10 @@ public abstract class BaseCard : MonoBehaviour
                     inactiveFilter.enabled = true;
                     handIndex = -1;
                     GetCastingTarget();
+                    if (PlaySound != null)
+                    {
+                        PlaySound("playCardInSpellSlot");
+                    }
                 }
                 break;
             }
@@ -442,6 +437,7 @@ public abstract class BaseCard : MonoBehaviour
     [PunRPC]
     public void Cast()
     {
+       
         Debug.Log("Casting card....");
         //if target != autocast
         // wait for target to be selected before casting
@@ -458,7 +454,10 @@ public abstract class BaseCard : MonoBehaviour
     [PunRPC]
     protected virtual void PutIntoPlay()
     {
-
+        if (PlaySound != null)
+        {
+            PlaySound("playCardBuildUp");
+        }
         Debug.Log("Card entering play");
         currentCardState = cardState.InPlay;
         inactiveFilter.enabled = false;
@@ -488,12 +487,11 @@ public abstract class BaseCard : MonoBehaviour
             currentCardState = cardState.InGraveyard;
             summonZoneTextBox.text = "";
             targetLine.enabled = false;
-            if (!playedCardReleaseSound && audioManager != null)
+            if(PlaySound != null)
             {
-                playedCardReleaseSound = true;
-                audioManager.playCardRelease();
+                PlaySound("playCardRelease");
             }
-
+            
             //If the card beings to player 1
             if (photonView.isMine)
             { localPlayerController.sendToGraveyard(gameObject, zoneIndex); }
@@ -521,7 +519,15 @@ public abstract class BaseCard : MonoBehaviour
        
     }
 
-  
+    public void OnMouseEnter()
+    {
+        if (currentCardState == cardState.InHand && PlaySound != null)
+        {
+            PlaySound("playCardSelect");
+        }
+    }
+
+
     public void InitializeCard(int ownerID, string id)
     {
         playerID = ownerID;
@@ -647,19 +653,16 @@ public abstract class BaseCard : MonoBehaviour
     public void ReturnToHand()
     {
        
-            Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");    
-            //play card return sound
-            /*
-            if (!playedCardReleaseSound)
-            {
-                playedCardReleaseSound = true;
-                audioManager.playCardRelease();
-            }
-            */
-            //RETURN TO HAND
+        Debug.Log(cardTitle + " returned to " + photonView.owner + " hand");
+        //play card return sound
+        if (PlaySound != null)
+        {
+            PlaySound("playCardRelease");
+        }
+        //RETURN TO HAND
 
-            //Put the card into proper place
-        if(photonView.isMine)
+        //Put the card into proper place
+        if (photonView.isMine)
         {
             localPlayerController.ReturnToHand(this.gameObject, photonView.viewID, zoneIndex);
         }
