@@ -6,11 +6,14 @@ using UnityEngine.UI;
 public class CardCollectionButton : MonoBehaviour {
 
     //The itemId of the Card (not unique, used to reference custom data)
-    public string cardId;
+    public string itemId;
     //the custom data of the card
     private string customData;
     //The name of the card
     public string cardTitle;
+
+    bool componentsFound = false;
+    bool initialized = false;
 
 
     //CARD COMPONENTS
@@ -35,6 +38,9 @@ public class CardCollectionButton : MonoBehaviour {
     public string cardType;
     //The time it takes for the card to be casted
     public float castTime;
+    public float rechargeTime;
+    public int attackPower;
+    public int defensePower;
     public string castTarget = null;
     //The potential targets for this cards abilities (could be creature, player, all, autocast)
     //does not include types of targets for a creature attack, but DOES include targets for special creature abilites (like direct damage on summon)
@@ -65,29 +71,31 @@ public class CardCollectionButton : MonoBehaviour {
         }
 
         cardTitleTextBox.text = cardTitle;
+        componentsFound = true;
     }
 	
 	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    public void InitializeCard(string id)
+	void Update ()
     {
-        SetCustomData(id);
+        if (componentsFound == true && initialized == false)
+        {
+            initialized = true;
+            SetCustomData();
+           
+        }
+        
     }
+
+  
     //takes a string of custom data and stores it
-    public void SetCustomData(string id)//string[] data)
+    public void SetCustomData()//string[] data)
     {
-        //set the card's id
-        cardId = id;
+     
         //set cards name 
-        cardTitle = PlayFabDataStore.cardNameList[id];
-        cardTitleTextBox.text = cardTitle;
-        //set cards description
-        descriptionText.text = PlayFabDataStore.cardDescriptions[id];
+        cardTitle = PlayFabDataStore.cardNameList[itemId];
+       
         // Retrieve the custom data for this card type
-        string[] data = PlayFabDataStore.cardCustomData[id];
+        string[] data = PlayFabDataStore.cardCustomData[itemId];
         //iterate through each string in the split data
         //goes to 1 less than total length because the last variable doesnt need to be checked and nextString will fail
         for (int j = 0; j < data.Length - 1; j++)//splitResultTest.Length -1; j++)
@@ -114,16 +122,17 @@ public class CardCollectionButton : MonoBehaviour {
                     break;
                 case "CastTime":
                     castTime = float.Parse(nextString);
-                    castTimeTextBox.text = castTime.ToString();
+                    
                     break;
                 case "RechargeTime":
-                    rechargeTimeTextBox.text = nextString;
+                    rechargeTime = float.Parse(nextString);
+                    
                     break;
                 case "AttackPower":
-                    attackPowerTextBox.text = nextString;
+                    attackPower = int.Parse(nextString);
                     break;
                 case "DefensePower":
-                    defensePowerTextBox.text = nextString;
+                    defensePower = int.Parse(nextString);
                     break;
 
                 default:
@@ -132,16 +141,23 @@ public class CardCollectionButton : MonoBehaviour {
         }
 
         //Set the proper art for the card
-        SetArt();
+        SetDisplays();
     }
 
    
 
-    public void SetArt()
+    public void SetDisplays()
     {
         if (artName != null && artName != "temp")
         {
             cardArtImage.overrideSprite = Resources.Load<Sprite>("CardArt/" + artName);
         }
+        cardTitleTextBox.text = cardTitle;
+        //set cards description
+        descriptionText.text = PlayFabDataStore.cardDescriptions[itemId];
+        castTimeTextBox.text = castTime.ToString();
+        rechargeTimeTextBox.text = rechargeTime.ToString();
+        attackPowerTextBox.text = attackPower.ToString();
+        defensePowerTextBox.text = defensePower.ToString();
     }
 }

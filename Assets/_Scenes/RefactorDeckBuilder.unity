@@ -1168,7 +1168,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1102387550}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed534d9d746eb5a43a57774a8691684e, type: 3}
   m_Name: 
@@ -1273,7 +1273,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1368573159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1325,7 +1325,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -305.26932, y: 18}
+  m_AnchoredPosition: {x: -305.09628, y: 18}
   m_SizeDelta: {x: 0, y: 200}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!1 &1509734276
@@ -1622,6 +1622,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardButton: {fileID: 1156036903030698, guid: 6425515fa97b00e429eeb087c469c1c1, type: 2}
+  collectionScrollView: {fileID: 747747710}
 --- !u!1 &1793646432
 GameObject:
   m_ObjectHideFlags: 0
