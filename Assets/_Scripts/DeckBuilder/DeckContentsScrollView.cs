@@ -36,7 +36,7 @@ public class DeckContentsScrollView : MonoBehaviour
         //store script for card collection
         cardCollectionScript = cardCollection.GetComponent<CardCollectionScrollView>();
         //load card list into scroll view
-        //StartCoroutine(LoadList());
+        StartCoroutine(LoadList());
     }
     //when panel is set inactive
     void OnDisable()

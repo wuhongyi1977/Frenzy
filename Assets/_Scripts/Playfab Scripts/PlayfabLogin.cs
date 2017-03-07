@@ -214,7 +214,7 @@ public class PlayfabLogin : MonoBehaviour
     //when player presses deck builder button on main menu
     public void DeckBuilder()
     {
-        PhotonNetwork.LoadLevel("RefactorDeckBuilder");
+        PhotonNetwork.LoadLevel("DeckBuilder");
     }
     //if the player fails to join a random room
     public void OnPhotonRandomJoinFailed()

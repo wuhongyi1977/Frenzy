@@ -11,3 +11,5 @@ EditorBuildSettings:
     path: Assets/_Scenes/RefactorTest.unity
   - enabled: 1
     path: Assets/_Scenes/RefactorDeckBuilder.unity
+  - enabled: 1
+    path: Assets/_Scenes/DeckBuilder.unity
