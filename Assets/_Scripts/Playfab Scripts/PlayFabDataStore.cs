@@ -15,6 +15,8 @@ public class PlayFabDataStore : MonoBehaviour
 
     //the number of cards in a deck
     public static int deckSize = 60;
+
+    public static int userGold = 0;
    
     //number of decks a player has stored
     public static int numberOfDecks;

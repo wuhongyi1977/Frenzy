@@ -316,5 +316,27 @@ public class PlayfabApiCalls : MonoBehaviour
         });
     }
 
+    public static void AddGold(int amountToAdd)
+    {
+        var request = new AddUserVirtualCurrencyRequest()
+        {
+            VirtualCurrency = "GD",
+            Amount = amountToAdd
+        };
+
+        PlayFabClientAPI.AddUserVirtualCurrency(request, (result) =>
+        {
+            Debug.Log(amountToAdd+" gold granted to local player");
+            //store the number of saved decks
+            PlayFabDataStore.userGold += amountToAdd;
+        },
+        (error) =>
+        {
+            Debug.Log("Gold not granted");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
 
 }

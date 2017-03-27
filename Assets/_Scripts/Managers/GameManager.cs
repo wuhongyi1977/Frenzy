@@ -134,6 +134,7 @@ public class GameManager : MonoBehaviour
     public void Win()
     {
         Debug.Log("You Win!!");
+        PlayfabApiCalls.AddGold(25);
         gameNotifyPanel.SetActive(true);
         gameNotifyText.text = "You Win! \n Returning To Menu";
         StartCoroutine("WaitForExit");
