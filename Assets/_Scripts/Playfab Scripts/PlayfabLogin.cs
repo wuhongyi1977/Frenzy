@@ -216,6 +216,12 @@ public class PlayfabLogin : MonoBehaviour
     {
         PhotonNetwork.LoadLevel("DeckBuilder");
     }
+
+    public void BoosterMenu()
+    {
+        PhotonNetwork.LoadLevel("BoosterPack");
+    }
+
     //if the player fails to join a random room
     public void OnPhotonRandomJoinFailed()
     {

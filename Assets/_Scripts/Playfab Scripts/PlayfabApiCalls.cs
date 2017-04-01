@@ -338,5 +338,76 @@ public class PlayfabApiCalls : MonoBehaviour
         });
     }
 
+    public static void SubtractGold(int amountToSubtract)
+    {
+        var request = new SubtractUserVirtualCurrencyRequest()
+        {
+            VirtualCurrency = "GD",
+            Amount = amountToSubtract
+        };
+
+        PlayFabClientAPI.SubtractUserVirtualCurrency(request, (result) =>
+        {
+            Debug.Log(amountToSubtract + " gold taken from local player");
+            //store the number of saved decks
+            PlayFabDataStore.userGold -= amountToSubtract;
+        },
+        (error) =>
+        {
+            Debug.Log("Gold not removed");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
+    public static void GrantPacksToUser(string[] packIdsToAdd)
+    {
+        var request = new ExecuteCloudScriptRequest()
+        {
+            FunctionName = "grantItemsToUser",
+            FunctionParameter = new { itemsToAdd = packIdsToAdd }
+        };
+
+        PlayFabClientAPI.ExecuteCloudScript(request, (result) =>
+        {
+            Debug.Log("Packss Granted To User");
+
+        },
+        (error) =>
+        {
+            Debug.Log("Packss Not Granted To User");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
+
+
+    public static void OpenPack(string packItemId)
+    {
+        var request = new UnlockContainerItemRequest()
+        {
+            ContainerItemId = packItemId
+        };
+
+        PlayFabClientAPI.UnlockContainerItem(request, (result) =>
+        {
+            Debug.Log("Pack opened");
+            //string[] grantedCards = new string[7];
+            //int index = 0;
+            foreach (ItemInstance item in result.GrantedItems)
+            {
+                //grantedCards[index++] = item.DisplayName;
+                Debug.Log(item.DisplayName+" received from pack");
+            }
+           
+
+        },
+        (error) =>
+        {
+            Debug.Log("Pack not opened ");
+            Debug.Log(error.ErrorMessage);
+            Debug.Log(error.ErrorDetails);
+        });
+    }
 
 }
