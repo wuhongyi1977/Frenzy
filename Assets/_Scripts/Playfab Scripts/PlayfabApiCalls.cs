@@ -327,8 +327,8 @@ public class PlayfabApiCalls : MonoBehaviour
         PlayFabClientAPI.AddUserVirtualCurrency(request, (result) =>
         {
             Debug.Log(amountToAdd+" gold granted to local player");
-            //store the number of saved decks
-            PlayFabDataStore.userGold += amountToAdd;
+            
+            PlayFabDataStore.userGold = result.Balance;
         },
         (error) =>
         {
@@ -349,8 +349,8 @@ public class PlayfabApiCalls : MonoBehaviour
         PlayFabClientAPI.SubtractUserVirtualCurrency(request, (result) =>
         {
             Debug.Log(amountToSubtract + " gold taken from local player");
-            //store the number of saved decks
-            PlayFabDataStore.userGold -= amountToSubtract;
+            
+            PlayFabDataStore.userGold = result.Balance;
         },
         (error) =>
         {

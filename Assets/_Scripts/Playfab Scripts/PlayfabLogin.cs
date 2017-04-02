@@ -431,6 +431,10 @@ public class PlayfabLogin : MonoBehaviour
             //Retrieve player decks
             PlayfabApiCalls.RetrieveDecks(PlayFabDataStore.playFabId);
             PlayfabApiCalls.RetrieveCatalogData();
+
+            //get user currency (adds nothing, but sets balance at the end of the call)
+            PlayfabApiCalls.AddGold(0);
+            
             
         }, (error) =>
         {
